@@ -22,7 +22,7 @@ godot::CL::TradingVehicle::TradingVehicle()
     : debug_mode_(false),
       speed_(0.0),
       destination_threshold_(0.0),
-      state_(Vehicle_IDLE),
+      state_(VEHICLE_IDLE),
       navigation_target_(Vector2()),
       direction_(Vector2()),
       animated_sprite_(nullptr),
@@ -92,31 +92,23 @@ void godot::CL::TradingVehicle::initialize_sprite_frames_() {
     animated_sprite_->set_sprite_frames(sprite_frames);
 }
 
-void godot::CL::TradingVehicle::_ready() {
-    if (::CL::is_in_editor()) {
-        e_assign_required_components_();
-    } else {
-        r_assign_required_components_();
-    }
-}
-
 void godot::CL::TradingVehicle::handle_movement(double delta) {
     if (::CL::is_in_editor()) {
         return;
     }
     if (Input::get_singleton()->is_action_just_pressed("mouse_click")) {
         navigation_target_ = get_global_mouse_position();
-        state_ = Vehicle_MOVING;
+        state_ = VEHICLE_MOVING;
     }
 
-    if (state_ != Vehicle_MOVING) {
+    if (state_ != VEHICLE_MOVING) {
         return;
     }
 
     auto pos = get_position();
     auto diff = navigation_target_ - pos;
     if (diff.length() <= destination_threshold_) {
-        state_ = Vehicle_IDLE;  // destination reached
+        state_ = VEHICLE_IDLE;  // destination reached
         animated_sprite_->stop();
         return;
     }
@@ -132,6 +124,14 @@ void godot::CL::TradingVehicle::update_animation() {
          Math_TAU));
     ERR_FAIL_COND_MSG(anim_idx >= AnimationSize, "anim_idx is out of bounds");
     animated_sprite_->play(AnimationNames[anim_idx].c_str());
+}
+
+void godot::CL::TradingVehicle::_ready() {
+    if (::CL::is_in_editor()) {
+        e_assign_required_components_();
+    } else {
+        r_assign_required_components_();
+    }
 }
 
 void godot::CL::TradingVehicle::_bind_methods() {
@@ -178,4 +178,10 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::add_property("TradingVehicle",
                           PropertyInfo(Variant::BOOL, "debug_mode"),
                           "set_debug_mode", "get_debug_mode");
+
+    // BIND ENUMS
+    BIND_ENUM_CONSTANT(VEHICLE_IDLE);
+    BIND_ENUM_CONSTANT(VEHICLE_MOVING);
+    BIND_ENUM_CONSTANT(VEHICLE_ONLOADING);
+    BIND_ENUM_CONSTANT(VEHICLE_OFFLOADING);
 }

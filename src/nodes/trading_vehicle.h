@@ -1,20 +1,20 @@
-#ifndef CL_TRADING_TRADING_VEHICLE_H
-#define CL_TRADING_TRADING_VEHICLE_H
+#ifndef CL_TRADING_TRADING_VEHICLE_H_
+#define CL_TRADING_TRADING_VEHICLE_H_
 
 #include <cstddef>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
+#include <godot_cpp/core/binder_common.hpp>
 #include <string>
 
 namespace godot::CL {
 
-// TODO find out how to expose to godot
 enum VehicleState {
-    Vehicle_IDLE = 0,
-    Vehicle_MOVING = 1,
-    Vehicle_ONLOADING = 2,
-    Vehicle_OFFLOADING = 3
+    VEHICLE_IDLE = 0,
+    VEHICLE_MOVING = 1,
+    VEHICLE_ONLOADING = 2,
+    VEHICLE_OFFLOADING = 3
 };
 
 /* TradingVehicle is anything that can move,
@@ -87,12 +87,11 @@ class TradingVehicle : public Area2D {
     }
     inline bool get_debug_mode() const { return debug_mode_; }
     inline double get_speed() const { return speed_; }
-    // TODO return type should be VehicleState
-    inline int get_state() const { return state_; }
+    inline VehicleState get_state() const { return state_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
     inline void set_debug_mode(const bool m) { debug_mode_ = m; }
     inline void set_speed(const double s) { speed_ = s; }
-    inline bool is_moving() const { return state_ == Vehicle_MOVING; }
+    inline bool is_moving() const { return state_ == VEHICLE_MOVING; }
     inline void set_navigation_target(const Vector2 t) {
         navigation_target_ = t;
     }
@@ -100,7 +99,8 @@ class TradingVehicle : public Area2D {
         destination_threshold_ = t;
     }
 };
-
 }  // namespace godot::CL
 
-#endif  // CL_TRADING_TRADING_VEHICLE_H
+VARIANT_ENUM_CAST(godot::CL::VehicleState);
+
+#endif  // CL_TRADING_TRADING_VEHICLE_H_

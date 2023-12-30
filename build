@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+
+# debug / dev build
+scons platform=windows target=template_debug debug_symbols=yes
+

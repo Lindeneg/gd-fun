@@ -1,29 +1,29 @@
 [gd_scene load_steps=9 format=3 uid="uid://bmsmew3bvvad8"]
 
-[ext_resource type="Script" path="res://core/trading_vehicle.gd" id="1_dkixm"]
-[ext_resource type="Texture2D" uid="uid://dgonmq5h2fad2" path="res://assets/Miscellaneous/WarShip.png" id="2_pg4hj"]
+[ext_resource type="Script" path="res://core/trading_vehicle.gd" id="1_breqh"]
+[ext_resource type="Texture2D" uid="uid://dgonmq5h2fad2" path="res://assets/Miscellaneous/WarShip.png" id="1_m0bei"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_lt1pe"]
-atlas = ExtResource("2_pg4hj")
+[sub_resource type="AtlasTexture" id="AtlasTexture_podb5"]
+atlas = ExtResource("1_m0bei")
 region = Rect2(64, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_q30io"]
-atlas = ExtResource("2_pg4hj")
+[sub_resource type="AtlasTexture" id="AtlasTexture_n4vw5"]
+atlas = ExtResource("1_m0bei")
 region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_70ebq"]
-atlas = ExtResource("2_pg4hj")
+[sub_resource type="AtlasTexture" id="AtlasTexture_skugm"]
+atlas = ExtResource("1_m0bei")
 region = Rect2(96, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_y522k"]
-atlas = ExtResource("2_pg4hj")
+[sub_resource type="AtlasTexture" id="AtlasTexture_wa5ba"]
+atlas = ExtResource("1_m0bei")
 region = Rect2(32, 0, 32, 32)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_44ae3"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_fqth0"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_lt1pe")
+"texture": SubResource("AtlasTexture_podb5")
 }],
 "loop": true,
 "name": &"down",
@@ -31,7 +31,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_q30io")
+"texture": SubResource("AtlasTexture_n4vw5")
 }],
 "loop": true,
 "name": &"left",
@@ -39,7 +39,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_70ebq")
+"texture": SubResource("AtlasTexture_skugm")
 }],
 "loop": true,
 "name": &"right",
@@ -47,24 +47,24 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_y522k")
+"texture": SubResource("AtlasTexture_wa5ba")
 }],
 "loop": true,
 "name": &"up",
 "speed": 5.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7dr43"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xllnl"]
 
-[node name="Ship" type="TradingVehicle"]
+[node name="TradingVehicle" type="TradingVehicle"]
 speed = 10.0
 destination_threshold = 0.5
 debug_mode = true
-script = ExtResource("1_dkixm")
+script = ExtResource("1_breqh")
 
 [node name="VehicleAnimation" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_44ae3")
-animation = &"up"
+sprite_frames = SubResource("SpriteFrames_fqth0")
+animation = &"down"
 
 [node name="VehicleCollider" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_7dr43")
+shape = SubResource("RectangleShape2D_xllnl")

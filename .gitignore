@@ -18,5 +18,7 @@ mono_crash.*.json
 extension_api.json
 compile_commands.json
 *.obj
+*.pdb
+*.rdbg
 bin
 

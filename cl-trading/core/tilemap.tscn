@@ -1,0 +1,256 @@
+[gd_scene load_steps=32 format=3 uid="uid://ckk670n4m2u80"]
+
+[ext_resource type="Texture2D" uid="uid://bcg7op4qoavig" path="res://assets/Ground/TexturedGrass.png" id="1_yc8i5"]
+[ext_resource type="Texture2D" uid="uid://bra5p5uhicrlu" path="res://assets/Ground/Grass.png" id="2_2e8h8"]
+[ext_resource type="Texture2D" uid="uid://bhdtt4tn1vvja" path="res://assets/Ground/Shore.png" id="3_0xdcl"]
+[ext_resource type="Texture2D" uid="uid://downpbwnsluch" path="res://assets/Nature/Rocks.png" id="3_6kbup"]
+[ext_resource type="Texture2D" uid="uid://dpwhqrpalg4x8" path="res://assets/Ground/Cliff.png" id="4_2jg40"]
+[ext_resource type="Texture2D" uid="uid://bkcojnulyrqkc" path="res://assets/Nature/Trees.png" id="4_j6m3w"]
+[ext_resource type="Texture2D" uid="uid://ilx7dhktnexa" path="res://assets/Nature/Tumbleweed.png" id="5_7bccx"]
+[ext_resource type="Texture2D" uid="uid://cfgaaqkl5ayl1" path="res://assets/Ground/Cliff-Water.png" id="5_46gnv"]
+[ext_resource type="Texture2D" uid="uid://b6rtoiju8nkms" path="res://assets/Nature/Wheatfield.png" id="6_0y0ai"]
+[ext_resource type="Texture2D" uid="uid://dykjq2yvw3m0d" path="res://assets/Nature/WinterDeadTrees.png" id="7_mq3kc"]
+[ext_resource type="Texture2D" uid="uid://bml8ksi8o6q0m" path="res://assets/Nature/WinterTrees.png" id="8_o3rwj"]
+[ext_resource type="Texture2D" uid="uid://derno3cw1sbv4" path="res://assets/Nature/Cactus.png" id="12_x6ibg"]
+[ext_resource type="Texture2D" uid="uid://de7r16i5tf0vo" path="res://assets/Nature/CoconutTrees.png" id="13_1s4tq"]
+[ext_resource type="Texture2D" uid="uid://n6arnmsdkfvd" path="res://assets/Nature/DeadTrees.png" id="14_wsiex"]
+[ext_resource type="Texture2D" uid="uid://dg2p3cxyyxq0s" path="res://assets/Nature/PineTrees.png" id="15_1h5p4"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jo6l1"]
+texture = ExtResource("1_yc8i5")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4hcxs"]
+texture = ExtResource("2_2e8h8")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jcbl4"]
+texture = ExtResource("3_6kbup")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ehb4m"]
+texture = ExtResource("4_j6m3w")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6ftx1"]
+texture = ExtResource("5_7bccx")
+0:0/0 = 0
+1:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_si7tw"]
+texture = ExtResource("6_0y0ai")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wo7jb"]
+texture = ExtResource("7_mq3kc")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ybr0w"]
+texture = ExtResource("8_o3rwj")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_41lok"]
+texture = ExtResource("3_0xdcl")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4q7jh"]
+texture = ExtResource("4_2jg40")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+3:5/0 = 0
+4:5/0 = 0
+5:5/0 = 0
+6:5/0 = 0
+0:6/0 = 0
+1:6/0 = 0
+2:6/0 = 0
+0:7/0 = 0
+1:7/0 = 0
+2:7/0 = 0
+3:7/0 = 0
+4:7/0 = 0
+5:7/0 = 0
+6:7/0 = 0
+0:8/0 = 0
+1:8/0 = 0
+2:8/0 = 0
+3:8/0 = 0
+4:8/0 = 0
+5:8/0 = 0
+6:8/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b4tj3"]
+texture = ExtResource("5_46gnv")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_u6dir"]
+texture = ExtResource("12_x6ibg")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ub1m8"]
+texture = ExtResource("13_1s4tq")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_je6l7"]
+texture = ExtResource("14_wsiex")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jgfws"]
+texture = ExtResource("15_1h5p4")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_4neke"]
+sources/0 = SubResource("TileSetAtlasSource_jo6l1")
+sources/1 = SubResource("TileSetAtlasSource_4hcxs")
+sources/2 = SubResource("TileSetAtlasSource_41lok")
+sources/4 = SubResource("TileSetAtlasSource_4q7jh")
+sources/5 = SubResource("TileSetAtlasSource_b4tj3")
+sources/6 = SubResource("TileSetAtlasSource_u6dir")
+sources/7 = SubResource("TileSetAtlasSource_ub1m8")
+sources/8 = SubResource("TileSetAtlasSource_je6l7")
+sources/9 = SubResource("TileSetAtlasSource_jgfws")
+sources/10 = SubResource("TileSetAtlasSource_jcbl4")
+sources/11 = SubResource("TileSetAtlasSource_ehb4m")
+sources/12 = SubResource("TileSetAtlasSource_6ftx1")
+sources/13 = SubResource("TileSetAtlasSource_si7tw")
+sources/14 = SubResource("TileSetAtlasSource_wo7jb")
+sources/15 = SubResource("TileSetAtlasSource_ybr0w")
+
+[node name="Tilemap" type="TileMap"]
+y_sort_enabled = true
+texture_filter = 1
+tile_set = SubResource("TileSet_4neke")
+format = 2
+layer_0/name = "Background"
+layer_0/y_sort_enabled = true
+layer_0/navigation_enabled = false
+layer_1/name = "Vegetation"
+layer_1/y_sort_enabled = true
+layer_1/navigation_enabled = false
+layer_1/tile_data = PackedInt32Array()
+layer_2/name = "Obstacle"
+layer_2/y_sort_enabled = true
+layer_2/navigation_enabled = false
+layer_2/tile_data = PackedInt32Array()

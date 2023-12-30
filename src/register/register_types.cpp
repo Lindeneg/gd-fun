@@ -5,6 +5,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "../nodes/tile_manager.h"
 #include "../nodes/trading_vehicle.h"
 
 using namespace godot;
@@ -14,6 +15,7 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
         return;
     }
     ClassDB::register_class<CL::TradingVehicle>();
+    ClassDB::register_class<CL::TileManager>();
 }
 
 void uninitialize_cl_trading_module(ModuleInitializationLevel p_level) {
