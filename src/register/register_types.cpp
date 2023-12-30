@@ -5,7 +5,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "../core/trading_vehicle.h"
+#include "../nodes/trading_vehicle.h"
 
 using namespace godot;
 

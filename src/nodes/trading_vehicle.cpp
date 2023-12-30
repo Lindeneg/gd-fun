@@ -12,7 +12,7 @@
 #include <godot_cpp/variant/variant.hpp>
 #include <iostream>
 
-#include "../nodes/utils.h"
+#include "../core/utils.h"
 
 const std::size_t godot::CL::TradingVehicle::AnimationSize{4};
 const std::string godot::CL::TradingVehicle::AnimationNames
