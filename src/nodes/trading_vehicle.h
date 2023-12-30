@@ -18,9 +18,7 @@ enum VehicleState {
 };
 
 /* TradingVehicle is anything that can move,
- * has animations and carries cargo from A<->B.
- *
- * */
+ * has animations and carries cargo from A<->B. */
 class TradingVehicle : public Area2D {
     GDCLASS(TradingVehicle, Area2D)
    private:
@@ -89,6 +87,7 @@ class TradingVehicle : public Area2D {
     }
     inline bool get_debug_mode() const { return debug_mode_; }
     inline double get_speed() const { return speed_; }
+    // TODO return type should be VehicleState
     inline int get_state() const { return state_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
     inline void set_debug_mode(const bool m) { debug_mode_ = m; }
