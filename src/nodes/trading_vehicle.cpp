@@ -1,5 +1,6 @@
 #include "trading_vehicle.h"
 
+#include <cstdint>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/classes/input.hpp>
@@ -14,7 +15,7 @@
 
 #include "../core/utils.h"
 
-const std::size_t godot::CL::TradingVehicle::AnimationSize{4};
+const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const std::string godot::CL::TradingVehicle::AnimationNames
     [godot::CL::TradingVehicle::AnimationSize]{"left", "up", "right", "down"};
 
@@ -44,13 +45,13 @@ godot::CL::TradingVehicle::~TradingVehicle() {
 // this is called on _ready notification at runtime
 void godot::CL::TradingVehicle::r_assign_required_components_() {
     if (animated_sprite_ == nullptr) {
-        auto anim = find_child("VehicleAnimation");
+        Node* anim = find_child("VehicleAnimation");
         ERR_FAIL_COND_MSG(anim == nullptr,
                           "required component VehicleAnimation missing");
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
     if (collision_shape_ == nullptr) {
-        auto col = find_child("VehicleCollider");
+        Node* col = find_child("VehicleCollider");
         ERR_FAIL_COND_MSG(col == nullptr,
                           "required component VehicleCollider missing");
         collision_shape_ = static_cast<CollisionShape2D*>(col);
@@ -63,7 +64,7 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
                       "component VehicleAnimation already assigned");
     ERR_FAIL_COND_MSG(collision_shape_ != nullptr,
                       "component VehicleCollider already assigned");
-    auto anim = find_child("VehicleAnimation");
+    Node* anim{find_child("VehicleAnimation")};
     if (anim == nullptr) {
         animated_sprite_ =
             create_component_<AnimatedSprite2D>("VehicleAnimation");
@@ -71,7 +72,7 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
     } else {
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
-    auto col = find_child("VehicleCollider");
+    Node* col{find_child("VehicleCollider")};
     if (col == nullptr) {
         collision_shape_ =
             create_component_<CollisionShape2D>("VehicleCollider");
@@ -82,11 +83,11 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
 }
 
 void godot::CL::TradingVehicle::initialize_sprite_frames_() {
-    auto sprite_frames = new SpriteFrames();
+    auto* sprite_frames{new SpriteFrames()};
     if (sprite_frames->has_animation("default")) {
         sprite_frames->remove_animation("default");
     }
-    for (auto animation : AnimationNames) {
+    for (const auto animation : AnimationNames) {
         sprite_frames->add_animation(animation.c_str());
     }
     animated_sprite_->set_sprite_frames(sprite_frames);
@@ -105,8 +106,8 @@ void godot::CL::TradingVehicle::handle_movement(double delta) {
         return;
     }
 
-    auto pos = get_position();
-    auto diff = navigation_target_ - pos;
+    const Vector2 pos{get_position()};
+    const Vector2 diff{navigation_target_ - pos};
     if (diff.length() <= destination_threshold_) {
         state_ = VEHICLE_IDLE;  // destination reached
         animated_sprite_->stop();
@@ -118,10 +119,10 @@ void godot::CL::TradingVehicle::handle_movement(double delta) {
 }
 
 void godot::CL::TradingVehicle::update_animation() {
-    auto anim_idx = static_cast<std::size_t>(
+    const auto anim_idx{static_cast<int32_t>(
         (AnimationSize *
          (direction_.rotated(Math_PI / AnimationSize).angle() + Math_PI) /
-         Math_TAU));
+         Math_TAU))};
     ERR_FAIL_COND_MSG(anim_idx >= AnimationSize, "anim_idx is out of bounds");
     animated_sprite_->play(AnimationNames[anim_idx].c_str());
 }
@@ -135,6 +136,7 @@ void godot::CL::TradingVehicle::_ready() {
 }
 
 void godot::CL::TradingVehicle::_bind_methods() {
+    // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
 
     ClassDB::bind_method(D_METHOD("get_navigation_target"),

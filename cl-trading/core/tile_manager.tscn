@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4ldkys7rvwlr"]
+
+[ext_resource type="TileSet" uid="uid://dxklvh7v3a88l" path="res://assets/std_tilemap.tres" id="1_0o2b3"]
+
+[node name="TileManager" type="TileManager"]
+y_sort_enabled = true
+tile_set = ExtResource("1_0o2b3")
+layer_0/name = "Background"
+layer_0/y_sort_enabled = true
+layer_1/name = "Vegetation"
+layer_1/y_sort_enabled = true
+layer_1/tile_data = PackedInt32Array()
+layer_2/name = "Obstacle"
+layer_2/y_sort_enabled = true
+layer_2/tile_data = PackedInt32Array()

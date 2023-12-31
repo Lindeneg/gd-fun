@@ -20,5 +20,7 @@ compile_commands.json
 *.obj
 *.pdb
 *.rdbg
-bin
+*.dll
+*.exp
+*.lib
 

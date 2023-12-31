@@ -1,0 +1,8 @@
+[configuration]
+
+entry_symbol = "cl_trading_library_init"
+compatibility_minimum = "4.2.0"
+
+[libraries]
+
+windows.debug.x86_64 = "res://bin/cltrading.windows.template_debug.x86_64.dll"

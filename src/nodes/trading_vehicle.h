@@ -1,7 +1,6 @@
 #ifndef CL_TRADING_TRADING_VEHICLE_H_
 #define CL_TRADING_TRADING_VEHICLE_H_
 
-#include <cstddef>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
@@ -73,7 +72,7 @@ class TradingVehicle : public Area2D {
     // godot::String is not available when AnimationNames
     // is initialized, so std::string will do
     static const std::string AnimationNames[4];
-    static const std::size_t AnimationSize;
+    static const int32_t AnimationSize;
 
     TradingVehicle();
     ~TradingVehicle();

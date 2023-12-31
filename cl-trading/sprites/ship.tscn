@@ -57,9 +57,6 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xllnl"]
 
 [node name="TradingVehicle" type="TradingVehicle"]
-speed = 10.0
-destination_threshold = 0.5
-debug_mode = true
 script = ExtResource("1_breqh")
 
 [node name="VehicleAnimation" type="AnimatedSprite2D" parent="."]
