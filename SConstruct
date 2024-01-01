@@ -5,6 +5,10 @@ import sys
 env = SConscript("godot-cpp/SConstruct")
 
 env.Append(CPPPATH=["src/", "src/core/", "src/nodes/"])
+
+if env["target"] == "template_debug":
+    env.Append(CPPDEFINES=["CL_TRADING_DEBUG=1"])
+
 sources = Glob("src/**/*.cpp")
 
 if env["platform"] == "macos":

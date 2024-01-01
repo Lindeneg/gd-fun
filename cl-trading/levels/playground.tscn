@@ -7,7 +7,7 @@
 [node name="Playground" type="Node2D"]
 
 [node name="MainCamera" type="Camera2D" parent="."]
-position = Vector2(199, 255)
+position = Vector2(181, 162)
 zoom = Vector2(2, 2)
 
 [node name="TileManager" parent="." instance=ExtResource("3_0dhwo")]
@@ -19,9 +19,11 @@ layer_2/tile_data = PackedInt32Array(851968, 10, 0, 851969, 10, 0, 851970, 10, 0
 [node name="Ship" parent="." instance=ExtResource("1_wq5is")]
 speed = 10.0
 destination_threshold = 0.5
-position = Vector2(15, 299)
+position = Vector2(-28, 306)
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
+[connection signal="clear_debug_lines" from="Ship" to="DebugManager" method="_on_ship_clear_debug_lines"]
+[connection signal="draw_debug_lines" from="Ship" to="DebugManager" method="_on_ship_draw_debug_lines"]

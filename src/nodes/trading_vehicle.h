@@ -57,7 +57,7 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
-    void emit_debug_signal_() const;
+    void emit_debug_signal_();
     // create component and add to tree
     template <typename T>
     T* create_component_(const String name) {
@@ -93,7 +93,10 @@ class TradingVehicle : public Area2D {
     inline double get_speed() const { return speed_; }
     inline VehicleState get_state() const { return state_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
-    inline void set_debug_mode(const bool m) { debug_mode_ = m; }
+    inline void set_debug_mode(const bool m) {
+        debug_mode_ = m;
+        emit_debug_signal_();
+    }
     inline void set_speed(const double s) { speed_ = s; }
     inline bool is_moving() const { return state_ == VEHICLE_MOVING; }
     inline void set_navigation_target(const Vector2 t) {

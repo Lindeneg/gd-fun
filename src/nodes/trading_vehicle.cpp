@@ -136,20 +136,19 @@ void godot::CL::TradingVehicle::_ready() {
 }
 
 void godot::CL::TradingVehicle::_process(double delta) {
-    if (!::CL::is_in_editor()) {
+    if (::CL::is_in_game()) {
         handle_movement(delta);
     }
-    if (debug_mode_) {
-        emit_debug_signal_();
-    }
+    emit_debug_signal_();
 }
 
-void godot::CL::TradingVehicle::emit_debug_signal_() const {
-    if (is_moving()) {
-        const auto position = get_position();
-        const auto target = get_navigation_target();
-        // TODO cannot use pointers, use Ref instead
-        // emit_signal("draw_debug_lines", position, target);
+void godot::CL::TradingVehicle::emit_debug_signal_() {
+    if (debug_mode_) {
+        if (is_moving()) {
+            emit_signal("draw_debug_lines", get_position(), navigation_target_);
+        }
+    } else {
+        emit_signal("clear_debug_lines");
     }
 }
 
@@ -204,7 +203,7 @@ void godot::CL::TradingVehicle::_bind_methods() {
                         MethodInfo("draw_debug_lines",
                                    PropertyInfo(Variant::VECTOR2, "position"),
                                    PropertyInfo(Variant::VECTOR2, "target")));
-
+    ClassDB::add_signal("TradingVehicle", MethodInfo("clear_debug_lines"));
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);
     BIND_ENUM_CONSTANT(VEHICLE_MOVING);

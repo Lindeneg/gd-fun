@@ -9,6 +9,7 @@ extends Node2D
 		queue_redraw();
 
 const TILE_MANAGER_NAME: String = "TileManagerGrid";
+const MOVEABLE_LINE: String = "MoveableLine";
 const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
 var tile_size: int = 0;
 var draw_shapes: Dictionary = {};
@@ -19,6 +20,8 @@ func _draw():
 	for key in draw_shapes.keys():
 		if key == TILE_MANAGER_NAME:
 			draw_tile_manager_grid();
+		elif key == MOVEABLE_LINE:
+			draw_moveable_line();
 
 func _on_tile_manager_draw_debug_grid(size: int, tiles: Array) -> void:
 	tile_size = size;
@@ -30,6 +33,14 @@ func _on_tile_manager_remove_debug_grid() -> void:
 		tile_size = 0;
 		draw_shapes.erase(TILE_MANAGER_NAME);
 		queue_redraw();
+
+func _on_ship_draw_debug_lines(position_: Vector2, target: Vector2) -> void:
+	draw_shapes[MOVEABLE_LINE] = [position_, target];
+	queue_redraw();
+
+func _on_ship_clear_debug_lines() -> void:
+	draw_shapes[MOVEABLE_LINE] = null;
+	queue_redraw();
 
 func draw_tile_manager_grid():
 	var vectors = draw_shapes.get(TILE_MANAGER_NAME);
@@ -44,5 +55,11 @@ func draw_tile_manager_grid():
 				tile_size, tile_size
 			),
 			TILE_COLORS[vec.mat],
-			false # do not fill
+			false
 		);
+
+func draw_moveable_line():
+	var ctx = draw_shapes.get(MOVEABLE_LINE);
+	if ctx != null and ctx.size() == 2:
+		draw_line(to_local(ctx[0]), to_local(ctx[1]), Color.PINK);
+		queue_redraw();
