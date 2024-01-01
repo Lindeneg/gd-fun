@@ -2,11 +2,13 @@
 #define CL_TRADING_TILE_GRAPH_H_
 
 #include <cstdint>
-#include <godot_cpp/variant/vector2i.hpp>
+#include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <utility>
 #include <vector>
 
+namespace godot {
 class Vector2i;
+}  // namespace godot
 
 namespace godot::CL {
 enum TileMat {
@@ -45,11 +47,13 @@ class TileGraph {
         return vertices_;
     }
 
-    void add_edge(TileVertex* v1, TileVertex* v2, int weight);
-    bool add_edge(Vector2i v1, Vector2i v2, int weight);
-    TileVertex* add_vertex(Vector2i indicies, int weight, TileMat mat,
-                           TileVertex* previous);
-    TileVertex* get_vertex(Vector2i indicies) const;
+    PackedVector2Array construct_path(const Vector2i start, const Vector2i end,
+                                      const TileMat mat);
+    void add_edge(TileVertex* v1, TileVertex* v2, const int weight);
+    bool add_edge(const Vector2i v1, const Vector2i v2, const int weight);
+    TileVertex* add_vertex(const Vector2i indicies, const int weight,
+                           const TileMat mat, TileVertex* previous);
+    TileVertex* get_vertex(const Vector2i indicies) const;
     void print() const;
     void destroy();
 };

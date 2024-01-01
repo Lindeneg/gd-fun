@@ -1,11 +1,14 @@
 #ifndef CL_TRADING_TRADING_VEHICLE_H_
 #define CL_TRADING_TRADING_VEHICLE_H_
 
-#include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/area2d.hpp>
-#include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/core/binder_common.hpp>
 #include <string>
+
+namespace godot {
+class AnimatedSprite2D;
+class CollisionShape2D;
+}  // namespace godot
 
 namespace godot::CL {
 
@@ -54,9 +57,10 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
+    void emit_debug_signal_() const;
     // create component and add to tree
     template <typename T>
-    T* create_component_(String name) {
+    T* create_component_(const String name) {
         T* obj = new T();
         obj->set_name(name);
         add_child(obj);
@@ -78,6 +82,7 @@ class TradingVehicle : public Area2D {
     ~TradingVehicle();
 
     void _ready() override;
+    void _process(double delta) override;
 
     void handle_movement(double delta);
 

@@ -45,13 +45,13 @@ godot::CL::TradingVehicle::~TradingVehicle() {
 // this is called on _ready notification at runtime
 void godot::CL::TradingVehicle::r_assign_required_components_() {
     if (animated_sprite_ == nullptr) {
-        Node* anim = find_child("VehicleAnimation");
+        Node* anim{find_child("VehicleAnimation")};
         ERR_FAIL_COND_MSG(anim == nullptr,
                           "required component VehicleAnimation missing");
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
     if (collision_shape_ == nullptr) {
-        Node* col = find_child("VehicleCollider");
+        Node* col{find_child("VehicleCollider")};
         ERR_FAIL_COND_MSG(col == nullptr,
                           "required component VehicleCollider missing");
         collision_shape_ = static_cast<CollisionShape2D*>(col);
@@ -135,6 +135,24 @@ void godot::CL::TradingVehicle::_ready() {
     }
 }
 
+void godot::CL::TradingVehicle::_process(double delta) {
+    if (!::CL::is_in_editor()) {
+        handle_movement(delta);
+    }
+    if (debug_mode_) {
+        emit_debug_signal_();
+    }
+}
+
+void godot::CL::TradingVehicle::emit_debug_signal_() const {
+    if (is_moving()) {
+        const auto position = get_position();
+        const auto target = get_navigation_target();
+        // TODO cannot use pointers, use Ref instead
+        // emit_signal("draw_debug_lines", position, target);
+    }
+}
+
 void godot::CL::TradingVehicle::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
@@ -180,6 +198,12 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::add_property("TradingVehicle",
                           PropertyInfo(Variant::BOOL, "debug_mode"),
                           "set_debug_mode", "get_debug_mode");
+
+    // SIGNALS
+    ClassDB::add_signal("TradingVehicle",
+                        MethodInfo("draw_debug_lines",
+                                   PropertyInfo(Variant::VECTOR2, "position"),
+                                   PropertyInfo(Variant::VECTOR2, "target")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);
