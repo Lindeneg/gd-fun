@@ -1,13 +1,17 @@
 #include "tile_manager.h"
 
 #include <cstdint>
+#include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/classes/tile_data.hpp>
 #include <godot_cpp/classes/tile_set.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/object.hpp>
 #include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
+#include <godot_cpp/variant/variant.hpp>
+#include <iostream>
 
 #include "../core/tile_graph.h"
 #include "../core/utils.h"
@@ -22,34 +26,44 @@ godot::CL::TileManager::TileManager()
 
 godot::CL::TileManager::~TileManager() {}
 
-void godot::CL::TileManager::set_map_size(const Vector2i v) { map_size_ = v; }
+void godot::CL::TileManager::set_map_size(const Vector2i v) {
+    map_size_ = v;
+    create_graph_();
+}
 
 void godot::CL::TileManager::set_debug_mode(const bool m) {
     debug_mode_ = m;
     emit_debug_signal_();
 }
 
+// used inside editor as a lazy button-like action
 void godot::CL::TileManager::set_rebuild_debug_graph(const bool m) {
+#ifdef CL_TRADING_DEBUG
     if (!debug_mode_) {
         return;
     }
-    rebuild_debug_graph_ = true;
+    std::cout << "TileManager: rebuilding debug graph\n";
     debug_array_.clear();
     create_graph_();
-    emit_debug_signal_();
-    rebuild_debug_graph_ = false;
+#endif
 }
 
 void godot::CL::TileManager::emit_debug_signal_() {
-    if (debug_mode_) {
+#ifdef CL_TRADING_DEBUG
+    if (debug_mode_ && get_tile_graph_size() > 0 && tile_size_ > 0) {
         set_debug_array_();
+        std::cout << "TileManager: emitting draw debug signal\n";
         emit_signal("draw_debug_grid", tile_size_, debug_array_);
     } else {
+        std::cout << "TileManager: emitting clear debug signal\n";
         emit_signal("remove_debug_grid");
     }
+#endif
 }
 
 void godot::CL::TileManager::set_debug_array_() {
+#ifdef CL_TRADING_DEBUG
+    std::cout << "TileManager: setting debug array\n";
     const auto size{get_tile_graph_size()};
     if (size > debug_array_.size()) {
         debug_array_.resize(size);
@@ -60,9 +74,10 @@ void godot::CL::TileManager::set_debug_array_() {
         const auto& vertex{vertices[i]};
         auto dict{Dictionary()};
         dict["coords"] = map_to_local(Vector2i(vertex->x, vertex->y));
-        dict["mat"] = int(vertex->mat);
+        dict["mat"] = vertex->mat;
         debug_array_.insert(i, dict);
     }
+#endif
 }
 
 void godot::CL::TileManager::create_graph_() {
@@ -75,27 +90,32 @@ void godot::CL::TileManager::create_graph_() {
             TileVertex* new_vertex{tile_graph_.add_vertex(
                 coords, tile_context.weight, tile_context.mat, previous)};
             previous = new_vertex;
+            // add up neighbor
             if (i > 0) {
                 add_tile_edge_(Vector2i(j, i - 1), new_vertex);
             }
+            // add left neighbor
             if (j > 0) {
                 add_tile_edge_(Vector2i(j - 1, i), new_vertex);
             }
         }
     }
+#ifdef CL_TRADING_DEBUG
     if (debug_mode_) {
-        std::cout << "\n\nGRAPH: \n";
+        std::cout << "GRAPH:\n";
         tile_graph_.print();
+        emit_debug_signal_();
     }
+#endif
 }
 
 void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
                                             TileVertex* current) {
     TileVertex* vertex{tile_graph_.get_vertex(coords)};
-    if (vertex != nullptr) {
-        const auto weight{int((current->weight + vertex->weight / 2))};
-        tile_graph_.add_edge(current, vertex, weight);
-    }
+    ERR_FAIL_NULL_EDMSG(vertex, vformat("vertex (%d,%d) was not found in graph",
+                                        coords.x, coords.y));
+    const auto weight{int((current->weight + vertex->weight / 2))};
+    tile_graph_.add_edge(current, vertex, weight);
 }
 
 godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
@@ -173,7 +193,6 @@ void godot::CL::TileManager::_ready() {
     }
     ensure_tile_size_set_();
     create_graph_();
-    emit_debug_signal_();
 }
 
 void godot::CL::TileManager::_bind_methods() {

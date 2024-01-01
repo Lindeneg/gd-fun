@@ -9,7 +9,9 @@
 godot::CL::TileGraph::TileGraph() : vertices_({}) {}
 
 godot::CL::TileGraph::~TileGraph() {
-    std::cout << "TileGraph destructor called\n";
+#ifdef CL_TRADING_DEBUG
+    std::cout << "TileGraph: Freeing tile vertices\n";
+#endif
     destroy();
 }
 

@@ -3,7 +3,6 @@
 
 #include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/core/binder_common.hpp>
-#include <string>
 
 namespace godot {
 class AnimatedSprite2D;
@@ -12,6 +11,7 @@ class CollisionShape2D;
 
 namespace godot::CL {
 
+// possible vehicle states
 enum VehicleState {
     VEHICLE_IDLE = 0,
     VEHICLE_MOVING = 1,
@@ -24,7 +24,7 @@ enum VehicleState {
 class TradingVehicle : public Area2D {
     GDCLASS(TradingVehicle, Area2D)
    private:
-    // draw some helper lines
+    // draw line from position to target
     bool debug_mode_;
     // TODO int cargo_space_;
     // TODO int maintenance_cost_;
@@ -57,6 +57,7 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
+    // emit signal to debug manager
     void emit_debug_signal_();
     // create component and add to tree
     template <typename T>
@@ -73,9 +74,7 @@ class TradingVehicle : public Area2D {
 
    public:
     // left,up,right,down
-    // godot::String is not available when AnimationNames
-    // is initialized, so std::string will do
-    static const std::string AnimationNames[4];
+    static const char* AnimationNames[];
     static const int32_t AnimationSize;
 
     TradingVehicle();
