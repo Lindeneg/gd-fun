@@ -14,6 +14,7 @@
 
 godot::CL::TileManager::TileManager()
     : debug_mode_(false),
+      rebuild_debug_graph_(false),
       tile_size_(0),
       debug_array_(Array()),
       map_size_(Vector2i()),
@@ -21,15 +22,22 @@ godot::CL::TileManager::TileManager()
 
 godot::CL::TileManager::~TileManager() {}
 
-void godot::CL::TileManager::set_map_size(const Vector2i v) {
-    map_size_ = v;
-    create_graph_();
-    emit_debug_signal_();
-}
+void godot::CL::TileManager::set_map_size(const Vector2i v) { map_size_ = v; }
 
 void godot::CL::TileManager::set_debug_mode(const bool m) {
     debug_mode_ = m;
     emit_debug_signal_();
+}
+
+void godot::CL::TileManager::set_rebuild_debug_graph(const bool m) {
+    if (!debug_mode_) {
+        return;
+    }
+    rebuild_debug_graph_ = true;
+    debug_array_.clear();
+    create_graph_();
+    emit_debug_signal_();
+    rebuild_debug_graph_ = false;
 }
 
 void godot::CL::TileManager::emit_debug_signal_() {
@@ -41,31 +49,18 @@ void godot::CL::TileManager::emit_debug_signal_() {
     }
 }
 
-// TODO
-godot::PackedVector2Array godot::CL::TileManager::construct_path(Vector2i start,
-                                                                 Vector2i end,
-                                                                 TileMat mat) {
-    auto array{PackedVector2Array()};
-    return array;
-}
-
 void godot::CL::TileManager::set_debug_array_() {
     const auto size{get_tile_graph_size()};
-    if (size == 0) return;
-    debug_array_.clear();
-    debug_array_.resize(size);
+    if (size > debug_array_.size()) {
+        debug_array_.resize(size);
+    }
     const auto& vertices{tile_graph_.get_vertices_()};
     const auto vertices_size = vertices.size();
     for (int32_t i = 0; i < vertices_size; i++) {
         const auto& vertex{vertices[i]};
-        auto dict = Dictionary();
+        auto dict{Dictionary()};
         dict["coords"] = map_to_local(Vector2i(vertex->x, vertex->y));
-        if (vertex->mat == TILE_MAT_GROUND || vertex->mat == TILE_MAT_WATER) {
-            dict["color"] = Color::named("PINK");
-        } else if (vertex->mat == TILE_MAT_OBSTACLE ||
-                   vertex->mat == TILE_MAT_NONE) {
-            dict["color"] = Color::named("RED");
-        }
+        dict["mat"] = int(vertex->mat);
         debug_array_.insert(i, dict);
     }
 }
@@ -94,7 +89,7 @@ void godot::CL::TileManager::create_graph_() {
     }
 }
 
-void godot::CL::TileManager::add_tile_edge_(Vector2i coords,
+void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
                                             TileVertex* current) {
     TileVertex* vertex{tile_graph_.get_vertex(coords)};
     if (vertex != nullptr) {
@@ -104,7 +99,7 @@ void godot::CL::TileManager::add_tile_edge_(Vector2i coords,
 }
 
 godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
-    Vector2i coords) const {
+    const Vector2i coords) const {
     auto result{CellTileContext()};
     TileData* obs_data{get_cell_tile_data(TILE_OBSTACLE_LAYER, coords)};
     if (obs_data != nullptr) {
@@ -152,8 +147,10 @@ void godot::CL::TileManager::ensure_tile_size_set_() {
     tile_size_ = tileset->get_tile_size().x;
 }
 
-void godot::CL::TileManager::create_layer_(Ref<TileSet> tileset, int32_t layer,
-                                           String name, Variant::Type type) {
+void godot::CL::TileManager::create_layer_(Ref<TileSet> tileset,
+                                           const int32_t layer,
+                                           const String name,
+                                           const Variant::Type type) {
     if (tileset == nullptr) {
         return;
     }
@@ -162,7 +159,8 @@ void godot::CL::TileManager::create_layer_(Ref<TileSet> tileset, int32_t layer,
     tileset->set_custom_data_layer_type(layer, type);
 }
 
-void godot::CL::TileManager::create_layer_(int32_t layer, String name) {
+void godot::CL::TileManager::create_layer_(const int32_t layer,
+                                           const String name) {
     add_layer(layer);
     set_layer_name(layer, name);
     set_layer_y_sort_enabled(layer, true);
@@ -197,11 +195,18 @@ void godot::CL::TileManager::_bind_methods() {
                          &TileManager::get_debug_mode);
     ClassDB::bind_method(D_METHOD("set_debug_mode", "m"),
                          &TileManager::set_debug_mode);
+    ClassDB::bind_method(D_METHOD("get_rebuild_debug_graph"),
+                         &TileManager::get_rebuild_debug_graph);
+    ClassDB::bind_method(D_METHOD("set_rebuild_debug_graph", "m"),
+                         &TileManager::set_rebuild_debug_graph);
 
     ClassDB::add_property_group("TileManager", "Debug", "");
     ClassDB::add_property("TileManager",
                           PropertyInfo(Variant::BOOL, "debug_mode"),
                           "set_debug_mode", "get_debug_mode");
+    ClassDB::add_property("TileManager",
+                          PropertyInfo(Variant::BOOL, "rebuild_debug_graph"),
+                          "set_rebuild_debug_graph", "get_rebuild_debug_graph");
 
     // SIGNALS
     ClassDB::add_signal(

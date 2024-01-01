@@ -45,13 +45,13 @@ godot::CL::TradingVehicle::~TradingVehicle() {
 // this is called on _ready notification at runtime
 void godot::CL::TradingVehicle::r_assign_required_components_() {
     if (animated_sprite_ == nullptr) {
-        Node* anim = find_child("VehicleAnimation");
+        Node* anim{find_child("VehicleAnimation")};
         ERR_FAIL_COND_MSG(anim == nullptr,
                           "required component VehicleAnimation missing");
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
     if (collision_shape_ == nullptr) {
-        Node* col = find_child("VehicleCollider");
+        Node* col{find_child("VehicleCollider")};
         ERR_FAIL_COND_MSG(col == nullptr,
                           "required component VehicleCollider missing");
         collision_shape_ = static_cast<CollisionShape2D*>(col);
@@ -135,6 +135,23 @@ void godot::CL::TradingVehicle::_ready() {
     }
 }
 
+void godot::CL::TradingVehicle::_process(double delta) {
+    if (::CL::is_in_game()) {
+        handle_movement(delta);
+    }
+    emit_debug_signal_();
+}
+
+void godot::CL::TradingVehicle::emit_debug_signal_() {
+    if (debug_mode_) {
+        if (is_moving()) {
+            emit_signal("draw_debug_lines", get_position(), navigation_target_);
+        }
+    } else {
+        emit_signal("clear_debug_lines");
+    }
+}
+
 void godot::CL::TradingVehicle::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
@@ -181,6 +198,12 @@ void godot::CL::TradingVehicle::_bind_methods() {
                           PropertyInfo(Variant::BOOL, "debug_mode"),
                           "set_debug_mode", "get_debug_mode");
 
+    // SIGNALS
+    ClassDB::add_signal("TradingVehicle",
+                        MethodInfo("draw_debug_lines",
+                                   PropertyInfo(Variant::VECTOR2, "position"),
+                                   PropertyInfo(Variant::VECTOR2, "target")));
+    ClassDB::add_signal("TradingVehicle", MethodInfo("clear_debug_lines"));
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);
     BIND_ENUM_CONSTANT(VEHICLE_MOVING);

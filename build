@@ -1,5 +1,25 @@
 #!/usr/bin/bash
 
-# debug / dev build
-scons platform=windows target=template_debug debug_symbols=yes
+function build_release() {
+    scons platform=windows target=template_release
+}
+
+
+function build_debug() {
+    local cdb=no
+    if [[ "$1" == "db" ]]
+    then
+        echo "generating compile commands json"
+        cdb=yes
+    fi
+    scons platform=windows target=template_debug debug_symbols=yes compiledb="${cdb}"
+}
+
+if [[ "$1" == "release" ]] then
+    echo "building release"
+    build_release
+else
+    echo "building debug"
+    build_debug $1
+fi
 

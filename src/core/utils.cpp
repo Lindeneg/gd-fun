@@ -1,0 +1,9 @@
+#include "utils.h"
+
+#include <godot_cpp/classes/engine.hpp>
+
+bool CL::is_in_editor() {
+    return godot::Engine::get_singleton()->is_editor_hint();
+}
+
+bool CL::is_in_game() { return !(is_in_editor()); }

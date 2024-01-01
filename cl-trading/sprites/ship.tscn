@@ -1,6 +1,5 @@
-[gd_scene load_steps=9 format=3 uid="uid://bmsmew3bvvad8"]
+[gd_scene load_steps=8 format=3 uid="uid://bmsmew3bvvad8"]
 
-[ext_resource type="Script" path="res://core/trading_vehicle.gd" id="1_breqh"]
 [ext_resource type="Texture2D" uid="uid://dgonmq5h2fad2" path="res://assets/Miscellaneous/WarShip.png" id="1_m0bei"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_podb5"]
@@ -56,8 +55,7 @@ animations = [{
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xllnl"]
 
-[node name="TradingVehicle" type="TradingVehicle"]
-script = ExtResource("1_breqh")
+[node name="Ship" type="TradingVehicle"]
 
 [node name="VehicleAnimation" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_fqth0")

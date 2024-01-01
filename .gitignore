@@ -15,8 +15,11 @@ data_*/
 mono_crash.*.json
 .cache
 .sconsign*
+
+# stuff and things
 extension_api.json
 compile_commands.json
+notes.txt
 *.obj
 *.pdb
 *.rdbg

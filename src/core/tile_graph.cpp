@@ -1,5 +1,6 @@
 #include "tile_graph.h"
 
+#include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <godot_cpp/variant/vector2i.hpp>
 #include <iostream>
 #include <utility>
@@ -22,12 +23,20 @@ void godot::CL::TileGraph::destroy() {
     vertices_.clear();
 }
 
+// TODO
+godot::PackedVector2Array godot::CL::TileGraph::construct_path(
+    const Vector2i start, const Vector2i end, const TileMat mat) {
+    auto array{PackedVector2Array()};
+    return array;
+}
+
 void godot::CL::TileGraph::add_edge(TileVertex* v1, TileVertex* v2,
-                                    int weight) {
+                                    const int weight) {
     v1->edges.push_back(std::make_pair(v2, weight));
     v2->edges.push_back(std::make_pair(v1, weight));
 }
-bool godot::CL::TileGraph::add_edge(Vector2i v1, Vector2i v2, int weight) {
+bool godot::CL::TileGraph::add_edge(const Vector2i v1, const Vector2i v2,
+                                    const int weight) {
     TileVertex* t1{get_vertex(v1)};
     if (t1 == nullptr) {
         return false;
@@ -40,8 +49,9 @@ bool godot::CL::TileGraph::add_edge(Vector2i v1, Vector2i v2, int weight) {
     return true;
 }
 
-godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(Vector2i indicies,
-                                                        int weight, TileMat mat,
+godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(const Vector2i indicies,
+                                                        const int weight,
+                                                        const TileMat mat,
                                                         TileVertex* previous) {
     auto* vertex{new TileVertex()};
     vertex->x = indicies.x;
@@ -54,7 +64,7 @@ godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(Vector2i indicies,
 }
 
 godot::CL::TileVertex* godot::CL::TileGraph::get_vertex(
-    Vector2i indicies) const {
+    const Vector2i indicies) const {
     for (const auto& vertex : vertices_) {
         if (vertex->x == indicies.x && vertex->y == indicies.y) {
             return vertex;
