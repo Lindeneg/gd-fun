@@ -3,7 +3,7 @@
 
 #include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/core/binder_common.hpp>
-#include <string>
+#include <godot_cpp/core/memory.hpp>
 
 namespace godot {
 class AnimatedSprite2D;
@@ -12,25 +12,45 @@ class CollisionShape2D;
 
 namespace godot::CL {
 
-enum VehicleState {
-    VEHICLE_IDLE = 0,
-    VEHICLE_MOVING = 1,
-    VEHICLE_ONLOADING = 2,
-    VEHICLE_OFFLOADING = 3
+// vehicle tiers determine
+// efficiency and build/gost cost
+enum VehicleTier {
+    VEHICLE_TIER_BUDGET,
+    VEHICLE_TIER_COMMON,
+    VEHICLE_TIER_PREMIUM
 };
 
-/* TradingVehicle is anything that can move,
- * has animations and carries cargo from A<->B. */
+// possible vehicle states
+enum VehicleState {
+    VEHICLE_IDLE,
+    VEHICLE_MOVING,
+    VEHICLE_ONLOADING,
+    VEHICLE_OFFLOADING
+};
+
+/* TradingVehicle are part of Route and
+ * is anything that can move, has animations
+ * and carries cargo from A<->B.
+ *
+ * TODO
+ * TradingVehicle has build-time relative to
+ * the its tier managed by BuildManager.
+ *
+ * TODO
+ * TradingVehciles are managed by associated Route.
+ * */
 class TradingVehicle : public Area2D {
     GDCLASS(TradingVehicle, Area2D)
    private:
-    // draw some helper lines
+    // draw line from position to target
     bool debug_mode_;
     // TODO int cargo_space_;
     // TODO int maintenance_cost_;
     // TODO Node* cargo_container_;
     // TODO Route route_;
 
+    // tier of vehicle
+    VehicleTier tier_;
     // speed multiplier
     double speed_;
     // stops movement if distance
@@ -57,11 +77,12 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
+    // emit signal to debug manager
     void emit_debug_signal_();
     // create component and add to tree
     template <typename T>
     T* create_component_(const String name) {
-        T* obj = new T();
+        T* obj = memnew(T);
         obj->set_name(name);
         add_child(obj);
         obj->set_owner(this);
@@ -73,9 +94,7 @@ class TradingVehicle : public Area2D {
 
    public:
     // left,up,right,down
-    // godot::String is not available when AnimationNames
-    // is initialized, so std::string will do
-    static const std::string AnimationNames[4];
+    static const char* AnimationNames[];
     static const int32_t AnimationSize;
 
     TradingVehicle();
@@ -92,11 +111,13 @@ class TradingVehicle : public Area2D {
     inline bool get_debug_mode() const { return debug_mode_; }
     inline double get_speed() const { return speed_; }
     inline VehicleState get_state() const { return state_; }
+    inline VehicleTier get_tier() const { return tier_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
     inline void set_debug_mode(const bool m) {
         debug_mode_ = m;
         emit_debug_signal_();
     }
+    inline void set_tier(const VehicleTier t) { tier_ = t; }
     inline void set_speed(const double s) { speed_ = s; }
     inline bool is_moving() const { return state_ == VEHICLE_MOVING; }
     inline void set_navigation_target(const Vector2 t) {
@@ -109,5 +130,6 @@ class TradingVehicle : public Area2D {
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::VehicleState);
+VARIANT_ENUM_CAST(godot::CL::VehicleTier);
 
 #endif  // CL_TRADING_TRADING_VEHICLE_H_

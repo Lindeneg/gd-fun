@@ -14,7 +14,22 @@ const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
 var tile_size: int = 0;
 var draw_shapes: Dictionary = {};
 
+@onready var t = $"../TileManager" as TileManager;
+
 func _draw():
+	var v1 = Vector2(0, 0);
+	var v2 = Vector2(8, 6);
+	print(v1, v2);
+	var path = t.construct_path(v1, v2, t.TILE_MAT_GROUND);
+	for i in range(path.size()):
+		var k = path[i]
+		if (i < path.size() - 1):
+			var is_start = i == 0;
+			var k2 = path[i+1]
+			if is_start:
+				draw_line(t.map_to_local(k), t.map_to_local(k2), Color.RED);
+			else:
+				draw_line(t.map_to_local(k), t.map_to_local(k2), Color.BLACK);
 	if not debug_mode:
 		return;
 	for key in draw_shapes.keys():
@@ -62,4 +77,3 @@ func draw_moveable_line():
 	var ctx = draw_shapes.get(MOVEABLE_LINE);
 	if ctx != null and ctx.size() == 2:
 		draw_line(to_local(ctx[0]), to_local(ctx[1]), Color.PINK);
-		queue_redraw();

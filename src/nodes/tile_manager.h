@@ -14,40 +14,56 @@ class PackedVector2Array;
 
 namespace godot::CL {
 
+// tile layers
 enum TileLayer {
-    TILE_BACKGROUND_LAYER = 0,
-    TILE_VEGETATION_LAYER = 1,
-    TILE_OBSTACLE_LAYER = 2
+    TILE_BACKGROUND_LAYER,
+    TILE_VEGETATION_LAYER,
+    TILE_OBSTACLE_LAYER
 };
 
-enum TileDataLayer { TILE_DATA_LAYER_WEIGHT = 0, TILE_DATA_LAYER_IS_WATER = 1 };
-
+// custom tile data
+enum TileDataLayer { TILE_DATA_LAYER_WEIGHT, TILE_DATA_LAYER_IS_WATER };
 struct CellTileContext {
     TileMat mat;
     int weight;
 };
 
 /* TileManager is meant to answer questions like:
- * 'Given these two points, give me back a path
- * between them that avoids (static) obstacles' */
+ * 'Given these two points, on this material (onshore/offshore)
+ * give me back a path between them that avoids (static) obstacles' */
 class TileManager : public TileMap {
     GDCLASS(TileManager, TileMap)
 
+    // TODO should know about own material (ground/water)
    private:
+    // draw colored tile grid
     bool debug_mode_;
+    // rebuilds debug graph
     bool rebuild_debug_graph_;
-    int32_t tile_size_;
+    // payload to debug signal
     Array debug_array_;
+    // tile size
+    int32_t tile_size_;
+    // map size
     Vector2i map_size_;
+    // weighted tile graph
     TileGraph tile_graph_;
 
+    // useful for tile_graph world navigation
     CellTileContext get_tile_context_(const Vector2i coords) const;
+    // emits debug signal
     void emit_debug_signal_();
+    // recreates debug array
     void set_debug_array_();
+    // adds edge to tile
     void add_tile_edge_(const Vector2i coords, TileVertex* current);
+    // creates weighted tile graph
     void create_graph_();
+    // ensures required tile layers are created
     void ensure_layers_created_();
+    // ensures tile_size_ member is set
     void ensure_tile_size_set_();
+    // creates a named layer
     void create_layer_(const int32_t layer, const String name);
     void create_layer_(Ref<TileSet> tileset, const int32_t layer,
                        const String name, const Variant::Type type);
@@ -61,10 +77,12 @@ class TileManager : public TileMap {
 
     void _ready() override;
 
+    // constructs a path avoiding obstacles from start->end
+    // respecting the given TileMat constraint
     inline PackedVector2Array construct_path(const Vector2i start,
                                              const Vector2i end,
                                              const TileMat mat) {
-        return tile_graph_.construct_path(start, end, mat);
+        return tile_graph_.astar_construct_path(start, end, mat);
     }
     void set_rebuild_debug_graph(const bool m);
     void set_debug_mode(const bool m);

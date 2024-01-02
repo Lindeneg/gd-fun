@@ -1,16 +1,15 @@
 #ifndef CL_TRADING_TILE_GRAPH_H_
 #define CL_TRADING_TILE_GRAPH_H_
 
-#include <cstdint>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
-#include <utility>
+#include <godot_cpp/variant/vector2i.hpp>
+#include <limits>
+#include <map>
+#include <queue>
 #include <vector>
 
-namespace godot {
-class Vector2i;
-}  // namespace godot
-
 namespace godot::CL {
+
 enum TileMat {
     TILE_MAT_NONE,
     TILE_MAT_GROUND,
@@ -19,25 +18,61 @@ enum TileMat {
 };
 
 struct TileVertex {
-    int32_t x;
-    int32_t y;
+    Vector2i coords;
     int weight;
     TileMat mat;
     TileVertex* previous;
-    std::vector<std::pair<TileVertex*, int>> edges;
+    std::vector<TileVertex*> edges;
 
     TileVertex()
-        : x(0),
-          y(0),
+        : coords(Vector2i()),
           weight(0),
           mat(TILE_MAT_NONE),
           previous(nullptr),
           edges({}) {}
 };
 
+struct AStarCompare {
+    // lesser weight, higher priority
+    bool operator()(const TileVertex* a, const TileVertex* b) const {
+        return a->weight < b->weight;
+    }
+};
+
+// int with default value of max instead of 0
+struct AStarScoreNode {
+    int val;
+    AStarScoreNode() : val(std::numeric_limits<int>::max()) {}
+    AStarScoreNode(int i) : val(i) {}
+};
+
+// keep track of where we came from, so path between
+// start/end can be reconstructed once end is reached
+using AStarCameFromMap = std::map<TileVertex*, TileVertex*>;
+// best currently known paths from start to node N
+using AStarGScoreMap = std::map<TileVertex*, AStarScoreNode>;
+// best guess as to how cheap a path from start to end
+// could be if it goes through node N
+using AStarFScoreMap = std::map<TileVertex*, AStarScoreNode>;
+// queue with priority determined by the weight of a node
+using AStarPrioQueue =
+    std::priority_queue<TileVertex*, std::vector<TileVertex*>, AStarCompare>;
+// prio queue doesn't contain a method to see if it contains an element
+// so, because I'm stupid, I have another map that keeps track of that
+// if value is 0, not added, if value is 1, then it is added
+using AStarPrioQueueMember = std::map<TileVertex*, int>;
+
 class TileGraph {
    private:
+    static const int MaxPathLength_;
+
     std::vector<TileVertex*> vertices_;
+
+    PackedVector2Array astar_reconstruct_path_(const Vector2i start,
+                                               AStarCameFromMap came_from,
+                                               TileVertex* current);
+    int astar_calculate_heuristic_(TileVertex* current, TileVertex* goal) const;
+    int astar_calculate_cost_(TileVertex* current, TileVertex* neighbor) const;
 
    public:
     TileGraph();
@@ -47,10 +82,12 @@ class TileGraph {
         return vertices_;
     }
 
-    PackedVector2Array construct_path(const Vector2i start, const Vector2i end,
-                                      const TileMat mat);
-    void add_edge(TileVertex* v1, TileVertex* v2, const int weight);
-    bool add_edge(const Vector2i v1, const Vector2i v2, const int weight);
+    PackedVector2Array astar_construct_path(TileVertex* start, TileVertex* end,
+                                            const TileMat mat);
+    PackedVector2Array astar_construct_path(Vector2i start, Vector2i end,
+                                            const TileMat mat);
+    void add_edge(TileVertex* v1, TileVertex* v2);
+    bool add_edge(const Vector2i v1, const Vector2i v2);
     TileVertex* add_vertex(const Vector2i indicies, const int weight,
                            const TileMat mat, TileVertex* previous);
     TileVertex* get_vertex(const Vector2i indicies) const;
