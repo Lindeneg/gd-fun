@@ -105,6 +105,7 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_reconstruct_path_(
         }
         tmp = came_from[tmp];
         path.append(tmp->coords);
+        ++iters;
     }
     path.reverse();
     return path;
