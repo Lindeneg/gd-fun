@@ -9,11 +9,13 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
+#include <godot_cpp/core/memory.hpp>
 #include <godot_cpp/core/property_info.hpp>
 #include <godot_cpp/variant/variant.hpp>
 #include <iostream>
 
 #include "../core/utils.h"
+#include "godot_cpp/classes/global_constants.hpp"
 
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const char* godot::CL::TradingVehicle::AnimationNames
@@ -78,14 +80,14 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
     if (col == nullptr) {
         collision_shape_ =
             create_component_<CollisionShape2D>("VehicleCollider");
-        collision_shape_->set_shape(new RectangleShape2D());
+        collision_shape_->set_shape(memnew(RectangleShape2D));
     } else {
         collision_shape_ = static_cast<CollisionShape2D*>(col);
     }
 }
 
 void godot::CL::TradingVehicle::initialize_sprite_frames_() {
-    auto* sprite_frames{new SpriteFrames()};
+    auto* sprite_frames{memnew(SpriteFrames)};
     if (sprite_frames->has_animation("default")) {
         sprite_frames->remove_animation("default");
     }
@@ -171,15 +173,22 @@ void godot::CL::TradingVehicle::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("is_moving"), &TradingVehicle::is_moving);
 
-    // NAVIGATION EDITOR PROPS
     ClassDB::bind_method(D_METHOD("get_speed"), &TradingVehicle::get_speed);
     ClassDB::bind_method(D_METHOD("set_speed", "s"),
                          &TradingVehicle::set_speed);
+
+    ClassDB::bind_method(D_METHOD("get_tier"), &TradingVehicle::get_tier);
+    ClassDB::bind_method(D_METHOD("set_tier", "t"), &TradingVehicle::set_tier);
 
     ClassDB::bind_method(D_METHOD("get_destination_threshold"),
                          &TradingVehicle::get_destination_threshold);
     ClassDB::bind_method(D_METHOD("set_destination_threshold", "t"),
                          &TradingVehicle::set_destination_threshold);
+
+    ClassDB::add_property("TradingVehicle",
+                          PropertyInfo(Variant::INT, "tier", PROPERTY_HINT_ENUM,
+                                       "Budget,Common,Premium"),
+                          "set_tier", "get_tier");
 
     ClassDB::add_property_group("TradingVehicle", "Navigation", "");
     ClassDB::add_property(
@@ -209,9 +218,14 @@ void godot::CL::TradingVehicle::_bind_methods() {
                                    PropertyInfo(Variant::VECTOR2, "position"),
                                    PropertyInfo(Variant::VECTOR2, "target")));
     ClassDB::add_signal("TradingVehicle", MethodInfo("clear_debug_lines"));
+
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);
     BIND_ENUM_CONSTANT(VEHICLE_MOVING);
     BIND_ENUM_CONSTANT(VEHICLE_ONLOADING);
     BIND_ENUM_CONSTANT(VEHICLE_OFFLOADING);
+
+    BIND_ENUM_CONSTANT(VEHICLE_TIER_BUDGET);
+    BIND_ENUM_CONSTANT(VEHICLE_TIER_COMMON);
+    BIND_ENUM_CONSTANT(VEHICLE_TIER_PREMIUM);
 }

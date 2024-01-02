@@ -17,11 +17,14 @@ layer_0/tile_data = PackedInt32Array(0, 131072, 1, 65536, 0, 1, 131072, 65536, 0
 layer_2/tile_data = PackedInt32Array(851968, 10, 0, 851969, 10, 0, 851970, 10, 0, 655379, 10, 0, 655378, 10, 0, 655377, 10, 0, 1245189, 10, 0, 1179653, 10, 0, 1114117, 10, 0, 196613, 4, 0, 262149, 4, 1, 327685, 4, 2, 196614, 65540, 0, 262150, 65540, 1, 327686, 65540, 2, 196615, 131076, 0, 262151, 131076, 1, 327687, 131076, 2)
 
 [node name="Ship" parent="." instance=ExtResource("1_wq5is")]
+tier = 0
 speed = 10.0
 destination_threshold = 0.5
+debug_mode = true
 position = Vector2(-28, 306)
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
+debug_mode = true
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]

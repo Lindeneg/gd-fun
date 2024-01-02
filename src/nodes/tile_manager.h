@@ -16,13 +16,13 @@ namespace godot::CL {
 
 // tile layers
 enum TileLayer {
-    TILE_BACKGROUND_LAYER = 0,
-    TILE_VEGETATION_LAYER = 1,
-    TILE_OBSTACLE_LAYER = 2
+    TILE_BACKGROUND_LAYER,
+    TILE_VEGETATION_LAYER,
+    TILE_OBSTACLE_LAYER
 };
 
 // custom tile data
-enum TileDataLayer { TILE_DATA_LAYER_WEIGHT = 0, TILE_DATA_LAYER_IS_WATER = 1 };
+enum TileDataLayer { TILE_DATA_LAYER_WEIGHT, TILE_DATA_LAYER_IS_WATER };
 struct CellTileContext {
     TileMat mat;
     int weight;
@@ -34,6 +34,7 @@ struct CellTileContext {
 class TileManager : public TileMap {
     GDCLASS(TileManager, TileMap)
 
+    // TODO should know about own material (ground/water)
    private:
     // draw colored tile grid
     bool debug_mode_;
@@ -81,7 +82,7 @@ class TileManager : public TileMap {
     inline PackedVector2Array construct_path(const Vector2i start,
                                              const Vector2i end,
                                              const TileMat mat) {
-        return tile_graph_.construct_path(start, end, mat);
+        return tile_graph_.astar_construct_path(start, end, mat);
     }
     void set_rebuild_debug_graph(const bool m);
     void set_debug_mode(const bool m);

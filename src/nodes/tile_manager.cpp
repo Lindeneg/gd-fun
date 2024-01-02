@@ -73,7 +73,7 @@ void godot::CL::TileManager::set_debug_array_() {
     for (int32_t i = 0; i < vertices_size; i++) {
         const auto& vertex{vertices[i]};
         auto dict{Dictionary()};
-        dict["coords"] = map_to_local(Vector2i(vertex->x, vertex->y));
+        dict["coords"] = map_to_local(vertex->coords);
         dict["mat"] = vertex->mat;
         debug_array_.insert(i, dict);
     }
@@ -114,8 +114,7 @@ void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
     TileVertex* vertex{tile_graph_.get_vertex(coords)};
     ERR_FAIL_NULL_EDMSG(vertex, vformat("vertex (%d,%d) was not found in graph",
                                         coords.x, coords.y));
-    const auto weight{int((current->weight + vertex->weight / 2))};
-    tile_graph_.add_edge(current, vertex, weight);
+    tile_graph_.add_edge(current, vertex);
 }
 
 godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
