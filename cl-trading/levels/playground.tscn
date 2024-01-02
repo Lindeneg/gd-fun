@@ -20,13 +20,14 @@ layer_2/tile_data = PackedInt32Array(851968, 10, 0, 851969, 10, 0, 851970, 10, 0
 tier = 0
 speed = 10.0
 destination_threshold = 0.5
-debug_mode = true
 position = Vector2(-28, 306)
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 debug_mode = true
+show_tiles = true
+start_path = Vector2i(6, 6)
+end_path = Vector2i(7, 2)
+show_path = true
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
-[connection signal="clear_debug_lines" from="Ship" to="DebugManager" method="_on_ship_clear_debug_lines"]
-[connection signal="draw_debug_lines" from="Ship" to="DebugManager" method="_on_ship_draw_debug_lines"]

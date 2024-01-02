@@ -4,6 +4,7 @@
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <godot_cpp/variant/vector2i.hpp>
 #include <iostream>
+#include <queue>
 #include <vector>
 
 const int godot::CL::TileGraph::MaxPathLength_{1024};
@@ -35,14 +36,28 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     return astar_construct_path(start_vertex, end_vertex, mat);
 }
 
-// first time implementing a star, this seems so extensive in space
 godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     TileVertex* start, TileVertex* end, const TileMat mat) {
-    AStarPrioQueue open_set{};
+    std::cout << "Constructing path between: " << start->coords.x << ", "
+              << start->coords.y << " <-> " << end->coords.x << ", "
+              << end->coords.y << '\n';
+
     AStarPrioQueueMember open_set_members{};
     AStarCameFromMap came_from{};
     AStarGScoreMap g_score{};
     AStarFScoreMap f_score{};
+
+    auto cmp = [&f_score](TileVertex* a, TileVertex* b) {
+        const auto a_score{f_score.find(a)};
+        const auto b_score{f_score.find(b)};
+        // TODO make assertion
+        if (a_score == f_score.end() || b_score == f_score.end()) {
+        }
+        return b_score->second.val < a_score->second.val;
+    };
+    std::priority_queue<TileVertex*, std::vector<TileVertex*>, decltype(cmp)>
+        open_set(cmp);
+
     g_score[start] = 0;
     f_score[start] = astar_calculate_heuristic_(start, end);
     open_set.push(start);
@@ -50,12 +65,15 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     while (!open_set.empty()) {
         auto* current = open_set.top();
         open_set.pop();
+        open_set_members[current] = 0;
         if (current == end) {
             return astar_reconstruct_path_(start->coords, came_from, current);
         }
         for (auto* edge : current->edges) {
-            auto tmp_g_score =
-                g_score[current].val + astar_calculate_cost_(current, edge);
+            if (edge->mat != mat) {
+                continue;
+            }
+            auto tmp_g_score{g_score[current].val + edge->weight};
             if (tmp_g_score < g_score[edge].val) {
                 came_from[edge] = current;
                 g_score[edge] = tmp_g_score;
@@ -94,15 +112,10 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_reconstruct_path_(
 
 int godot::CL::TileGraph::astar_calculate_heuristic_(TileVertex* current,
                                                      TileVertex* goal) const {
-    auto x_diff = current->coords.x - goal->coords.x;
-    auto y_diff = current->coords.y - goal->coords.y;
-    auto mag = (x_diff * x_diff) + (y_diff * y_diff);
-    return std::sqrt(mag);
-}
-
-int godot::CL::TileGraph::astar_calculate_cost_(TileVertex* current,
-                                                TileVertex* neighbor) const {
-    return int((current->weight + neighbor->weight) / 2.0);
+    auto x_diff{current->coords.x - goal->coords.x};
+    auto y_diff{current->coords.y - goal->coords.y};
+    auto mag{(x_diff * x_diff) + (y_diff * y_diff)};
+    return int(std::sqrt(mag) * 10);
 }
 
 void godot::CL::TileGraph::add_edge(TileVertex* v1, TileVertex* v2) {

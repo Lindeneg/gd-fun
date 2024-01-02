@@ -102,8 +102,8 @@ void godot::CL::TileManager::create_graph_() {
     }
 #ifdef CL_TRADING_DEBUG
     if (debug_mode_) {
-        std::cout << "GRAPH:\n";
-        tile_graph_.print();
+        // std::cout << "GRAPH:\n";
+        // tile_graph_.print();
         emit_debug_signal_();
     }
 #endif

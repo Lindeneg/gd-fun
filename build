@@ -15,9 +15,14 @@ function build_debug() {
     scons platform=windows target=template_debug debug_symbols=yes compiledb="${cdb}"
 }
 
-if [[ "$1" == "release" ]] then
+if [[ "$1" == "release" ]]
+then
     echo "building release"
     build_release
+elif [[ "$1" == "pdb" ]]
+then
+    echo "building pdb"
+    scons platform=windows target=editor debug_symbols=yes
 else
     echo "building debug"
     build_debug $1

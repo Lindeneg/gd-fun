@@ -138,13 +138,13 @@ void godot::CL::TradingVehicle::_ready() {
     } else {
         r_assign_required_components_();
     }
+    emit_debug_signal_();
 }
 
 void godot::CL::TradingVehicle::_process(double delta) {
     if (::CL::is_in_game()) {
         handle_movement(delta);
     }
-    emit_debug_signal_();
 }
 
 void godot::CL::TradingVehicle::emit_debug_signal_() {

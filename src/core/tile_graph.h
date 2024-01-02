@@ -3,9 +3,7 @@
 
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <godot_cpp/variant/vector2i.hpp>
-#include <limits>
 #include <map>
-#include <queue>
 #include <vector>
 
 namespace godot::CL {
@@ -32,17 +30,11 @@ struct TileVertex {
           edges({}) {}
 };
 
-struct AStarCompare {
-    // lesser weight, higher priority
-    bool operator()(const TileVertex* a, const TileVertex* b) const {
-        return a->weight < b->weight;
-    }
-};
-
 // int with default value of max instead of 0
 struct AStarScoreNode {
     int val;
-    AStarScoreNode() : val(std::numeric_limits<int>::max()) {}
+    // TODO remove hardcoded value
+    AStarScoreNode() : val(5e4) {}
     AStarScoreNode(int i) : val(i) {}
 };
 
@@ -54,9 +46,6 @@ using AStarGScoreMap = std::map<TileVertex*, AStarScoreNode>;
 // best guess as to how cheap a path from start to end
 // could be if it goes through node N
 using AStarFScoreMap = std::map<TileVertex*, AStarScoreNode>;
-// queue with priority determined by the weight of a node
-using AStarPrioQueue =
-    std::priority_queue<TileVertex*, std::vector<TileVertex*>, AStarCompare>;
 // prio queue doesn't contain a method to see if it contains an element
 // so, because I'm stupid, I have another map that keeps track of that
 // if value is 0, not added, if value is 1, then it is added
@@ -68,11 +57,10 @@ class TileGraph {
 
     std::vector<TileVertex*> vertices_;
 
+    int astar_calculate_heuristic_(TileVertex* current, TileVertex* goal) const;
     PackedVector2Array astar_reconstruct_path_(const Vector2i start,
                                                AStarCameFromMap came_from,
                                                TileVertex* current);
-    int astar_calculate_heuristic_(TileVertex* current, TileVertex* goal) const;
-    int astar_calculate_cost_(TileVertex* current, TileVertex* neighbor) const;
 
    public:
     TileGraph();
