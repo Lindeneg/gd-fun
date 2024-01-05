@@ -8,8 +8,14 @@ extends Node2D
 		debug_mode = value;
 		queue_redraw();
 
-@export_category("Tile Map")
+@export_group("City")
+@export var notify_city_change: bool = false:
+	get:
+		return notify_city_change;
+	set(value):
+		city_manager.notify_tile_manager_of_cities();
 
+@export_group("Tile Map")
 @export var show_tiles: bool = false:
 	get:
 		return show_tiles;
@@ -25,9 +31,13 @@ extends Node2D
 			show_tiles = true;
 			return;
 		queue_redraw();
+@export var rebuild_debug_graph: bool = false:
+	get:
+		return rebuild_debug_graph;
+	set(value):
+		tile_manager.set_rebuild_debug_graph(true);
 
-@export_category("Path Finding")
-
+@export_group("Path Finding")
 @export var start_path: Vector2i = Vector2i();
 @export var end_path: Vector2i = Vector2i();
 @export_enum("Ground:1", "Water:2") var path_mat: int = 1:
@@ -48,10 +58,10 @@ const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
 var tile_size: int = 0;
 var draw_shapes: Dictionary = {};
 
-@onready var t = $"../TileManager" as TileManager;
+@onready var tile_manager = $"../TileManager" as TileManager;
+@onready var city_manager = $"../CityManager" as CityManager;
 
 func _draw():
-	print("draw called");
 	if not debug_mode:
 		return;
 	for key in draw_shapes.keys():
@@ -87,9 +97,15 @@ func draw_tile_manager_grid():
 			false
 		);
 		if show_tile_coords:
-			var local_coord = t.local_to_map(vec.coords);
-			draw_tile_coord_string(Vector2(vec.coords.x - 8, vec.coords.y), str(local_coord.x));
-			draw_tile_coord_string(Vector2(vec.coords.x - 8, vec.coords.y + 8), str(local_coord.y));
+			var local_coord = tile_manager.local_to_map(vec.coords);
+			draw_tile_coord_string(
+				Vector2(vec.coords.x - half_tile_size, vec.coords.y),
+				str(local_coord.x)
+			);
+			draw_tile_coord_string(
+				Vector2(vec.coords.x - half_tile_size, vec.coords.y + half_tile_size),
+				str(local_coord.y)
+			);
 
 func draw_tile_coord_string(vec: Vector2, s: String):
 		draw_string(
@@ -106,11 +122,16 @@ func draw_tile_coord_string(vec: Vector2, s: String):
 func draw_path_line():
 	if start_path == end_path:
 		return;
-	var path = t.construct_path(start_path, end_path, path_mat);
+	var path = tile_manager.construct_path(start_path, end_path, path_mat);
 	var path_size = path.size();
 	for i in range(path_size):
 		var current = path[i]
 		if (i < path_size - 1):
 			var next = path[i+1]
 			var color = Color.CORNSILK if i == 0 else Color.BLACK;
-			draw_line(t.map_to_local(current), t.map_to_local(next), color, 2);
+			draw_line(
+				tile_manager.map_to_local(current),
+				tile_manager.map_to_local(next),
+				color,
+				2
+			);

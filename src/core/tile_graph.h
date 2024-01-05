@@ -19,42 +19,33 @@ struct TileVertex {
     Vector2i coords;
     int weight;
     TileMat mat;
-    TileVertex* previous;
     std::vector<TileVertex*> edges;
 
     TileVertex()
-        : coords(Vector2i()),
-          weight(0),
-          mat(TILE_MAT_NONE),
-          previous(nullptr),
-          edges({}) {}
+        : coords(Vector2i()), weight(0), mat(TILE_MAT_NONE), edges({}) {}
 };
 
-// int with default value of max instead of 0
+// int with an arbitrary default
+// value of 50000 instead of 0
 struct AStarScoreNode {
     int val;
-    // TODO remove hardcoded value
     AStarScoreNode() : val(5e4) {}
     AStarScoreNode(int i) : val(i) {}
 };
 
-// keep track of where we came from, so path between
-// start/end can be reconstructed once end is reached
 using AStarCameFromMap = std::map<TileVertex*, TileVertex*>;
-// best currently known paths from start to node N
 using AStarGScoreMap = std::map<TileVertex*, AStarScoreNode>;
-// best guess as to how cheap a path from start to end
-// could be if it goes through node N
 using AStarFScoreMap = std::map<TileVertex*, AStarScoreNode>;
-// prio queue doesn't contain a method to see if it contains an element
-// so, because I'm stupid, I have another map that keeps track of that
-// if value is 0, not added, if value is 1, then it is added
 using AStarPrioQueueMember = std::map<TileVertex*, int>;
 
+/* TileGraph is a weighted undirected graph
+ * structure that is used for pathfinding */
+// TODO should probably think about caching path results at some point
 class TileGraph {
    private:
     static const int MaxPathLength_;
 
+    std::map<const Vector2i, int> foreign_occupants_;
     std::vector<TileVertex*> vertices_;
 
     int astar_calculate_heuristic_(TileVertex* current, TileVertex* goal) const;
@@ -69,15 +60,25 @@ class TileGraph {
     inline const std::vector<TileVertex*>& get_vertices_() const {
         return vertices_;
     }
+    inline void reset_occupants() { foreign_occupants_.clear(); }
+    inline bool has_occupant(const Vector2i v) const {
+        auto occupant{foreign_occupants_.find(v)};
+        if (occupant != foreign_occupants_.end() && occupant->second > 0) {
+            return true;
+        }
+        return false;
+    }
 
     PackedVector2Array astar_construct_path(TileVertex* start, TileVertex* end,
                                             const TileMat mat);
     PackedVector2Array astar_construct_path(Vector2i start, Vector2i end,
                                             const TileMat mat);
     void add_edge(TileVertex* v1, TileVertex* v2);
-    bool add_edge(const Vector2i v1, const Vector2i v2);
+    void add_edge(const Vector2i v1, const Vector2i v2);
+    void add_foreign_occupant(const Vector2i v);
+    void remove_foreign_occupant(const Vector2i v);
     TileVertex* add_vertex(const Vector2i indicies, const int weight,
-                           const TileMat mat, TileVertex* previous);
+                           const TileMat mat);
     TileVertex* get_vertex(const Vector2i indicies) const;
     void print() const;
     void destroy();

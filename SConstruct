@@ -6,7 +6,7 @@ env = SConscript("godot-cpp/SConstruct")
 
 env.Append(CPPPATH=["src/", "src/core/", "src/nodes/"])
 
-if env["target"] == "template_debug":
+if env["target"] == "template_debug" or env["target"] == "editor":
     env.Append(CPPDEFINES=["CL_TRADING_DEBUG=1"])
 
 sources = Glob("src/**/*.cpp")

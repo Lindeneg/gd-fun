@@ -54,12 +54,16 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xllnl"]
+size = Vector2(32, 33)
 
 [node name="Ship" type="TradingVehicle"]
+tier = 383
+z_index = 4
+y_sort_enabled = true
 
 [node name="VehicleAnimation" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_fqth0")
-animation = &"down"
+animation = &"up"
 
 [node name="VehicleCollider" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_xllnl")

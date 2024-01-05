@@ -34,7 +34,6 @@ struct CellTileContext {
 class TileManager : public TileMap {
     GDCLASS(TileManager, TileMap)
 
-    // TODO should know about own material (ground/water)
    private:
     // draw colored tile grid
     bool debug_mode_;
@@ -87,7 +86,9 @@ class TileManager : public TileMap {
     void set_rebuild_debug_graph(const bool m);
     void set_debug_mode(const bool m);
     void set_map_size(const Vector2i v);
+    void update_vertex_mat(const Vector2i v, const int m);
 
+    inline bool reset_occupants() { tile_graph_.reset_occupants(); }
     inline bool get_rebuild_debug_graph() const { return rebuild_debug_graph_; }
     inline bool get_debug_mode() const { return debug_mode_; }
     inline int32_t get_tile_graph_size() const {

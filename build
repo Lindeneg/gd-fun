@@ -19,9 +19,9 @@ if [[ "$1" == "release" ]]
 then
     echo "building release"
     build_release
-elif [[ "$1" == "pdb" ]]
+elif [[ "$1" == "editor" ]]
 then
-    echo "building pdb"
+    echo "building editor"
     scons platform=windows target=editor debug_symbols=yes
 else
     echo "building debug"

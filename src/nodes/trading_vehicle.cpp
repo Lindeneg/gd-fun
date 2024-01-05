@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
+#include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/rectangle_shape2d.hpp>
 #include <godot_cpp/classes/sprite_frames.hpp>
@@ -15,7 +16,6 @@
 #include <iostream>
 
 #include "../core/utils.h"
-#include "godot_cpp/classes/global_constants.hpp"
 
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const char* godot::CL::TradingVehicle::AnimationNames
@@ -98,7 +98,7 @@ void godot::CL::TradingVehicle::initialize_sprite_frames_() {
 }
 
 void godot::CL::TradingVehicle::handle_movement(double delta) {
-    if (::CL::is_in_editor()) {
+    if (Utils::is_in_editor()) {
         return;
     }
     // TODO remove this tmp code, movement comes from routes not input
@@ -133,16 +133,18 @@ void godot::CL::TradingVehicle::update_animation() {
 }
 
 void godot::CL::TradingVehicle::_ready() {
-    if (::CL::is_in_editor()) {
+    if (Utils::is_in_editor()) {
         e_assign_required_components_();
     } else {
         r_assign_required_components_();
     }
+    set_y_sort_enabled(true);
+    set_z_index(4);
     emit_debug_signal_();
 }
 
 void godot::CL::TradingVehicle::_process(double delta) {
-    if (::CL::is_in_game()) {
+    if (Utils::is_in_game()) {
         handle_movement(delta);
     }
 }

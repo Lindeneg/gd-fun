@@ -15,6 +15,7 @@
 
 #include "../core/tile_graph.h"
 #include "../core/utils.h"
+#include "godot_cpp/variant/node_path.hpp"
 
 godot::CL::TileManager::TileManager()
     : debug_mode_(false),
@@ -52,10 +53,8 @@ void godot::CL::TileManager::emit_debug_signal_() {
 #ifdef CL_TRADING_DEBUG
     if (debug_mode_ && get_tile_graph_size() > 0 && tile_size_ > 0) {
         set_debug_array_();
-        std::cout << "TileManager: emitting draw debug signal\n";
         emit_signal("draw_debug_grid", tile_size_, debug_array_);
     } else {
-        std::cout << "TileManager: emitting clear debug signal\n";
         emit_signal("remove_debug_grid");
     }
 #endif
@@ -83,13 +82,11 @@ void godot::CL::TileManager::set_debug_array_() {
 void godot::CL::TileManager::create_graph_() {
     tile_graph_.destroy();
     for (int i = 0; i < map_size_.y; i++) {
-        TileVertex* previous{nullptr};
         for (int j = 0; j < map_size_.x; j++) {
             const auto coords{Vector2i(j, i)};
             const CellTileContext tile_context{get_tile_context_(coords)};
             TileVertex* new_vertex{tile_graph_.add_vertex(
-                coords, tile_context.weight, tile_context.mat, previous)};
-            previous = new_vertex;
+                coords, tile_context.weight, tile_context.mat)};
             // add up neighbor
             if (i > 0) {
                 add_tile_edge_(Vector2i(j, i - 1), new_vertex);
@@ -101,11 +98,7 @@ void godot::CL::TileManager::create_graph_() {
         }
     }
 #ifdef CL_TRADING_DEBUG
-    if (debug_mode_) {
-        // std::cout << "GRAPH:\n";
-        // tile_graph_.print();
-        emit_debug_signal_();
-    }
+    emit_debug_signal_();
 #endif
 }
 
@@ -117,9 +110,21 @@ void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
     tile_graph_.add_edge(current, vertex);
 }
 
+void godot::CL::TileManager::update_vertex_mat(const Vector2i v, const int m) {
+    if (m == 1) {
+        tile_graph_.add_foreign_occupant(v);
+    } else {
+        tile_graph_.remove_foreign_occupant(v);
+    }
+}
+
 godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
     const Vector2i coords) const {
     auto result{CellTileContext()};
+    if (tile_graph_.has_occupant(coords)) {
+        result.mat = TILE_MAT_OBSTACLE;
+        return result;
+    }
     TileData* obs_data{get_cell_tile_data(TILE_OBSTACLE_LAYER, coords)};
     if (obs_data != nullptr) {
         result.mat = TILE_MAT_OBSTACLE;
@@ -186,7 +191,7 @@ void godot::CL::TileManager::create_layer_(const int32_t layer,
 }
 
 void godot::CL::TileManager::_ready() {
-    if (::CL::is_in_editor()) {
+    if (Utils::is_in_editor()) {
         set_y_sort_enabled(true);
         ensure_layers_created_();
     }
@@ -198,6 +203,10 @@ void godot::CL::TileManager::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("construct_path", "start", "end", "mat"),
                          &TileManager::construct_path);
+    ClassDB::bind_method(D_METHOD("update_vertex_mat", "v", "mat"),
+                         &TileManager::update_vertex_mat);
+    ClassDB::bind_method(D_METHOD("reset_occupants"),
+                         &TileManager::reset_occupants);
 
     // MAP EDITOR PROPS
     ClassDB::bind_method(D_METHOD("get_map_size"), &TileManager::get_map_size);
@@ -222,9 +231,6 @@ void godot::CL::TileManager::_bind_methods() {
     ClassDB::add_property("TileManager",
                           PropertyInfo(Variant::BOOL, "debug_mode"),
                           "set_debug_mode", "get_debug_mode");
-    ClassDB::add_property("TileManager",
-                          PropertyInfo(Variant::BOOL, "rebuild_debug_graph"),
-                          "set_rebuild_debug_graph", "get_rebuild_debug_graph");
 
     // SIGNALS
     ClassDB::add_signal(

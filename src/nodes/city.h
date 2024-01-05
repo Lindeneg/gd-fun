@@ -16,7 +16,7 @@ enum CitySize {
 };
 
 /* City has supply, demand and a size.
- * City als only place where
+ * City also only place where
  * Industry can be located.
  *
  * City size grows over time allowing
@@ -24,13 +24,19 @@ enum CitySize {
 class City : public Node2D {
     GDCLASS(City, Node2D)
 
+    // TODO create CityManager
    private:
+    // TODO use typed array
     // resource supply
     Array supply_;
     // resource demand
     Array demand_;
     // industries in city
     Array industries_;
+    // onshore entry points for trading vehicles
+    Array onshore_entries_;
+    // offshore entry points for trading vehicles
+    Array offshore_entries_;
     // city size
     CitySize size_;
     // maximum capacity i.e
@@ -46,6 +52,8 @@ class City : public Node2D {
     City();
     ~City();
 
+    void _ready() override;
+
     // TODO
     // void add_supply();
     // void remove_supply();
@@ -55,6 +63,8 @@ class City : public Node2D {
     // void remove_industry();
     inline void set_size(const CitySize s) { size_ = s; }
 
+    inline Array get_onshore_entries() const { return onshore_entries_; }
+    inline Array get_offshore_entries() const { return offshore_entries_; }
     inline Array get_supply() const { return supply_; }
     inline Array get_demand() const { return demand_; }
     inline Array get_industries() const { return industries_; }

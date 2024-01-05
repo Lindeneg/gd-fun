@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://ctoa158yq0esu"]
+
+[ext_resource type="PackedScene" uid="uid://dovhhg3bg0wmu" path="res://sprites/cities/houses/house_a.tscn" id="1_snhyq"]
+
+[node name="CityGround" type="City"]
+z_index = 5
+y_sort_enabled = true
+
+[node name="HouseA" parent="." instance=ExtResource("1_snhyq")]
+
+[node name="HouseA2" parent="." instance=ExtResource("1_snhyq")]
+position = Vector2(16, 0)
+
+[node name="HouseA3" parent="." instance=ExtResource("1_snhyq")]
+position = Vector2(16, 16)
+
+[node name="HouseA4" parent="." instance=ExtResource("1_snhyq")]
+position = Vector2(32, 16)
+
+[node name="HouseA5" parent="." instance=ExtResource("1_snhyq")]
+position = Vector2(32, 0)
+
+[node name="CityEntryGroundPoint" type="Marker2D" parent="."]
+position = Vector2(8, 24)
+gizmo_extents = 6.0

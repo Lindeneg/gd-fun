@@ -6,6 +6,7 @@
 #include <godot_cpp/godot.hpp>
 
 #include "../nodes/city.h"
+#include "../nodes/city_manager.h"
 #include "../nodes/route.h"
 #include "../nodes/tile_manager.h"
 #include "../nodes/trading_vehicle.h"
@@ -19,6 +20,7 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     ClassDB::register_class<CL::City>();
     ClassDB::register_class<CL::Route>();
     ClassDB::register_class<CL::TileManager>();
+    ClassDB::register_class<CL::CityManager>();
     ClassDB::register_class<CL::TradingVehicle>();
 }
 

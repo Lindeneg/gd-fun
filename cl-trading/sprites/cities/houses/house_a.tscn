@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://dovhhg3bg0wmu"]
+
+[ext_resource type="Texture2D" uid="uid://d0u3eybdsevc7" path="res://assets/Buildings/Wood/Houses.png" id="1_t4njs"]
+
+[node name="HouseA" type="Node2D"]
+
+[node name="HouseASprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_t4njs")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)

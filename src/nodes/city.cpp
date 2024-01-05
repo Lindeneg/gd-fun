@@ -2,6 +2,11 @@
 
 #include <godot_cpp/core/class_db.hpp>
 
+#include "godot_cpp/classes/global_constants.hpp"
+#include "godot_cpp/core/property_info.hpp"
+#include "godot_cpp/variant/node_path.hpp"
+#include "godot_cpp/variant/variant.hpp"
+
 godot::CL::City::City()
     : supply_(Array()),
       demand_(Array()),
@@ -12,10 +17,17 @@ godot::CL::City::City()
 
 godot::CL::City::~City() {}
 
+void godot::CL::City::_ready() {
+    set_y_sort_enabled(true);
+    set_z_index(5);
+}
+
 void godot::CL::City::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_size"), &City::get_size);
     ClassDB::bind_method(D_METHOD("set_size", "s"), &City::set_size);
+    ClassDB::bind_method(D_METHOD("get_onshore_entries"),
+                         &City::get_onshore_entries);
 
     ClassDB::add_property(
         "City",

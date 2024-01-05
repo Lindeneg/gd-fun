@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=31 format=3 uid="uid://dxklvh7v3a88l"]
+[gd_resource type="TileSet" load_steps=35 format=3 uid="uid://dxklvh7v3a88l"]
 
 [ext_resource type="Texture2D" uid="uid://bcg7op4qoavig" path="res://assets/Ground/TexturedGrass.png" id="1_11stx"]
 [ext_resource type="Texture2D" uid="uid://bra5p5uhicrlu" path="res://assets/Ground/Grass.png" id="2_f7ccx"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dykjq2yvw3m0d" path="res://assets/Nature/WinterDeadTrees.png" id="7_f6u8f"]
 [ext_resource type="Texture2D" uid="uid://bml8ksi8o6q0m" path="res://assets/Nature/WinterTrees.png" id="8_eb0a1"]
 [ext_resource type="Texture2D" uid="uid://bhdtt4tn1vvja" path="res://assets/Ground/Shore.png" id="9_4e7qk"]
+[ext_resource type="Texture2D" uid="uid://b3lcq5raetqpx" path="res://assets/Buildings/Wood/Docks.png" id="10_1yna0"]
 [ext_resource type="Texture2D" uid="uid://dpwhqrpalg4x8" path="res://assets/Ground/Cliff.png" id="10_7ifyl"]
 [ext_resource type="Texture2D" uid="uid://cfgaaqkl5ayl1" path="res://assets/Ground/Cliff-Water.png" id="11_xl2sf"]
 [ext_resource type="Texture2D" uid="uid://derno3cw1sbv4" path="res://assets/Nature/Cactus.png" id="12_fciao"]
@@ -16,20 +17,26 @@
 [ext_resource type="Texture2D" uid="uid://n6arnmsdkfvd" path="res://assets/Nature/DeadTrees.png" id="14_n74nq"]
 [ext_resource type="Texture2D" uid="uid://dg2p3cxyyxq0s" path="res://assets/Nature/PineTrees.png" id="15_b3qp1"]
 
+[sub_resource type="TileMapPattern" id="TileMapPattern_23pc7"]
+tile_data = PackedInt32Array(0, 0, 0, 65536, 0, 0, 1, 65536, 0, 65537, 65536, 0)
+
+[sub_resource type="TileMapPattern" id="TileMapPattern_2pr40"]
+tile_data = PackedInt32Array(0, 131075, 0, 65536, 131075, 1)
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jo6l1"]
 texture = ExtResource("1_11stx")
 0:0/0 = 0
 0:0/0/custom_data_0 = 1
 1:0/0 = 0
-1:0/0/custom_data_0 = 50
+1:0/0/custom_data_0 = 2
 2:0/0 = 0
-2:0/0/custom_data_0 = 50
+2:0/0/custom_data_0 = 2
 0:1/0 = 0
 0:1/0/custom_data_0 = 1
 1:1/0 = 0
-1:1/0/custom_data_0 = 50
+1:1/0/custom_data_0 = 2
 2:1/0 = 0
-2:1/0/custom_data_0 = 50
+2:1/0/custom_data_0 = 2
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4hcxs"]
 texture = ExtResource("2_f7ccx")
@@ -118,6 +125,17 @@ texture = ExtResource("9_4e7qk")
 4:0/0 = 0
 4:0/0/custom_data_0 = 1
 4:0/0/custom_data_1 = true
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_usltg"]
+texture = ExtResource("10_1yna0")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4q7jh"]
 texture = ExtResource("10_7ifyl")
@@ -259,3 +277,6 @@ sources/12 = SubResource("TileSetAtlasSource_6ftx1")
 sources/13 = SubResource("TileSetAtlasSource_si7tw")
 sources/14 = SubResource("TileSetAtlasSource_wo7jb")
 sources/15 = SubResource("TileSetAtlasSource_ybr0w")
+sources/3 = SubResource("TileSetAtlasSource_usltg")
+pattern_0 = SubResource("TileMapPattern_23pc7")
+pattern_1 = SubResource("TileMapPattern_2pr40")

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://r857xm6bjgiu"]
+
+[ext_resource type="Texture2D" uid="uid://b3lcq5raetqpx" path="res://assets/Buildings/Wood/Docks.png" id="1_8vrk0"]
+
+[node name="HouseDockDown" type="Node2D"]
+
+[node name="HouseDockDownSprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_8vrk0")
+centered = false
+region_enabled = true
+region_rect = Rect2(32, 0, 16, 32)
