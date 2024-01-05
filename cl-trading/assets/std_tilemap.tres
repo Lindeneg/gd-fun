@@ -78,6 +78,7 @@ texture = ExtResource("5_amg8k")
 1:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_si7tw"]
+resource_name = "WheatField"
 texture = ExtResource("6_m1xru")
 0:0/0 = 0
 1:0/0 = 0

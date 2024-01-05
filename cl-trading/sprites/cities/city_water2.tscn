@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://bhfi0udcbb1dk"]
+
+[ext_resource type="PackedScene" uid="uid://dovhhg3bg0wmu" path="res://sprites/cities/houses/house_a.tscn" id="1_6hwnq"]
+[ext_resource type="PackedScene" uid="uid://cvvuc375bhj5v" path="res://sprites/cities/houses/house_dock_up.tscn" id="2_yox23"]
+
+[node name="CityWater" type="City"]
+z_index = 5
+y_sort_enabled = true
+
+[node name="HouseA" parent="." instance=ExtResource("1_6hwnq")]
+position = Vector2(32, 16)
+
+[node name="HouseA2" parent="." instance=ExtResource("1_6hwnq")]
+position = Vector2(16, 16)
+
+[node name="HouseA7" parent="." instance=ExtResource("1_6hwnq")]
+position = Vector2(32, 32)
+
+[node name="HouseA8" parent="." instance=ExtResource("1_6hwnq")]
+position = Vector2(16, 32)
+
+[node name="HouseDockUp" parent="." instance=ExtResource("2_yox23")]
+position = Vector2(0, 16)
+
+[node name="HouseA3" parent="." instance=ExtResource("1_6hwnq")]
+position = Vector2(48, 16)
+
+[node name="CityEntryGroundPoint" type="Marker2D" parent="."]
+position = Vector2(8, 8)
+gizmo_extents = 6.0
+
+[node name="CityEntryWaterPoint" type="Marker2D" parent="."]
+position = Vector2(56, 40)
+gizmo_extents = 6.0

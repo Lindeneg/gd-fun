@@ -23,6 +23,9 @@ const char* godot::CL::TradingVehicle::AnimationNames
 
 godot::CL::TradingVehicle::TradingVehicle()
     : debug_mode_(false),
+      map_route_inc_(true),
+      map_route_(TypedArray<Vector2>()),
+      current_map_route_idx_(0),
       speed_(0.0),
       destination_threshold_(0.0),
       state_(VEHICLE_IDLE),
@@ -97,56 +100,77 @@ void godot::CL::TradingVehicle::initialize_sprite_frames_() {
     animated_sprite_->set_sprite_frames(sprite_frames);
 }
 
-void godot::CL::TradingVehicle::handle_movement(double delta) {
-    if (Utils::is_in_editor()) {
+void godot::CL::TradingVehicle::handle_movement_(double delta) {
+    if (state_ != VEHICLE_MOVING || Utils::is_in_editor()) {
         return;
     }
-    // TODO remove this tmp code, movement comes from routes not input
-    if (Input::get_singleton()->is_action_just_pressed("mouse_click")) {
-        navigation_target_ = get_global_mouse_position();
-        state_ = VEHICLE_MOVING;
-    }
-
-    if (state_ != VEHICLE_MOVING) {
-        return;
-    }
-
     const Vector2 pos{get_position()};
     const Vector2 diff{navigation_target_ - pos};
     if (diff.length() <= destination_threshold_) {
-        state_ = VEHICLE_IDLE;  // destination reached
-        animated_sprite_->stop();
+        auto next{get_next_navigation_target_()};
+        if (next.is_valid_target) {
+            set_navigation_target(next.target);
+        } else {
+            auto tmp = navigation_target_;
+            state_ = VEHICLE_IDLE;
+            animated_sprite_->stop();
+            map_route_inc_ = !map_route_inc_;
+            navigation_target_ = Vector2();
+            emit_signal("destination_reached", tmp);
+        }
         return;
     }
     direction_ = diff.normalized();
     set_position(pos + (direction_ * speed_ * delta));
-    update_animation();
+    update_animation_();
 }
 
-void godot::CL::TradingVehicle::update_animation() {
+void godot::CL::TradingVehicle::start_navigating() {
+    auto next{get_next_navigation_target_()};
+    if (!next.is_valid_target) {
+        // TODO err message
+        return;
+    }
+    navigation_target_ = next.target;
+    state_ = VEHICLE_MOVING;
+}
+
+void godot::CL::TradingVehicle::stop_navigating() {
+    state_ = VEHICLE_IDLE;
+    animated_sprite_->stop();
+}
+
+godot::CL::NextNavResult
+godot::CL::TradingVehicle::get_next_navigation_target_() {
+    int64_t route_size{map_route_.size()};
+    NextNavResult result{};
+    if (map_route_inc_) {
+        if (current_map_route_idx_ < route_size) {
+            result.target = map_route_[current_map_route_idx_];
+            result.is_valid_target = result.target != navigation_target_;
+            if (current_map_route_idx_ + 1 < route_size) {
+                ++current_map_route_idx_;
+            }
+        }
+    } else {
+        if (current_map_route_idx_ >= 0) {
+            result.target = map_route_[current_map_route_idx_];
+            result.is_valid_target = result.target != navigation_target_;
+            if (current_map_route_idx_ > 0) {
+                --current_map_route_idx_;
+            }
+        }
+    }
+    return result;
+}
+
+void godot::CL::TradingVehicle::update_animation_() {
     const auto anim_idx{static_cast<int32_t>(
         (AnimationSize *
          (direction_.rotated(Math_PI / AnimationSize).angle() + Math_PI) /
          Math_TAU))};
     ERR_FAIL_INDEX_MSG(anim_idx, AnimationSize, "anim_idx is out of bounds");
     animated_sprite_->play(AnimationNames[anim_idx]);
-}
-
-void godot::CL::TradingVehicle::_ready() {
-    if (Utils::is_in_editor()) {
-        e_assign_required_components_();
-    } else {
-        r_assign_required_components_();
-    }
-    set_y_sort_enabled(true);
-    set_z_index(4);
-    emit_debug_signal_();
-}
-
-void godot::CL::TradingVehicle::_process(double delta) {
-    if (Utils::is_in_game()) {
-        handle_movement(delta);
-    }
 }
 
 void godot::CL::TradingVehicle::emit_debug_signal_() {
@@ -161,17 +185,38 @@ void godot::CL::TradingVehicle::emit_debug_signal_() {
 #endif
 }
 
+void godot::CL::TradingVehicle::_ready() {
+    if (Utils::is_in_editor()) {
+        e_assign_required_components_();
+    } else {
+        r_assign_required_components_();
+    }
+    set_y_sort_enabled(true);
+    set_z_index(6);
+    emit_debug_signal_();
+}
+
+void godot::CL::TradingVehicle::_process(double delta) {
+    if (Utils::is_in_game()) {
+        handle_movement_(delta);
+    }
+}
+
 void godot::CL::TradingVehicle::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
-
     ClassDB::bind_method(D_METHOD("get_navigation_target"),
                          &TradingVehicle::get_navigation_target);
-    ClassDB::bind_method(D_METHOD("set_navigation_target", "t"),
-                         &TradingVehicle::set_navigation_target);
 
-    ClassDB::bind_method(D_METHOD("handle_movement", "delta"),
-                         &TradingVehicle::handle_movement);
+    ClassDB::bind_method(D_METHOD("set_map_path", "v"),
+                         &TradingVehicle::set_map_path);
+    ClassDB::bind_method(D_METHOD("clear_map_path"),
+                         &TradingVehicle::clear_map_path);
+
+    ClassDB::bind_method(D_METHOD("start_navigating"),
+                         &TradingVehicle::start_navigating);
+    ClassDB::bind_method(D_METHOD("stop_navigating"),
+                         &TradingVehicle::stop_navigating);
 
     ClassDB::bind_method(D_METHOD("is_moving"), &TradingVehicle::is_moving);
 
@@ -220,6 +265,10 @@ void godot::CL::TradingVehicle::_bind_methods() {
                                    PropertyInfo(Variant::VECTOR2, "position"),
                                    PropertyInfo(Variant::VECTOR2, "target")));
     ClassDB::add_signal("TradingVehicle", MethodInfo("clear_debug_lines"));
+    ClassDB::add_signal(
+        "TradingVehicle",
+        MethodInfo("destination_reached",
+                   PropertyInfo(Variant::VECTOR2, "destination")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);

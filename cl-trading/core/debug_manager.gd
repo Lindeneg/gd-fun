@@ -37,26 +37,19 @@ extends Node2D
 	set(value):
 		tile_manager.set_rebuild_debug_graph(true);
 
-@export_group("Path Finding")
-@export var start_path: Vector2i = Vector2i();
-@export var end_path: Vector2i = Vector2i();
-@export_enum("Ground:1", "Water:2") var path_mat: int = 1:
+@export_group("Routes")
+@export var show_route_paths: bool = false:
 	get:
-		return path_mat;
+		return show_route_paths;
 	set(value):
-		path_mat = value;
-		queue_redraw();
-@export var show_path: bool = false:
-	get:
-		return show_path;
-	set(value):
-		show_path = value;
+		show_route_paths = value;
 		queue_redraw();
 
-const TILE_MANAGER_NAME: String = "TileManagerGrid";
+													 # NONE        # GROUND    # WATER      # OBSTACLE
 const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
 var tile_size: int = 0;
-var draw_shapes: Dictionary = {};
+var tile_array = [];
+var route_paths: Dictionary = {};
 
 @onready var tile_manager = $"../TileManager" as TileManager;
 @onready var city_manager = $"../CityManager" as CityManager;
@@ -64,46 +57,48 @@ var draw_shapes: Dictionary = {};
 func _draw():
 	if not debug_mode:
 		return;
-	for key in draw_shapes.keys():
-		if key == TILE_MANAGER_NAME and show_tiles:
-			draw_tile_manager_grid();
-	if show_path:
-		draw_path_line();
+	if show_tiles and tile_array and tile_array.size() > 0:
+		draw_tile_manager_grid();
+	if show_route_paths:
+		for route_key in route_paths.keys():
+			var route_path: Array = route_paths[route_key];
+			if route_path and route_path.size() > 0:
+				draw_route_path(route_path);
 
 func _on_tile_manager_draw_debug_grid(size: int, tiles: Array) -> void:
 	tile_size = size;
-	draw_shapes[TILE_MANAGER_NAME] = tiles;
+	tile_array = tiles;
 	queue_redraw();
 
 func _on_tile_manager_remove_debug_grid() -> void:
-	if draw_shapes.has(TILE_MANAGER_NAME):
-		tile_size = 0;
-		draw_shapes.erase(TILE_MANAGER_NAME);
-		queue_redraw();
+	tile_array = [];
+	tile_size = 0;
+	queue_redraw();
+
+
 
 func draw_tile_manager_grid():
-	var vectors = draw_shapes.get(TILE_MANAGER_NAME);
 	var half_tile_size = int(tile_size / 2.0);
-	for vec in vectors:
-		if vec == null:
+	for tile in tile_array:
+		if tile == null:
 			return;
 		draw_rect(
 			Rect2(
-				vec.coords.x - half_tile_size,
-				vec.coords.y - half_tile_size,
+				tile.coords.x - half_tile_size,
+				tile.coords.y - half_tile_size,
 				tile_size, tile_size
 			),
-			TILE_COLORS[vec.mat],
+			TILE_COLORS[tile.mat],
 			false
 		);
 		if show_tile_coords:
-			var local_coord = tile_manager.local_to_map(vec.coords);
+			var local_coord = tile_manager.local_to_map(tile.coords);
 			draw_tile_coord_string(
-				Vector2(vec.coords.x - half_tile_size, vec.coords.y),
+				Vector2(tile.coords.x - half_tile_size, tile.coords.y),
 				str(local_coord.x)
 			);
 			draw_tile_coord_string(
-				Vector2(vec.coords.x - half_tile_size, vec.coords.y + half_tile_size),
+				Vector2(tile.coords.x - half_tile_size, tile.coords.y + half_tile_size),
 				str(local_coord.y)
 			);
 
@@ -118,14 +113,11 @@ func draw_tile_coord_string(vec: Vector2, s: String):
 			Color.BLACK,
 		);
 
-# manual testing of path finding
-func draw_path_line():
-	if start_path == end_path:
-		return;
-	var path = tile_manager.construct_path(start_path, end_path, path_mat);
+func draw_route_path(path: Array):
 	var path_size = path.size();
+	print(path_size);
 	for i in range(path_size):
-		var current = path[i]
+		var current = path[i];
 		if (i < path_size - 1):
 			var next = path[i+1]
 			var color = Color.CORNSILK if i == 0 else Color.BLACK;
@@ -135,3 +127,8 @@ func draw_path_line():
 				color,
 				2
 			);
+
+func _on_route_a_draw_debug_path(name: String, v: Array) -> void:
+	print("DW", v)
+	route_paths[name] = v;
+	queue_redraw();

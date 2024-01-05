@@ -20,6 +20,7 @@ mono_crash.*.json
 extension_api.json
 compile_commands.json
 notes.txt
+.vs
 *.obj
 *.pdb
 *.rdbg

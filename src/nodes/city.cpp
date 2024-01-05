@@ -1,11 +1,10 @@
 #include "city.h"
 
+#include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/core/class_db.hpp>
-
-#include "godot_cpp/classes/global_constants.hpp"
-#include "godot_cpp/core/property_info.hpp"
-#include "godot_cpp/variant/node_path.hpp"
-#include "godot_cpp/variant/variant.hpp"
+#include <godot_cpp/core/property_info.hpp>
+#include <godot_cpp/variant/node_path.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
 godot::CL::City::City()
     : supply_(Array()),

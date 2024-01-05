@@ -4,24 +4,15 @@ import sys
 
 env = SConscript("godot-cpp/SConstruct")
 
-env.Append(CPPPATH=["src/", "src/core/", "src/nodes/"])
+env.Append(CPPPATH=["src/core/", "src/nodes/", "src/register"])
 
 if env["target"] == "template_debug" or env["target"] == "editor":
     env.Append(CPPDEFINES=["CL_TRADING_DEBUG=1"])
 
 sources = Glob("src/**/*.cpp")
-
-if env["platform"] == "macos":
-    library = env.SharedLibrary(
-        "cl-trading/bin/cltrading.{}.{}.framework/cltrading.{}.{}".format(
-            env["platform"], env["target"], env["platform"], env["target"]
-        ),
-        source=sources,
-    )
-else:
-    library = env.SharedLibrary(
+library = env.SharedLibrary(
         "cl-trading/bin/cltrading{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
-        source=sources,
-    )
+        source=sources)
+
 
 Default(library)

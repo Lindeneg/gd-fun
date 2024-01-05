@@ -1,3 +1,3 @@
 #!/usr/bin/bash
 
-gd421 ./cl-trading/project.godot
+gd421 ./cl-trading/project.godot "$1"

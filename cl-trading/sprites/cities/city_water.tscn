@@ -12,6 +12,12 @@ y_sort_enabled = true
 [node name="HouseDockDown" parent="." instance=ExtResource("2_o54sl")]
 position = Vector2(0, 16)
 
+[node name="HouseA2" parent="." instance=ExtResource("1_deve5")]
+position = Vector2(16, 16)
+
+[node name="HouseA7" parent="." instance=ExtResource("1_deve5")]
+position = Vector2(16, 32)
+
 [node name="CityEntryGroundPoint" type="Marker2D" parent="."]
 position = Vector2(24, 8)
 gizmo_extents = 6.0
@@ -19,21 +25,3 @@ gizmo_extents = 6.0
 [node name="CityEntryWaterPoint" type="Marker2D" parent="."]
 position = Vector2(8, 56)
 gizmo_extents = 6.0
-
-[node name="HouseA2" parent="." instance=ExtResource("1_deve5")]
-position = Vector2(16, 16)
-
-[node name="HouseA3" parent="." instance=ExtResource("1_deve5")]
-position = Vector2(32, 16)
-
-[node name="HouseA4" parent="." instance=ExtResource("1_deve5")]
-position = Vector2(32, 0)
-
-[node name="HouseA5" parent="." instance=ExtResource("1_deve5")]
-position = Vector2(32, 32)
-
-[node name="HouseA6" parent="." instance=ExtResource("1_deve5")]
-position = Vector2(48, 0)
-
-[node name="HouseA7" parent="." instance=ExtResource("1_deve5")]
-position = Vector2(16, 32)
