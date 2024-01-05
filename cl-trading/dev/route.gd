@@ -1,3 +1,4 @@
+@tool
 extends Route
 
 signal draw_debug_path(name: String, v: Array);
@@ -14,16 +15,25 @@ signal draw_debug_path(name: String, v: Array);
 		return show_debug_path;
 	set(value):
 		show_debug_path = value;
-		tile_route = tile_manager.construct_path(start, end, route_surface);
 		emit_signal("draw_debug_path", name, tile_route if show_debug_path else []);
 
 @onready var vehicle = $"Ship" as TradingVehicle;
-@onready var tile_manager = $"../TileManager" as TileManager;
+var tile_manager: TileManager;
 
 var tile_route = [];
 
+func _on_tile_manager_ready() -> void:
+	tile_manager = $"../TileManager" as TileManager;
+	if Engine.is_editor_hint():
+		tile_route = tile_manager.construct_path(start, end, route_surface);
+		emit_signal("draw_debug_path", name, tile_route if show_debug_path else []);
+
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return;
 	tile_route = tile_manager.construct_path(start, end, route_surface);
+	if show_debug_path:
+		emit_signal("draw_debug_path", name, tile_route);
 	var map_route = [];
 	for coord in tile_route:
 		map_route.append(tile_manager.map_to_local(coord));
@@ -31,5 +41,7 @@ func _ready() -> void:
 	vehicle.start_navigating();
 
 func _on_ship_destination_reached(_destination: Vector2) -> void:
-	pass
+	if Engine.is_editor_hint():
+		return;
 	#vehicle.start_navigating();
+

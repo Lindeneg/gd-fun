@@ -50,9 +50,9 @@ position = Vector2(224, 240)
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 debug_mode = true
 show_tiles = true
-show_route_paths = true
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
+[connection signal="ready" from="TileManager" to="RouteA" method="_on_tile_manager_ready"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
 [connection signal="draw_debug_path" from="RouteA" to="DebugManager" method="_on_route_a_draw_debug_path"]
 [connection signal="destination_reached" from="RouteA/Ship" to="RouteA" method="_on_ship_destination_reached"]

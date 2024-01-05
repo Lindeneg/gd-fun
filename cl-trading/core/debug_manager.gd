@@ -115,7 +115,6 @@ func draw_tile_coord_string(vec: Vector2, s: String):
 
 func draw_route_path(path: Array):
 	var path_size = path.size();
-	print(path_size);
 	for i in range(path_size):
 		var current = path[i];
 		if (i < path_size - 1):
@@ -129,6 +128,5 @@ func draw_route_path(path: Array):
 			);
 
 func _on_route_a_draw_debug_path(name: String, v: Array) -> void:
-	print("DW", v)
 	route_paths[name] = v;
 	queue_redraw();
