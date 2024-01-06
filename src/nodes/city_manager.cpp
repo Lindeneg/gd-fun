@@ -1,16 +1,17 @@
 #include "city_manager.h"
 
+#include <godot_cpp/classes/marker2d.hpp>
+#include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/classes/sprite2d.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/variant/callable.hpp>
 #include <godot_cpp/variant/node_path.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
-#include "godot_cpp/classes/marker2d.hpp"
-#include "godot_cpp/classes/node2d.hpp"
-#include "godot_cpp/classes/sprite2d.hpp"
-#include "godot_cpp/variant/variant.hpp"
-#include "tile_manager.h"
-#include "utils.h"
+#include "../core/utils.h"
+#include "./city.h"
+#include "./tile_manager.h"
 
 godot::CL::CityManager::CityManager()
     : tile_manager_(nullptr),
@@ -43,7 +44,20 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
                 handle_sprite_tile_manager_notification_(
                     static_cast<Sprite2D*>(node), parent);
             } else if (typeid(*node) == typeid(Marker2D)) {
-                // std::cout << "Found Marker2D Node!\n";
+                City* city = static_cast<City*>(parent);
+                Vector2 marker_position = node->get_position();
+                Vector2i coords{tile_manager_->local_to_map(
+                    parent->to_global(marker_position))};
+                auto city_entry_type =
+                    static_cast<CityEntryType>(node->get_visibility_layer());
+                city->add_city_entry_point(coords, city_entry_type);
+                printf(
+                    "Found Marker2D '%s' with parent '%s' at coords (%d, "
+                    "%d) at layer: %d)\n",
+                    Utils::convert_gd_string(node),
+                    Utils::convert_gd_string(parent), coords.x, coords.y,
+                    city_entry_type);
+
             } else {
                 WARN_PRINT_ED(
                     vformat("%s is unhandled city node", node->get_name()));

@@ -128,7 +128,7 @@ void godot::CL::TradingVehicle::handle_movement_(double delta) {
 void godot::CL::TradingVehicle::start_navigating() {
     auto next{get_next_navigation_target_()};
     if (!next.is_valid_target) {
-        // TODO err message
+        // TODO (4) err message
         return;
     }
     navigation_target_ = next.target;
@@ -142,6 +142,7 @@ void godot::CL::TradingVehicle::stop_navigating() {
 
 godot::CL::NextNavResult
 godot::CL::TradingVehicle::get_next_navigation_target_() {
+    // TODO(5) refactor this
     int64_t route_size{map_route_.size()};
     NextNavResult result{};
     if (map_route_inc_) {

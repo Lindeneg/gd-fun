@@ -10,11 +10,23 @@ godot::CL::City::City()
     : supply_(Array()),
       demand_(Array()),
       industries_(Array()),
+      onshore_entries_(Array()),
+      offshore_entries_(Array()),
       size_(CITY_SIZE_VILLAGE),
       max_route_capacity_(0),
       current_route_size_(0) {}
 
 godot::CL::City::~City() {}
+
+void godot::CL::City::add_city_entry_point(const Vector2i coords,
+                                           const CityEntryType type) {
+    if (type == CITY_ENTRY_ONSHORE) {
+        onshore_entries_.append(coords);
+    }
+    if (type == CITY_ENTRY_OFFSHORE) {
+        offshore_entries_.append(coords);
+    }
+}
 
 void godot::CL::City::_ready() {
     set_y_sort_enabled(true);
@@ -27,7 +39,8 @@ void godot::CL::City::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_size", "s"), &City::set_size);
     ClassDB::bind_method(D_METHOD("get_onshore_entries"),
                          &City::get_onshore_entries);
-
+    ClassDB::bind_method(D_METHOD("get_offshore_entries"),
+                         &City::get_offshore_entries);
     ClassDB::add_property(
         "City",
         PropertyInfo(Variant::INT, "size", PROPERTY_HINT_ENUM,
@@ -40,4 +53,7 @@ void godot::CL::City::_bind_methods() {
     BIND_ENUM_CONSTANT(CITY_SIZE_URBAN);
     BIND_ENUM_CONSTANT(CITY_SIZE_REGIO);
     BIND_ENUM_CONSTANT(CITY_SIZE_METRO);
+
+    BIND_ENUM_CONSTANT(CITY_ENTRY_ONSHORE);
+    BIND_ENUM_CONSTANT(CITY_ENTRY_OFFSHORE);
 }

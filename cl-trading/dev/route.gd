@@ -4,10 +4,9 @@ extends Route
 signal draw_debug_path(name: String, v: Array);
 
 @export_category("Path")
-@export var start: Vector2i = Vector2i.ZERO;
-@export var end: Vector2i = Vector2i.ZERO;
+@export var start: City;
+@export var end: City;
 @export_enum("Ground:1", "Water:2") var route_surface: int = 1;
-@export var wait_time_sec: int = 5;
 
 @export_category("Debug")
 @export var show_debug_path: bool = false:
@@ -17,21 +16,25 @@ signal draw_debug_path(name: String, v: Array);
 		show_debug_path = value;
 		emit_signal("draw_debug_path", name, tile_route if show_debug_path else []);
 
+@onready var timer = $RouteATimer as Timer;
 @onready var vehicle = $"Ship" as TradingVehicle;
-var tile_manager: TileManager;
+
+@onready var tile_manager = $"../../TileManager" as TileManager;
 
 var tile_route = [];
-
-func _on_tile_manager_ready() -> void:
-	tile_manager = $"../TileManager" as TileManager;
-	if Engine.is_editor_hint():
-		tile_route = tile_manager.construct_path(start, end, route_surface);
-		emit_signal("draw_debug_path", name, tile_route if show_debug_path else []);
+var reached_at = null;
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return;
-	tile_route = tile_manager.construct_path(start, end, route_surface);
+	if !start || !end:
+		return;
+
+	var start_entries = start.get_offshore_entries();
+	var end_entries = end.get_offshore_entries();
+	if start_entries.size() == 0 || end_entries.size() == 0:
+		return;
+	tile_route = tile_manager.construct_path(start_entries[0], end_entries[0], route_surface);
 	if show_debug_path:
 		emit_signal("draw_debug_path", name, tile_route);
 	var map_route = [];
@@ -43,5 +46,7 @@ func _ready() -> void:
 func _on_ship_destination_reached(_destination: Vector2) -> void:
 	if Engine.is_editor_hint():
 		return;
-	#vehicle.start_navigating();
+	timer.start();
 
+func _on_route_a_timer_timeout() -> void:
+	vehicle.start_navigating();

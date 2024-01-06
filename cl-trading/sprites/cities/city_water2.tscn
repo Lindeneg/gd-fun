@@ -26,9 +26,10 @@ position = Vector2(0, 16)
 position = Vector2(48, 16)
 
 [node name="CityEntryGroundPoint" type="Marker2D" parent="."]
-position = Vector2(8, 8)
+position = Vector2(56, 40)
 gizmo_extents = 6.0
 
 [node name="CityEntryWaterPoint" type="Marker2D" parent="."]
-position = Vector2(56, 40)
+visibility_layer = 2
+position = Vector2(8, 8)
 gizmo_extents = 6.0

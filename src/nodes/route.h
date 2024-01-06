@@ -9,25 +9,21 @@ namespace godot::CL {
 
 class City;
 class TradingVehicle;
+class Timer;
 
 // possible route states
 enum RouteState { ROUTE_INACTIVE, ROUTE_ACTIVE };
 
 /* Route connects two Cities via TradingVehicle to trade ressources.
- * Each Route has a dynamic cost (both monetary and time)
- * relative to distance between cities.
  *
- * TODO
- * The build aspect is managed by BuildManager.
- *
- * TODO
+ * TODO (1)
  * A Route is dynamic and the Player is allowed to change important
  * aspect of it (cities and vehicle) at will against a gold cost.
  *
- * TODO
+ * TODO (1)
  * Player can also delete Route and recoup some of its gold cost.
  *
- * TODO
+ * TODO (4)
  * All Routes are controlled by RouteManager. */
 class Route : public Node {
     GDCLASS(Route, Node)
@@ -35,6 +31,7 @@ class Route : public Node {
    private:
     // current state
     RouteState state_;
+    Timer* cooldown_timer_;
     // connected city 1
     City const* c1_;
     // connnected city 2
@@ -54,7 +51,7 @@ class Route : public Node {
     Route();
     ~Route();
 
-    // void _ready() override;
+    void _ready() override;
     // void _process(double delta) override;
 
     void change_trading_vehicle();
@@ -63,9 +60,11 @@ class Route : public Node {
     inline int get_distance() const { return distance_; }
     inline int get_gold_cost() const { return gold_cost_; }
     inline RouteState get_route_state() const { return state_; }
-    inline const TradingVehicle* get_vehicle() const { return vehicle_; }
+    inline TradingVehicle* get_vehicle() const { return vehicle_; }
     inline const City* get_city_one() const { return c1_; }
     inline const City* get_city_two() const { return c2_; }
+
+    void set_vehicle(TradingVehicle* vehicle);
 };
 }  // namespace godot::CL
 

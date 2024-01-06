@@ -20,6 +20,12 @@ position = Vector2(32, 16)
 [node name="HouseA5" parent="." instance=ExtResource("1_snhyq")]
 position = Vector2(32, 0)
 
+[node name="HouseA6" parent="." instance=ExtResource("1_snhyq")]
+position = Vector2(48, 16)
+
+[node name="HouseA7" parent="." instance=ExtResource("1_snhyq")]
+position = Vector2(48, 0)
+
 [node name="CityEntryGroundPoint" type="Marker2D" parent="."]
 position = Vector2(8, 24)
 gizmo_extents = 6.0

@@ -15,6 +15,8 @@ enum CitySize {
     CITY_SIZE_METRO
 };
 
+enum CityEntryType { CITY_ENTRY_ONSHORE = 1, CITY_ENTRY_OFFSHORE = 2 };
+
 /* City has supply, demand and a size.
  * City also only place where
  * Industry can be located.
@@ -24,9 +26,8 @@ enum CitySize {
 class City : public Node2D {
     GDCLASS(City, Node2D)
 
-    // TODO create CityManager
    private:
-    // TODO use typed array
+    // TODO (2) use typed array
     // resource supply
     Array supply_;
     // resource demand
@@ -54,7 +55,7 @@ class City : public Node2D {
 
     void _ready() override;
 
-    // TODO
+    // TODO (2)
     // void add_supply();
     // void remove_supply();
     // void add_demand();
@@ -62,6 +63,8 @@ class City : public Node2D {
     // void add_industry();
     // void remove_industry();
     inline void set_size(const CitySize s) { size_ = s; }
+
+    void add_city_entry_point(const Vector2i coords, const CityEntryType type);
 
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }
@@ -75,5 +78,6 @@ class City : public Node2D {
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::CitySize);
+VARIANT_ENUM_CAST(godot::CL::CityEntryType);
 
 #endif  // CL_TRADING_CITY_H_

@@ -1,11 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://fhxcmytplax2"]
+[gd_scene load_steps=8 format=3 uid="uid://fhxcmytplax2"]
 
 [ext_resource type="PackedScene" uid="uid://bmsmew3bvvad8" path="res://sprites/ship.tscn" id="1_wq5is"]
 [ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile_manager.tscn" id="3_0dhwo"]
 [ext_resource type="PackedScene" uid="uid://ctoa158yq0esu" path="res://sprites/cities/city_ground.tscn" id="3_rkss4"]
 [ext_resource type="PackedScene" uid="uid://btfn8crdxt066" path="res://sprites/cities/city_water.tscn" id="4_eqffp"]
 [ext_resource type="PackedScene" uid="uid://b1p2ffxrmj7xq" path="res://core/debug_manager.tscn" id="4_olsel"]
-[ext_resource type="Script" path="res://dev/RouteManager.gd" id="5_2dhrp"]
 [ext_resource type="PackedScene" uid="uid://bhfi0udcbb1dk" path="res://sprites/cities/city_water2.tscn" id="5_2dkme"]
 [ext_resource type="Script" path="res://dev/route.gd" id="6_gcq1m"]
 
@@ -34,7 +33,6 @@ position = Vector2(16, 144)
 position = Vector2(192, 240)
 
 [node name="RouteManager" type="Node" parent="."]
-script = ExtResource("5_2dhrp")
 
 [node name="RouteA" type="Route" parent="RouteManager" node_paths=PackedStringArray("start", "end")]
 script = ExtResource("6_gcq1m")
@@ -44,8 +42,8 @@ route_surface = 2
 show_debug_path = true
 
 [node name="Ship" parent="RouteManager/RouteA" instance=ExtResource("1_wq5is")]
-speed = 10.0
-destination_threshold = 1.0
+speed = 50.0
+destination_threshold = 0.5
 debug_mode = true
 z_index = 6
 texture_filter = 1
@@ -56,6 +54,7 @@ wait_time = 5.0
 one_shot = true
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
+debug_mode = true
 show_tiles = true
 show_tile_coords = true
 show_route_paths = true

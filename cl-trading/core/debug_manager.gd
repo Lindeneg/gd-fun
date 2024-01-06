@@ -127,6 +127,6 @@ func draw_route_path(path: Array):
 				2
 			);
 
-func _on_route_a_draw_debug_path(name: String, v: Array) -> void:
-	route_paths[name] = v;
+func _on_route_a_draw_debug_path(route_name: String, v: Array) -> void:
+	route_paths[route_name] = v;
 	queue_redraw();

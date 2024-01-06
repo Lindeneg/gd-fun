@@ -39,7 +39,7 @@ enum VehicleState {
  *
  * TradingVehicles are managed by associated Route.
  *
- * TODO
+ * TODO (1)
  * TradingVehicle has build-time relative to
  * the its tier managed by BuildManager.
  * */
@@ -48,9 +48,9 @@ class TradingVehicle : public Area2D {
    private:
     // draw line from position to target
     bool debug_mode_;
-    // TODO int cargo_space_;
-    // TODO int maintenance_cost_;
-    // TODO Node* cargo_container_;
+    // TODO (1) int cargo_space_;
+    // TODO (1) int maintenance_cost_;
+    // TODO (1) Node* cargo_container_;
 
     // increment or decrement route_idx
     // i.e are we going from
