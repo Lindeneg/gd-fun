@@ -136,11 +136,9 @@ func _on_route_manager_clear_route_path(route_name: String) -> void:
 	queue_redraw();
 
 func _on_route_debug_create_debug_route(c1: String, c2: String, surface: int) -> void:
-	var vt = "ONSHORE";
-	var vv = "HORSE";
-	if surface == 2:
-		vt = "OFFSHORE";
-		vv = "SHIP";
+	var is_water = surface == TileManager.TILE_MAT_WATER;
+	var vt = "OFFSHORE" if is_water else "ONSHORE";
+	var vv = "SHIP" if is_water else "HORSE";
 	route_manager.create_and_init_route(c1, c2, vt, vv, surface);
 
 # DRAWING FUNCTIONS

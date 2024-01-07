@@ -48,11 +48,10 @@ func create_and_init_route(
 	route.set_city_one(city1);
 	route.set_city_two(city2);
 	route.set_vehicle(vehicle);
-
 	# TEMP
 	route.set_debug_mode(true);
 
-	route.start();
+	route.start(true);
 
 # Instanciates a new instance of
 # TradingVehicle given a type and a name
@@ -65,9 +64,6 @@ func instanciate_vehicle(vehicle_type: String, vehicle_name: String) -> TradingV
 	if !vehicle_scene:
 		printerr("could not find vehicle: {v} with type {t}".format({"v": vehicle_name, "t": vehicle_type}));
 		return null;
-	#if vehicle_scene.can_instantiate():
-	#	printerr("cannot instanciate vehicle: {v} with type {t}".format({"v": vehicle_name, "t": vehicle_type}));
-	#	return null;
 	return vehicle_scene.instantiate();
 
 # DEBUG FUNCTIONS

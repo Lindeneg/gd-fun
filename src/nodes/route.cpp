@@ -101,7 +101,7 @@ godot::TypedArray<godot::Vector2> godot::CL::Route::get_local_path_() {
     return result;
 }
 
-void godot::CL::Route::start() {
+void godot::CL::Route::start(const bool initial_start) {
     ERR_FAIL_NULL_MSG(vehicle_,
                       vformat("start: vehicle is null on %s", get_name()));
     ERR_FAIL_COND_MSG(
@@ -109,7 +109,14 @@ void godot::CL::Route::start() {
         vformat("start: required managers missing on %s", get_name()));
     current_route_ = tile_manager_->construct_path(get_city_entry_(c1_),
                                                    get_city_entry_(c2_), type_);
-    vehicle_->set_map_path(get_local_path_());
+    auto local_path = get_local_path_();
+    ERR_FAIL_COND_MSG(
+        local_path.size() == 0,
+        vformat("start: could not calculate path on %s", get_name()));
+    vehicle_->set_map_path(local_path);
+    if (initial_start) {
+        vehicle_->set_position(local_path[0]);
+    }
     vehicle_->start_navigating();
     state_ = ROUTE_ACTIVE;
     cooldown_timer_->start();
@@ -212,7 +219,7 @@ void godot::CL::Route::_bind_methods() {
     ClassDB::bind_method(D_METHOD("handle_destination_reached_", "dest"),
                          &Route::handle_destination_reached_);
 
-    ClassDB::bind_method(D_METHOD("start"), &Route::start);
+    ClassDB::bind_method(D_METHOD("start", "initial_start"), &Route::start);
     ClassDB::bind_method(D_METHOD("stop"), &Route::stop);
     ClassDB::bind_method(D_METHOD("get_vehicle"), &Route::get_vehicle);
     ClassDB::bind_method(D_METHOD("set_vehicle", "vehicle"),

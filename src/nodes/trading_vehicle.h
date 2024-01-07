@@ -125,6 +125,7 @@ class TradingVehicle : public Area2D {
     inline VehicleState get_state() const { return state_; }
     inline VehicleTier get_tier() const { return tier_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
+    inline TypedArray<Vector2> get_map_path() const { return map_route_; }
 
     inline void set_map_path(const TypedArray<Vector2> v) {
         map_route_ = v;

@@ -199,6 +199,8 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_navigation_target"),
                          &TradingVehicle::get_navigation_target);
 
+    ClassDB::bind_method(D_METHOD("get_map_path"),
+                         &TradingVehicle::get_map_path);
     ClassDB::bind_method(D_METHOD("set_map_path", "v"),
                          &TradingVehicle::set_map_path);
     ClassDB::bind_method(D_METHOD("clear_map_path"),
