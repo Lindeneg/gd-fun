@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://fhxcmytplax2"]
 
-[ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile_manager.tscn" id="3_0dhwo"]
+[ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile-manager/tile_manager.tscn" id="3_0dhwo"]
 [ext_resource type="PackedScene" uid="uid://ctoa158yq0esu" path="res://sprites/cities/city_ground.tscn" id="3_rkss4"]
 [ext_resource type="PackedScene" uid="uid://btfn8crdxt066" path="res://sprites/cities/city_water.tscn" id="4_eqffp"]
-[ext_resource type="PackedScene" uid="uid://b1p2ffxrmj7xq" path="res://core/debug_manager.tscn" id="4_olsel"]
-[ext_resource type="Script" path="res://dev/RouteManager.gd" id="5_2dhrp"]
+[ext_resource type="PackedScene" uid="uid://b1p2ffxrmj7xq" path="res://dev/debug_manager.tscn" id="4_olsel"]
 [ext_resource type="PackedScene" uid="uid://bhfi0udcbb1dk" path="res://sprites/cities/city_water2.tscn" id="5_2dkme"]
+[ext_resource type="PackedScene" uid="uid://df4ax3qupqdh7" path="res://core/route-manager/route_manager.tscn" id="5_nbv6i"]
 
 [node name="Playground" type="Node2D"]
 
@@ -42,8 +42,7 @@ position = Vector2(640, 64)
 [node name="CityA3" parent="CityManager" instance=ExtResource("3_rkss4")]
 position = Vector2(736, 640)
 
-[node name="RouteManager" type="Node" parent="."]
-script = ExtResource("5_2dhrp")
+[node name="RouteManager" parent="." instance=ExtResource("5_nbv6i")]
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 z_index = 4096

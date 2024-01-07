@@ -1,0 +1,72 @@
+[gd_scene load_steps=8 format=3 uid="uid://d1bvht8kuq6ox"]
+
+[ext_resource type="Texture2D" uid="uid://dgonmq5h2fad2" path="res://assets/Miscellaneous/WarShip.png" id="1_porv7"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tfsmg"]
+atlas = ExtResource("1_porv7")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cjajy"]
+atlas = ExtResource("1_porv7")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l37qs"]
+atlas = ExtResource("1_porv7")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ovxfg"]
+atlas = ExtResource("1_porv7")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6hm0u"]
+resource_local_to_scene = true
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tfsmg")
+}],
+"loop": true,
+"name": &"down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cjajy")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l37qs")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ovxfg")
+}],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2ma0s"]
+resource_local_to_scene = true
+
+[node name="VehicleShip" type="TradingVehicle"]
+tier = 2
+speed = 25.0
+destination_threshold = 2.0
+z_index = 6
+y_sort_enabled = true
+
+[node name="@AnimatedSprite2D@42727" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_6hm0u")
+animation = &"down"
+
+[node name="@CollisionShape2D@42728" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_2ma0s")

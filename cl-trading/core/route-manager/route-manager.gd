@@ -12,10 +12,10 @@ signal clear_route_path(route_name: String);
 # add here when you create new vehicle scenes
 const VEHICLES = {
 	"ONSHORE": {
-		"HORSE": preload("res://dev/trading_horse.tscn"),
+		"HORSE": preload("res://sprites/vehicles/onshore/vehicle_horse.tscn"),
 	},
 	"OFFSHORE": {
-		"SHIP": preload("res://sprites/ship.tscn")
+		"SHIP": preload("res://sprites/vehicles/offshore/vehicle_ship.tscn")
 	}
 };
 
@@ -38,7 +38,7 @@ func create_and_init_route(
 		));
 		return;
 
-	# TEMP
+	# TEMP remove
 	route.connect("draw_debug_route", handle_draw_route_signal);
 	route.connect("remove_debug_route", handle_clear_route_signal);
 
@@ -48,7 +48,7 @@ func create_and_init_route(
 	route.set_city_one(city1);
 	route.set_city_two(city2);
 	route.set_vehicle(vehicle);
-	# TEMP
+	# TEMP remove
 	route.set_debug_mode(true);
 
 	route.start(true);
