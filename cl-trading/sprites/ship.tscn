@@ -19,6 +19,7 @@ atlas = ExtResource("1_m0bei")
 region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_fqth0"]
+resource_local_to_scene = true
 animations = [{
 "frames": [{
 "duration": 1.0,
@@ -54,16 +55,18 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xllnl"]
+resource_local_to_scene = true
 size = Vector2(32, 33)
 
 [node name="Ship" type="TradingVehicle"]
 tier = 383
-z_index = 4
+speed = 10.0
+z_index = 6
 y_sort_enabled = true
 
-[node name="VehicleAnimation" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_fqth0")
 animation = &"up"
 
-[node name="VehicleCollider" type="CollisionShape2D" parent="."]
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_xllnl")

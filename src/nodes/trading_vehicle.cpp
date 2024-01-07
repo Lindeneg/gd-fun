@@ -1,6 +1,7 @@
 #include "trading_vehicle.h"
 
 #include <cstdint>
+#include <cstdio>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
@@ -13,17 +14,19 @@
 #include <godot_cpp/core/memory.hpp>
 #include <godot_cpp/core/property_info.hpp>
 #include <godot_cpp/variant/variant.hpp>
-#include <iostream>
 
 #include "../core/utils.h"
 
+// STRING CONSTANTS
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const char* godot::CL::TradingVehicle::AnimationNames
     [godot::CL::TradingVehicle::AnimationSize]{"left", "up", "right", "down"};
 
+// SIGNALS
+const char* godot::CL::TradingVehicle::SDestReached{"destination_reached"};
+
 godot::CL::TradingVehicle::TradingVehicle()
-    : debug_mode_(false),
-      map_route_inc_(true),
+    : map_route_inc_(true),
       map_route_(TypedArray<Vector2>()),
       current_map_route_idx_(0),
       speed_(0.0),
@@ -35,18 +38,11 @@ godot::CL::TradingVehicle::TradingVehicle()
       collision_shape_(nullptr) {}
 
 godot::CL::TradingVehicle::~TradingVehicle() {
-    if (animated_sprite_ != nullptr) {
 #ifdef CL_TRADING_DEBUG
-        std::cout << "TradingVehicle: Freeing animated sprite\n";
+    printf("TradingVehicle: queuing sprite and shape for deletion\n");
 #endif
-        animated_sprite_->queue_free();
-    }
-    if (collision_shape_ != nullptr) {
-#ifdef CL_TRADING_DEBUG
-        std::cout << "TradingVehicle: Freeing collision shape\n";
-#endif
-        collision_shape_->queue_free();
-    }
+    Utils::queue_delete(animated_sprite_);
+    Utils::queue_delete(collision_shape_);
     animated_sprite_ = nullptr;
     collision_shape_ = nullptr;
 }
@@ -54,13 +50,13 @@ godot::CL::TradingVehicle::~TradingVehicle() {
 // this is called on _ready notification at runtime
 void godot::CL::TradingVehicle::r_assign_required_components_() {
     if (animated_sprite_ == nullptr) {
-        Node* anim{find_child("VehicleAnimation")};
-        ERR_FAIL_NULL_MSG(anim, "required component VehicleAnimation missing");
+        Node* anim{find_child("*AnimatedSprite*")};
+        ERR_FAIL_NULL_MSG(anim, "required component AnimatedSprite missing");
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
     if (collision_shape_ == nullptr) {
-        Node* col{find_child("VehicleCollider")};
-        ERR_FAIL_NULL_MSG(col, "required component VehicleCollider missing");
+        Node* col{find_child("*CollisionShape*")};
+        ERR_FAIL_NULL_MSG(col, "required component CollisionShape missing");
         collision_shape_ = static_cast<CollisionShape2D*>(col);
     }
 }
@@ -68,22 +64,22 @@ void godot::CL::TradingVehicle::r_assign_required_components_() {
 // this is called on _ready notification in editor
 void godot::CL::TradingVehicle::e_assign_required_components_() {
     ERR_FAIL_COND_EDMSG(animated_sprite_ != nullptr,
-                        "component VehicleAnimation already assigned");
+                        "component AnimatedSprite already assigned");
     ERR_FAIL_COND_EDMSG(collision_shape_ != nullptr,
-                        "component VehicleCollider already assigned");
-    Node* anim{find_child("VehicleAnimation")};
+                        "component CollisionShape already assigned");
+    Node* anim{find_child("*AnimatedSprite*")};
     if (anim == nullptr) {
-        animated_sprite_ =
-            create_component_<AnimatedSprite2D>("VehicleAnimation");
+        animated_sprite_ = create_component_<AnimatedSprite2D>();
         initialize_sprite_frames_();
     } else {
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
-    Node* col{find_child("VehicleCollider")};
+    Node* col{find_child("*CollisionShape*")};
     if (col == nullptr) {
-        collision_shape_ =
-            create_component_<CollisionShape2D>("VehicleCollider");
-        collision_shape_->set_shape(memnew(RectangleShape2D));
+        collision_shape_ = create_component_<CollisionShape2D>();
+        auto shape = memnew(RectangleShape2D);
+        shape->set_local_to_scene(true);
+        collision_shape_->set_shape(shape);
     } else {
         collision_shape_ = static_cast<CollisionShape2D*>(col);
     }
@@ -97,6 +93,7 @@ void godot::CL::TradingVehicle::initialize_sprite_frames_() {
     for (const auto animation : AnimationNames) {
         sprite_frames->add_animation(animation);
     }
+    sprite_frames->set_local_to_scene(true);
     animated_sprite_->set_sprite_frames(sprite_frames);
 }
 
@@ -113,10 +110,11 @@ void godot::CL::TradingVehicle::handle_movement_(double delta) {
         } else {
             auto tmp = navigation_target_;
             state_ = VEHICLE_IDLE;
-            animated_sprite_->stop();
             map_route_inc_ = !map_route_inc_;
             navigation_target_ = Vector2();
-            emit_signal("destination_reached", tmp);
+            // stop animation
+            update_animation_(true);
+            emit_signal(SDestReached, tmp);
         }
         return;
     }
@@ -165,25 +163,18 @@ godot::CL::TradingVehicle::get_next_navigation_target_() {
     return result;
 }
 
-void godot::CL::TradingVehicle::update_animation_() {
+void godot::CL::TradingVehicle::update_animation_(const bool stop) {
+    if (animated_sprite_ == nullptr) return;
+    if (stop) {
+        animated_sprite_->stop();
+        return;
+    }
     const auto anim_idx{static_cast<int32_t>(
         (AnimationSize *
          (direction_.rotated(Math_PI / AnimationSize).angle() + Math_PI) /
          Math_TAU))};
     ERR_FAIL_INDEX_MSG(anim_idx, AnimationSize, "anim_idx is out of bounds");
     animated_sprite_->play(AnimationNames[anim_idx]);
-}
-
-void godot::CL::TradingVehicle::emit_debug_signal_() {
-#ifdef CL_TRADING_DEBUG
-    if (debug_mode_) {
-        if (is_moving()) {
-            emit_signal("draw_debug_lines", get_position(), navigation_target_);
-        }
-    } else {
-        emit_signal("clear_debug_lines");
-    }
-#endif
 }
 
 void godot::CL::TradingVehicle::_ready() {
@@ -194,7 +185,6 @@ void godot::CL::TradingVehicle::_ready() {
     }
     set_y_sort_enabled(true);
     set_z_index(6);
-    emit_debug_signal_();
 }
 
 void godot::CL::TradingVehicle::_process(double delta) {
@@ -249,27 +239,9 @@ void godot::CL::TradingVehicle::_bind_methods() {
                           "set_destination_threshold",
                           "get_destination_threshold");
 
-    // DEBUG EDITOR PROPS
-    ClassDB::bind_method(D_METHOD("get_debug_mode"),
-                         &TradingVehicle::get_debug_mode);
-    ClassDB::bind_method(D_METHOD("set_debug_mode", "m"),
-                         &TradingVehicle::set_debug_mode);
-
-    ClassDB::add_property_group("TradingVehicle", "Debug", "");
-    ClassDB::add_property("TradingVehicle",
-                          PropertyInfo(Variant::BOOL, "debug_mode"),
-                          "set_debug_mode", "get_debug_mode");
-
-    // SIGNALS
     ClassDB::add_signal("TradingVehicle",
-                        MethodInfo("draw_debug_lines",
-                                   PropertyInfo(Variant::VECTOR2, "position"),
-                                   PropertyInfo(Variant::VECTOR2, "target")));
-    ClassDB::add_signal("TradingVehicle", MethodInfo("clear_debug_lines"));
-    ClassDB::add_signal(
-        "TradingVehicle",
-        MethodInfo("destination_reached",
-                   PropertyInfo(Variant::VECTOR2, "destination")));
+                        MethodInfo(SDestReached, PropertyInfo(Variant::VECTOR2,
+                                                              "destination")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);

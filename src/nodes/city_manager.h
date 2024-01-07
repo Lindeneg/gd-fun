@@ -4,6 +4,9 @@
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/variant/callable.hpp>
+#include <map>
+
+#include "./city.h"
 
 namespace godot {
 class Sprite2D;
@@ -17,6 +20,7 @@ class CityManager : public Node {
     GDCLASS(CityManager, Node)
 
    private:
+    std::map<StringName, City*> cities_;
     TileManager* tile_manager_;
     Callable tile_manager_ready_cb_;
 
@@ -35,6 +39,13 @@ class CityManager : public Node {
     void _enter_tree() override;
     void _exit_tree() override;
 
+    City* get_city(StringName name) const {
+        auto city = cities_.find(name);
+        if (city == cities_.end()) {
+            return nullptr;
+        }
+        return city->second;
+    }
     void notify_tile_manager_of_cities();
 };
 }  // namespace godot::CL

@@ -10,11 +10,11 @@
 #include <godot_cpp/variant/variant.hpp>
 
 #include "../core/utils.h"
-#include "./city.h"
 #include "./tile_manager.h"
 
 godot::CL::CityManager::CityManager()
-    : tile_manager_(nullptr),
+    : cities_({}),
+      tile_manager_(nullptr),
       tile_manager_ready_cb_(Callable(this, "notify_tile_manager_of_cities")) {}
 
 godot::CL::CityManager::~CityManager() {}
@@ -51,12 +51,7 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
                 auto city_entry_type =
                     static_cast<CityEntryType>(node->get_visibility_layer());
                 city->add_city_entry_point(coords, city_entry_type);
-                printf(
-                    "Found Marker2D '%s' with parent '%s' at coords (%d, "
-                    "%d) at layer: %d)\n",
-                    Utils::convert_gd_string(node),
-                    Utils::convert_gd_string(parent), coords.x, coords.y,
-                    city_entry_type);
+                cities_[city->get_name()] = city;
 
             } else {
                 WARN_PRINT_ED(
@@ -110,6 +105,7 @@ void godot::CL::CityManager::_exit_tree() {
 }
 
 void godot::CL::CityManager::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("get_city", "name"), &CityManager::get_city);
     ClassDB::bind_method(D_METHOD("notify_tile_manager_of_cities"),
                          &CityManager::notify_tile_manager_of_cities);
 }

@@ -33,7 +33,7 @@ void godot::CL::TileGraph::destroy() {
 }
 
 godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
-    Vector2i start, Vector2i end, const TileMat mat) {
+    Vector2i start, Vector2i end, const TileSurface surface) {
     auto* start_vertex = get_vertex(start);
     auto* end_vertex = get_vertex(end);
     ERR_FAIL_NULL_V_EDMSG(start_vertex, PackedVector2Array(),
@@ -42,12 +42,12 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     ERR_FAIL_NULL_V_EDMSG(
         end_vertex, PackedVector2Array(),
         vformat("end vertex (%d,%d) was not found in graph", end.x, end.y));
-    return astar_construct_path(start_vertex, end_vertex, mat);
+    return astar_construct_path(start_vertex, end_vertex, surface);
 }
 
 // https://en.wikipedia.org/wiki/A*_search_algorithm
 godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
-    TileVertex* start, TileVertex* end, const TileMat mat) {
+    TileVertex* start, TileVertex* end, const TileSurface surface) {
     // prio queue doesn't contain a method to see if it contains an element
     // so, because im stupid, I have another map that keeps track of that
     AStarPrioQueueMember open_set_members{};
@@ -91,7 +91,7 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
         for (auto* edge : current->edges) {
             // boats cannot travel on ground
             // wagons cannot travel on water
-            if (edge->mat != mat || has_occupant(edge->coords)) {
+            if (edge->surface != surface || has_occupant(edge->coords)) {
                 continue;
             }
             // distance from start to edge through current at cost weight
@@ -157,13 +157,12 @@ void godot::CL::TileGraph::add_edge(const Vector2i v1, const Vector2i v2) {
     add_edge(t1, t2);
 }
 
-godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(const Vector2i indicies,
-                                                        const int weight,
-                                                        const TileMat mat) {
+godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(
+    const Vector2i indicies, const int weight, const TileSurface surface) {
     auto* vertex{new TileVertex()};
     vertex->coords = indicies;
     vertex->weight = weight;
-    vertex->mat = mat;
+    vertex->surface = surface;
     vertices_.push_back(vertex);
     return vertex;
 }
@@ -183,8 +182,8 @@ void godot::CL::TileGraph::add_foreign_occupant(const Vector2i v) {
     if (vertex == nullptr) {
         return;
     }
-    foreign_occupants_[v] = vertex->mat;
-    vertex->mat = TILE_MAT_OBSTACLE;
+    foreign_occupants_[v] = vertex->surface;
+    vertex->surface = TILE_SURFACE_OBSTACLE;
 }
 
 void godot::CL::TileGraph::remove_foreign_occupant(const Vector2i v) {
@@ -192,7 +191,7 @@ void godot::CL::TileGraph::remove_foreign_occupant(const Vector2i v) {
     if (vertex == nullptr) {
         return;
     }
-    vertex->mat = static_cast<TileMat>(foreign_occupants_[v]);
+    vertex->surface = static_cast<TileSurface>(foreign_occupants_[v]);
     foreign_occupants_[v] = 0;
 }
 
@@ -200,7 +199,7 @@ void godot::CL::TileGraph::print() const {
     for (const auto& vertex : vertices_) {
         std::cout << "Vertex (" << vertex->coords.x << ", " << vertex->coords.y
                   << "):" << '\n';
-        std::cout << "  -> Has Material (" << vertex->mat << ")\n";
+        std::cout << "  -> Has Surface (" << vertex->surface << ")\n";
         std::cout << "  -> Has Weight (" << vertex->weight << ")\n";
         for (const auto& edge : vertex->edges) {
             std::cout << "      -> Has Edges (" << edge->coords.x << ", "

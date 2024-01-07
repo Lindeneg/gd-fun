@@ -6,23 +6,21 @@
 #include <map>
 #include <vector>
 
-namespace godot::CL {
+#include "../core/utils.h"
 
-enum TileMat {
-    TILE_MAT_NONE,
-    TILE_MAT_GROUND,
-    TILE_MAT_WATER,
-    TILE_MAT_OBSTACLE
-};
+namespace godot::CL {
 
 struct TileVertex {
     Vector2i coords;
     int weight;
-    TileMat mat;
+    TileSurface surface;
     std::vector<TileVertex*> edges;
 
     TileVertex()
-        : coords(Vector2i()), weight(0), mat(TILE_MAT_NONE), edges({}) {}
+        : coords(Vector2i()),
+          weight(0),
+          surface(TILE_SURFACE_NONE),
+          edges({}) {}
 };
 
 // int with an arbitrary default
@@ -71,15 +69,15 @@ class TileGraph {
     }
 
     PackedVector2Array astar_construct_path(TileVertex* start, TileVertex* end,
-                                            const TileMat mat);
+                                            const TileSurface surface);
     PackedVector2Array astar_construct_path(Vector2i start, Vector2i end,
-                                            const TileMat mat);
+                                            const TileSurface surface);
     void add_edge(TileVertex* v1, TileVertex* v2);
     void add_edge(const Vector2i v1, const Vector2i v2);
     void add_foreign_occupant(const Vector2i v);
     void remove_foreign_occupant(const Vector2i v);
     TileVertex* add_vertex(const Vector2i indicies, const int weight,
-                           const TileMat mat);
+                           const TileSurface surface);
     TileVertex* get_vertex(const Vector2i indicies) const;
     void print() const;
     void destroy();

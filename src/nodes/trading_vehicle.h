@@ -46,8 +46,8 @@ enum VehicleState {
 class TradingVehicle : public Area2D {
     GDCLASS(TradingVehicle, Area2D)
    private:
-    // draw line from position to target
-    bool debug_mode_;
+    static const char* AnimationNames[];
+    static const int32_t AnimationSize;
     // TODO (1) int cargo_space_;
     // TODO (1) int maintenance_cost_;
     // TODO (1) Node* cargo_container_;
@@ -82,7 +82,7 @@ class TradingVehicle : public Area2D {
     // handle movement towards current navigation target
     void handle_movement_(double delta);
     // update animation given current direction
-    void update_animation_();
+    void update_animation_(const bool stop = false);
     // make sure required components are
     // created/assigned when in editor
     void e_assign_required_components_();
@@ -91,13 +91,10 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
-    // emit signal to debug manager
-    void emit_debug_signal_();
     // create component and add to tree
     template <typename T>
-    T* create_component_(const String name) {
+    T* create_component_() {
         T* obj = memnew(T);
-        obj->set_name(name);
         add_child(obj);
         obj->set_owner(this);
         return obj;
@@ -107,12 +104,10 @@ class TradingVehicle : public Area2D {
     static void _bind_methods();
 
    public:
-    // left,up,right,down
-    static const char* AnimationNames[];
-    static const int32_t AnimationSize;
-
     TradingVehicle();
     ~TradingVehicle();
+
+    const static char* SDestReached;
 
     void _ready() override;
     void _process(double delta) override;
@@ -143,12 +138,6 @@ class TradingVehicle : public Area2D {
     }
     inline void set_tier(const VehicleTier t) { tier_ = t; }
     inline void set_speed(const double s) { speed_ = s; }
-
-    inline bool get_debug_mode() const { return debug_mode_; }
-    inline void set_debug_mode(const bool m) {
-        debug_mode_ = m;
-        emit_debug_signal_();
-    }
 };
 }  // namespace godot::CL
 

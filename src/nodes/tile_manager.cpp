@@ -15,7 +15,6 @@
 
 #include "../core/tile_graph.h"
 #include "../core/utils.h"
-#include "godot_cpp/variant/node_path.hpp"
 
 godot::CL::TileManager::TileManager()
     : debug_mode_(false),
@@ -73,7 +72,7 @@ void godot::CL::TileManager::set_debug_array_() {
         const auto& vertex{vertices[i]};
         auto dict{Dictionary()};
         dict["coords"] = map_to_local(vertex->coords);
-        dict["mat"] = vertex->mat;
+        dict["surface"] = vertex->surface;
         debug_array_.insert(i, dict);
     }
 #endif
@@ -86,7 +85,7 @@ void godot::CL::TileManager::create_graph_() {
             const auto coords{Vector2i(j, i)};
             const CellTileContext tile_context{get_tile_context_(coords)};
             TileVertex* new_vertex{tile_graph_.add_vertex(
-                coords, tile_context.weight, tile_context.mat)};
+                coords, tile_context.weight, tile_context.surface)};
             // add up neighbor
             if (i > 0) {
                 add_tile_edge_(Vector2i(j, i - 1), new_vertex);
@@ -122,12 +121,12 @@ godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
     const Vector2i coords) const {
     auto result{CellTileContext()};
     if (tile_graph_.has_occupant(coords)) {
-        result.mat = TILE_MAT_OBSTACLE;
+        result.surface = TILE_SURFACE_OBSTACLE;
         return result;
     }
     TileData* obs_data{get_cell_tile_data(TILE_OBSTACLE_LAYER, coords)};
     if (obs_data != nullptr) {
-        result.mat = TILE_MAT_OBSTACLE;
+        result.surface = TILE_SURFACE_OBSTACLE;
         return result;
     }
     TileData* bg_data{get_cell_tile_data(TILE_BACKGROUND_LAYER, coords)};
@@ -138,10 +137,10 @@ godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
             static_cast<bool>(bg_data->get_custom_data("is_water"))};
         result.weight = weight;
         if (is_water) {
-            result.mat = TILE_MAT_WATER;
+            result.surface = TILE_SURFACE_WATER;
             return result;
         }
-        result.mat = TILE_MAT_GROUND;
+        result.surface = TILE_SURFACE_GROUND;
     }
     return result;
 }

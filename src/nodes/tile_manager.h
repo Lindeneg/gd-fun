@@ -14,6 +14,14 @@ class PackedVector2Array;
 
 namespace godot::CL {
 
+// DEPRECATED - DO NOT USE
+enum TileMat {
+    TILE_MAT_NONE,
+    TILE_MAT_GROUND,
+    TILE_MAT_WATER,
+    TILE_MAT_OBSTACLE
+};
+
 // tile layers
 enum TileLayer {
     TILE_BACKGROUND_LAYER,
@@ -24,7 +32,7 @@ enum TileLayer {
 // custom tile data
 enum TileDataLayer { TILE_DATA_LAYER_WEIGHT, TILE_DATA_LAYER_IS_WATER };
 struct CellTileContext {
-    TileMat mat;
+    TileSurface surface;
     int weight;
 };
 
@@ -77,11 +85,11 @@ class TileManager : public TileMap {
     void _ready() override;
 
     // constructs a path avoiding obstacles from start->end
-    // respecting the given TileMat constraint
+    // respecting the given TileSurface constraint
     inline PackedVector2Array construct_path(const Vector2i start,
                                              const Vector2i end,
-                                             const TileMat mat) {
-        return tile_graph_.astar_construct_path(start, end, mat);
+                                             const TileSurface surface) {
+        return tile_graph_.astar_construct_path(start, end, surface);
     }
     void set_rebuild_debug_graph(const bool m);
     void set_debug_mode(const bool m);

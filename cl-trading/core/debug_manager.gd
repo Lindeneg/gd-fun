@@ -6,6 +6,10 @@ extends Node2D
 		return debug_mode;
 	set(value):
 		debug_mode = value;
+		if not debug_mode:
+			route_debug_ui.visible = false;
+		elif route_debug_ui != null:
+			route_debug_ui.visible = show_route_ui;
 		queue_redraw();
 
 @export_group("City")
@@ -44,6 +48,15 @@ extends Node2D
 	set(value):
 		show_route_paths = value;
 		queue_redraw();
+@export var show_route_ui: bool = false:
+	get:
+		return show_route_ui;
+	set(value):
+		if !route_debug_ui:
+			return;
+		show_route_ui = value;
+		route_debug_ui.visible = show_route_ui;
+		queue_redraw();
 
 													 # NONE        # GROUND    # WATER      # OBSTACLE
 const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
@@ -51,10 +64,45 @@ var tile_size: int = 0;
 var tile_array = [];
 var route_paths: Dictionary = {};
 
-@onready var tile_manager = $"../TileManager" as TileManager;
-@onready var city_manager = $"../CityManager" as CityManager;
+var tile_manager: TileManager;
+var city_manager: CityManager;
+var route_manager: Node;
+var route_debug_ui: Control;
+var route_debug_tab: HBoxContainer;
 
-func _draw():
+# NOTIFICATION CALLBACKS
+
+func _unhandled_input(event):
+	if Engine.is_editor_hint():
+		return;
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE:
+			get_tree().quit();
+		if event.keycode == KEY_D:
+			debug_mode = !debug_mode;
+		if event.keycode == KEY_T:
+			show_tiles = !show_tiles;
+		if event.keycode == KEY_C:
+			show_tile_coords = !show_tile_coords;
+		if event.keycode == KEY_P:
+			show_route_paths = !show_route_paths;
+		if event.keycode == KEY_U:
+			show_route_ui = !show_route_ui;
+
+func _ready() -> void:
+	tile_manager = get_node_or_null("../TileManager");
+	city_manager = get_node_or_null("../CityManager");
+	route_manager = get_node_or_null("../RouteManager");
+	route_debug_ui = get_node_or_null("DebugUIContainer");
+	route_debug_tab = get_node_or_null("DebugUIContainer/DebugTabs/RouteDebug");
+
+	debug_mode = false;
+	route_debug_ui.visible = false;
+
+	if !Engine.is_editor_hint():
+		route_debug_tab.add_city_nodes(city_manager.get_children());
+
+func _draw() -> void:
 	if not debug_mode:
 		return;
 	if show_tiles and tile_array and tile_array.size() > 0:
@@ -64,6 +112,10 @@ func _draw():
 			var route_path: Array = route_paths[route_key];
 			if route_path and route_path.size() > 0:
 				draw_route_path(route_path);
+	if show_route_ui:
+		draw_city_names();
+
+# SIGNAL CALLBACKS
 
 func _on_tile_manager_draw_debug_grid(size: int, tiles: Array) -> void:
 	tile_size = size;
@@ -75,7 +127,35 @@ func _on_tile_manager_remove_debug_grid() -> void:
 	tile_size = 0;
 	queue_redraw();
 
+func _on_route_manager_draw_route_path(route_name: String, route: PackedVector2Array) -> void:
+	route_paths[route_name] = route;
+	queue_redraw();
 
+func _on_route_manager_clear_route_path(route_name: String) -> void:
+	route_paths[route_name] = [];
+	queue_redraw();
+
+func _on_route_debug_create_debug_route(c1: String, c2: String, surface: int) -> void:
+	var vt = "ONSHORE";
+	var vv = "HORSE";
+	if surface == 2:
+		vt = "OFFSHORE";
+		vv = "SHIP";
+	route_manager.create_and_init_route(c1, c2, vt, vv, surface);
+
+# DRAWING FUNCTIONS
+
+func draw_city_names():
+		for child in city_manager.get_children():
+			draw_string(
+				ThemeDB.fallback_font,
+				child.position,
+				child.name,
+				HORIZONTAL_ALIGNMENT_FILL,
+				-1,
+				14,
+				Color.BLACK,
+			);
 
 func draw_tile_manager_grid():
 	var half_tile_size = int(tile_size / 2.0);
@@ -88,7 +168,7 @@ func draw_tile_manager_grid():
 				tile.coords.y - half_tile_size,
 				tile_size, tile_size
 			),
-			TILE_COLORS[tile.mat],
+			TILE_COLORS[tile.surface],
 			false
 		);
 		if show_tile_coords:
@@ -126,7 +206,3 @@ func draw_route_path(path: Array):
 				color,
 				2
 			);
-
-func _on_route_a_draw_debug_path(route_name: String, v: Array) -> void:
-	route_paths[route_name] = v;
-	queue_redraw();

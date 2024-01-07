@@ -1,9 +1,58 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1p2ffxrmj7xq"]
+[gd_scene load_steps=5 format=3 uid="uid://b1p2ffxrmj7xq"]
 
 [ext_resource type="Script" path="res://core/debug_manager.gd" id="1_eyoom"]
+[ext_resource type="Theme" uid="uid://twg6w3xsx8rf" path="res://dev/debug_theme.tres" id="2_ocvrc"]
+[ext_resource type="Script" path="res://dev/route_debug.gd" id="3_38xpf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ter2v"]
 
 [node name="DebugManager" type="Node2D"]
-z_index = 100
-y_sort_enabled = true
-texture_filter = 1
 script = ExtResource("1_eyoom")
+
+[node name="DebugUIContainer" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = -4.0
+offset_top = 608.0
+offset_right = 649.0
+offset_bottom = 649.0
+theme = ExtResource("2_ocvrc")
+
+[node name="DebugTabs" type="TabContainer" parent="DebugUIContainer"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = -32.0
+offset_right = 657.0
+offset_bottom = 42.0
+
+[node name="RouteDebug" type="HBoxContainer" parent="DebugUIContainer/DebugTabs"]
+layout_mode = 2
+script = ExtResource("3_38xpf")
+
+[node name="Option1" type="OptionButton" parent="DebugUIContainer/DebugTabs/RouteDebug"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Option2" type="OptionButton" parent="DebugUIContainer/DebugTabs/RouteDebug"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Option3" type="OptionButton" parent="DebugUIContainer/DebugTabs/RouteDebug"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+item_count = 2
+selected = 0
+popup/item_0/text = "GROUND"
+popup/item_0/id = 1
+popup/item_1/text = "WATER"
+popup/item_1/id = 2
+
+[node name="CreateRouteBtn" type="Button" parent="DebugUIContainer/DebugTabs/RouteDebug"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.298039, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ter2v")
+text = "Create Route"
+
+[connection signal="create_debug_route" from="DebugUIContainer/DebugTabs/RouteDebug" to="." method="_on_route_debug_create_debug_route"]
+[connection signal="button_down" from="DebugUIContainer/DebugTabs/RouteDebug/CreateRouteBtn" to="DebugUIContainer/DebugTabs/RouteDebug" method="_on_create_route_btn_button_down"]
