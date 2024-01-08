@@ -1,3 +1,26 @@
+"""
+RouteManager knows everything about how to create, update and delete Routes.
+
+Say in game-play scenario where a Player uses a UI to create a Route.
+In the UI, they'd chose the two cities, the appropiate vehicle, which cargo to transport etc..
+
+When Player has entered all required information, UIMangager can simply tell RouteManager,
+Hey, create me a Route for this Player with this information, and the RouteManager will:
+	(1) - Instanciate needed entites
+	(2) - Configure them appropiately
+	(3) - Spawn Route into the world.
+
+Same should work for edit/delete, which also happens via UI.
+
+TODO:
+	(1) - Cleanup debug-code and get out what we can of RouteManager
+	(2) - Find a better way to handle/save known vehicle scenes
+
+NOTE(cl):
+	All the hard-work is being done by the actual Route node (which is C++ code), so the RouteManager
+	here is just a conductor so-to-speak, and thus I'm fine with having this in GDScript.
+	It tells others what to do, it actually doesn't do any expensive calculations itself.
+"""
 extends Node
 
 # DEBUG SIGNALS
@@ -10,12 +33,13 @@ signal clear_route_path(route_name: String);
 # Dictionaries with Vehicle information
 # IMPORTANT:
 # add here when you create new vehicle scenes
+# NOTE(cl): we can probably find a better way to do it
 const VEHICLES = {
 	"ONSHORE": {
-		"HORSE": preload("res://dev/trading_horse.tscn"),
+		"HORSE": preload("res://sprites/vehicles/onshore/vehicle_horse.tscn"),
 	},
 	"OFFSHORE": {
-		"SHIP": preload("res://sprites/ship.tscn")
+		"SHIP": preload("res://sprites/vehicles/offshore/vehicle_ship.tscn")
 	}
 };
 
@@ -29,16 +53,16 @@ func create_and_init_route(
 	vehicle_type: String,
 	vehicle_name: String,
 	surface: int
-) -> void:
+) -> Route:
 	var route = Route.new();
 	var vehicle = instanciate_vehicle(vehicle_type, vehicle_name);
 	if !vehicle:
 		printerr("failed to create route {c1}<->{c2} with vehicle {v} - {t}".format(
 			{"c1": city1, "c2": city2, "v": vehicle_name, "t": vehicle_type}
 		));
-		return;
+		return null;
 
-	# TEMP
+	# TODO remove debug code
 	route.connect("draw_debug_route", handle_draw_route_signal);
 	route.connect("remove_debug_route", handle_clear_route_signal);
 
@@ -48,10 +72,16 @@ func create_and_init_route(
 	route.set_city_one(city1);
 	route.set_city_two(city2);
 	route.set_vehicle(vehicle);
-	# TEMP
+
+	# TODO remove debug code
 	route.set_debug_mode(true);
 
-	route.start(true);
+	# TODO remove
+	var did_start = route.start(true);
+	if !did_start:
+		remove_child(route);
+		return null;
+	return route;
 
 # Instanciates a new instance of
 # TradingVehicle given a type and a name

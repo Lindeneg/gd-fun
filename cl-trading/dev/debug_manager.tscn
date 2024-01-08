@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://b1p2ffxrmj7xq"]
 
-[ext_resource type="Script" path="res://core/debug_manager.gd" id="1_eyoom"]
-[ext_resource type="Theme" uid="uid://twg6w3xsx8rf" path="res://dev/debug_theme.tres" id="2_ocvrc"]
-[ext_resource type="Script" path="res://dev/route_debug.gd" id="3_38xpf"]
+[ext_resource type="Script" path="res://dev/debug_manager.gd" id="1_eyoom"]
+[ext_resource type="Theme" uid="uid://twg6w3xsx8rf" path="res://dev/ui/debug_theme.tres" id="2_ocvrc"]
+[ext_resource type="Script" path="res://dev/route/route_debug-ui.gd" id="3_36spn"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ter2v"]
 
@@ -13,22 +13,18 @@ script = ExtResource("1_eyoom")
 visible = false
 layout_mode = 3
 anchors_preset = 0
-offset_left = -4.0
-offset_top = 608.0
-offset_right = 649.0
-offset_bottom = 649.0
+offset_right = 640.0
+offset_bottom = 256.0
 theme = ExtResource("2_ocvrc")
 
 [node name="DebugTabs" type="TabContainer" parent="DebugUIContainer"]
 layout_mode = 0
-offset_left = 7.0
-offset_top = -32.0
-offset_right = 657.0
-offset_bottom = 42.0
+offset_right = 629.0
+offset_bottom = 74.0
 
 [node name="RouteDebug" type="HBoxContainer" parent="DebugUIContainer/DebugTabs"]
 layout_mode = 2
-script = ExtResource("3_38xpf")
+script = ExtResource("3_36spn")
 
 [node name="Option1" type="OptionButton" parent="DebugUIContainer/DebugTabs/RouteDebug"]
 custom_minimum_size = Vector2(200, 0)

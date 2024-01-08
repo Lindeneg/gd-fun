@@ -1,6 +1,17 @@
+"""
+RouteDebugUI allows to create debug Routes while the game is running.
+
+As with the DebugManager, this is debug code and will not have any influence
+on the final game. Thus, performance can be considered a less critical factor here.
+
+TODO:
+	(1) Show created Routes and allow further configuration and/or deletion.
+	(2) Once cargo/resources is implemented, allow it as option when creating debug routes.
+"""
 extends HBoxContainer
 
 signal create_debug_route(c1: String, c2: String, surface: int);
+signal remove_debug_route(route_name: String);
 
 @onready var city1_opts = $Option1;
 @onready var city2_opts = $Option2;
@@ -8,6 +19,7 @@ signal create_debug_route(c1: String, c2: String, surface: int);
 @onready var create_btn = $CreateRouteBtn;
 
 var city_nodes = [];
+var created_routes = [];
 
 func add_city_nodes(nodes: Array) -> void:
 	if !nodes:
