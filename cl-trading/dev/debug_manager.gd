@@ -64,6 +64,7 @@ var tile_size: int = 0;
 var tile_array = [];
 var route_paths: Dictionary = {};
 
+var camera_manager: Camera2D;
 var tile_manager: TileManager;
 var city_manager: CityManager;
 var route_manager: Node;
@@ -90,6 +91,7 @@ func _unhandled_input(event):
 			show_route_ui = !show_route_ui;
 
 func _ready() -> void:
+	camera_manager = get_node_or_null("../CameraManager");
 	tile_manager = get_node_or_null("../TileManager");
 	city_manager = get_node_or_null("../CityManager");
 	route_manager = get_node_or_null("../RouteManager");
@@ -101,6 +103,15 @@ func _ready() -> void:
 
 	if !Engine.is_editor_hint():
 		route_debug_tab.add_city_nodes(city_manager.get_children());
+
+func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return;
+	if show_route_ui:
+		route_debug_ui.position = Vector2(
+			camera_manager.position.x - (route_debug_tab.size.x / 2),
+			camera_manager.position.y,
+		);
 
 func _draw() -> void:
 	if not debug_mode:
@@ -139,7 +150,9 @@ func _on_route_debug_create_debug_route(c1: String, c2: String, surface: int) ->
 	var is_water = surface == TileManager.TILE_MAT_WATER;
 	var vt = "OFFSHORE" if is_water else "ONSHORE";
 	var vv = "SHIP" if is_water else "HORSE";
-	route_manager.create_and_init_route(c1, c2, vt, vv, surface);
+	var route = route_manager.create_and_init_route(c1, c2, vt, vv, surface);
+	if route != null:
+		route_debug_tab.created_routes.append(route);
 
 # DRAWING FUNCTIONS
 

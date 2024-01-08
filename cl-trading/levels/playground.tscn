@@ -1,5 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://fhxcmytplax2"]
+[gd_scene load_steps=8 format=3 uid="uid://fhxcmytplax2"]
 
+[ext_resource type="PackedScene" uid="uid://dqftsxjx78obm" path="res://core/camera-manager/camera_manager.tscn" id="1_rr1md"]
 [ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile-manager/tile_manager.tscn" id="3_0dhwo"]
 [ext_resource type="PackedScene" uid="uid://ctoa158yq0esu" path="res://sprites/cities/city_ground.tscn" id="3_rkss4"]
 [ext_resource type="PackedScene" uid="uid://btfn8crdxt066" path="res://sprites/cities/city_water.tscn" id="4_eqffp"]
@@ -9,8 +10,10 @@
 
 [node name="Playground" type="Node2D"]
 
-[node name="CameraManager" type="Camera2D" parent="."]
-position = Vector2(432, 352)
+[node name="CameraManager" parent="." instance=ExtResource("1_rr1md")]
+zoom = Vector2(1.5, 1.5)
+move_speed = 250.0
+min_zoom = 1.5
 
 [node name="TileManager" parent="." instance=ExtResource("3_0dhwo")]
 map_size = Vector2i(50, 50)

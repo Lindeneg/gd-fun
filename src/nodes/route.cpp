@@ -101,17 +101,17 @@ godot::TypedArray<godot::Vector2> godot::CL::Route::get_local_path_() {
     return result;
 }
 
-void godot::CL::Route::start(const bool initial_start) {
-    ERR_FAIL_NULL_MSG(vehicle_,
-                      vformat("start: vehicle is null on %s", get_name()));
-    ERR_FAIL_COND_MSG(
-        !has_required_managers_(),
+bool godot::CL::Route::start(const bool initial_start) {
+    ERR_FAIL_NULL_V_MSG(vehicle_, false,
+                        vformat("start: vehicle is null on %s", get_name()));
+    ERR_FAIL_COND_V_MSG(
+        !has_required_managers_(), false,
         vformat("start: required managers missing on %s", get_name()));
     current_route_ = tile_manager_->construct_path(get_city_entry_(c1_),
                                                    get_city_entry_(c2_), type_);
     auto local_path = get_local_path_();
-    ERR_FAIL_COND_MSG(
-        local_path.size() == 0,
+    ERR_FAIL_COND_V_MSG(
+        local_path.size() == 0, false,
         vformat("start: could not calculate path on %s", get_name()));
     vehicle_->set_map_path(local_path);
     if (initial_start) {
@@ -121,6 +121,7 @@ void godot::CL::Route::start(const bool initial_start) {
     state_ = ROUTE_ACTIVE;
     cooldown_timer_->start();
     emit_debug_signal_();
+    return true;
 }
 
 void godot::CL::Route::stop() {

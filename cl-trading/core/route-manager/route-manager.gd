@@ -29,14 +29,14 @@ func create_and_init_route(
 	vehicle_type: String,
 	vehicle_name: String,
 	surface: int
-) -> void:
+) -> Route:
 	var route = Route.new();
 	var vehicle = instanciate_vehicle(vehicle_type, vehicle_name);
 	if !vehicle:
 		printerr("failed to create route {c1}<->{c2} with vehicle {v} - {t}".format(
 			{"c1": city1, "c2": city2, "v": vehicle_name, "t": vehicle_type}
 		));
-		return;
+		return null;
 
 	# TEMP remove
 	route.connect("draw_debug_route", handle_draw_route_signal);
@@ -51,7 +51,12 @@ func create_and_init_route(
 	# TEMP remove
 	route.set_debug_mode(true);
 
-	route.start(true);
+	# TEMP remove
+	var did_start = route.start(true);
+	if !did_start:
+		remove_child(route);
+		return null;
+	return route;
 
 # Instanciates a new instance of
 # TradingVehicle given a type and a name

@@ -89,7 +89,7 @@ class Route : public Node {
     void _enter_tree() override;
     void _exit_tree() override;
 
-    void start(const bool initial_start = false);
+    bool start(const bool initial_start = false);
     void stop();
     void destroy();
     void change_trading_vehicle();

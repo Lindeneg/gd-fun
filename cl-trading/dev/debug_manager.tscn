@@ -13,18 +13,14 @@ script = ExtResource("1_eyoom")
 visible = false
 layout_mode = 3
 anchors_preset = 0
-offset_left = -4.0
-offset_top = 608.0
-offset_right = 649.0
-offset_bottom = 649.0
+offset_right = 640.0
+offset_bottom = 256.0
 theme = ExtResource("2_ocvrc")
 
 [node name="DebugTabs" type="TabContainer" parent="DebugUIContainer"]
 layout_mode = 0
-offset_left = 7.0
-offset_top = -32.0
-offset_right = 657.0
-offset_bottom = 42.0
+offset_right = 629.0
+offset_bottom = 74.0
 
 [node name="RouteDebug" type="HBoxContainer" parent="DebugUIContainer/DebugTabs"]
 layout_mode = 2
