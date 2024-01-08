@@ -107,14 +107,14 @@ bool godot::CL::Route::start(const bool initial_start) {
     ERR_FAIL_COND_V_MSG(
         !has_required_managers_(), false,
         vformat("start: required managers missing on %s", get_name()));
-    current_route_ = tile_manager_->construct_path(get_city_entry_(c1_),
-                                                   get_city_entry_(c2_), type_);
-    auto local_path = get_local_path_();
-    ERR_FAIL_COND_V_MSG(
-        local_path.size() == 0, false,
-        vformat("start: could not calculate path on %s", get_name()));
-    vehicle_->set_map_path(local_path);
     if (initial_start) {
+        current_route_ = tile_manager_->construct_path(
+            get_city_entry_(c1_), get_city_entry_(c2_), type_);
+        auto local_path = get_local_path_();
+        ERR_FAIL_COND_V_MSG(
+            local_path.size() == 0, false,
+            vformat("start: could not calculate path on %s", get_name()));
+        vehicle_->set_map_path(local_path);
         vehicle_->set_position(local_path[0]);
     }
     vehicle_->start_navigating();

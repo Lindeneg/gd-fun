@@ -3,4 +3,6 @@
 [ext_resource type="Script" path="res://core/camera-manager/camera_manager.gd" id="1_20s1l"]
 
 [node name="CameraManager" type="Camera2D"]
+anchor_mode = 0
 script = ExtResource("1_20s1l")
+move_speed = 400.0

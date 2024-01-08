@@ -1,3 +1,13 @@
+"""
+RouteDebugUI allows to create debug Routes while the game is running.
+
+As with the DebugManager, this is debug code and will not have any influence
+on the final game. Thus, performance can be considered a less critical factor here.
+
+TODO:
+	(1) Show created Routes and allow further configuration and/or deletion.
+	(2) Once cargo/resources is implemented, allow it as option when creating debug routes.
+"""
 extends HBoxContainer
 
 signal create_debug_route(c1: String, c2: String, surface: int);

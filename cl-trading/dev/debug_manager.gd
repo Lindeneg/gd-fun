@@ -1,3 +1,27 @@
+"""
+DebugManager is reponsible for connecting all debug information.
+It should not know anything about other entities but it should
+be able to be told about them via signals and then update accordingly.
+
+Performance is not that critical here, as this is not production-code i.e
+in a hypothetical release of the game, this code will not be shipped, so
+we can afford to be a bit lazy without having too many concerns.
+
+IMPORTANT: All code in this file runs in the editor AND the game.
+
+If you want to control when code is run, you can make an if-statement:
+
+if Engine.is_editor_hint():
+	# code in this block runs inside editor only
+else:
+	# code in this block runs inside game only
+
+Without it, code you write will run both places.
+
+TODO:
+	(1) Split into multiple files else this is going to become very big at some point.
+	(2) Clearly segregate drawing functions and UI functions.
+"""
 @tool
 extends Node2D
 
@@ -109,7 +133,7 @@ func _process(_delta: float) -> void:
 		return;
 	if show_route_ui:
 		route_debug_ui.position = Vector2(
-			camera_manager.position.x - (route_debug_tab.size.x / 2),
+			camera_manager.position.x,
 			camera_manager.position.y,
 		);
 
