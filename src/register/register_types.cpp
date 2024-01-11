@@ -18,10 +18,10 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
         return;
     }
     ClassDB::register_class<CL::City>();
+    ClassDB::register_class<CL::TradingVehicle>();
     ClassDB::register_class<CL::Route>();
     ClassDB::register_class<CL::TileManager>();
     ClassDB::register_class<CL::CityManager>();
-    ClassDB::register_class<CL::TradingVehicle>();
 }
 
 void uninitialize_cl_trading_module(ModuleInitializationLevel p_level) {

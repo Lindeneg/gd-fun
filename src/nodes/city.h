@@ -1,9 +1,13 @@
 #ifndef CL_TRADING_CITY_H_
 #define CL_TRADING_CITY_H_
 
-#include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/core/binder_common.hpp>
+
+namespace godot {
+class CollisionShape2D;
+}  // namespace godot
 
 namespace godot::CL {
 
@@ -23,10 +27,11 @@ enum CityEntryType { CITY_ENTRY_ONSHORE = 1, CITY_ENTRY_OFFSHORE = 2 };
  *
  * City size grows over time allowing
  * for more supply, demand and Industry. */
-class City : public Node2D {
-    GDCLASS(City, Node2D)
+class City : public Area2D {
+    GDCLASS(City, Area2D)
 
    private:
+    CollisionShape2D* col_shape_;
     // TODO (2) use typed array
     // resource supply
     Array supply_;
@@ -45,6 +50,9 @@ class City : public Node2D {
     int max_route_capacity_;
     // current route size
     int current_route_size_;
+
+    void r_assign_required_components_();
+    void e_assign_required_components_();
 
    protected:
     static void _bind_methods();

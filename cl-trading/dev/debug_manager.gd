@@ -82,8 +82,8 @@ extends Node2D
 		route_debug_ui.visible = show_route_ui;
 		queue_redraw();
 
-													 # NONE        # GROUND    # WATER      # OBSTACLE
-const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
+													 # NONE        # GROUND    # WATER      # OBSTACLE # BRIDGE
+const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA];
 var tile_size: int = 0;
 var tile_array = [];
 var route_paths: Dictionary = {};

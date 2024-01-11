@@ -26,7 +26,7 @@ void godot::CL::CityManager::setup_tile_manager_() {
     if (tile_manager_->is_node_ready()) {
         notify_tile_manager_of_cities();
     } else {
-        tile_manager_->connect("ready", tile_manager_ready_cb_);
+        Utils::connect(tile_manager_, "ready", tile_manager_ready_cb_);
     }
 }
 
@@ -44,18 +44,19 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
                 handle_sprite_tile_manager_notification_(
                     static_cast<Sprite2D*>(node), parent);
             } else if (typeid(*node) == typeid(Marker2D)) {
-                City* city = static_cast<City*>(parent);
+                auto* city{static_cast<City*>(parent)};
                 Vector2 marker_position = node->get_position();
                 Vector2i coords{tile_manager_->local_to_map(
                     parent->to_global(marker_position))};
+                // TODO(5) Use an actual property:
                 auto city_entry_type =
                     static_cast<CityEntryType>(node->get_visibility_layer());
                 city->add_city_entry_point(coords, city_entry_type);
                 cities_[city->get_name()] = city;
 
             } else {
-                WARN_PRINT_ED(
-                    vformat("%s is unhandled city node", node->get_name()));
+                // WARN_PRINT_ED(
+                //    vformat("%s is unhandled city node", node->get_name()));
             }
         } else {
             iterate_children_(grand_children, node);
@@ -99,9 +100,7 @@ void godot::CL::CityManager::notify_tile_manager_of_cities() {
 void godot::CL::CityManager::_enter_tree() { setup_tile_manager_(); }
 
 void godot::CL::CityManager::_exit_tree() {
-    if (tile_manager_->is_connected("ready", tile_manager_ready_cb_)) {
-        tile_manager_->disconnect("ready", tile_manager_ready_cb_);
-    }
+    Utils::disconnect(tile_manager_, "ready", tile_manager_ready_cb_);
 }
 
 void godot::CL::CityManager::_bind_methods() {

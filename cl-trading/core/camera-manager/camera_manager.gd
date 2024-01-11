@@ -15,7 +15,7 @@ TODO:
 extends Camera2D
 
 @export var move_speed: float = 100.0;
-@export var zoom_speed: float = 10.0;
+@export var zoom_speed: int = 10;
 @export var max_zoom: float = 3.0;
 @export var min_zoom: float = 1.5;
 
@@ -50,7 +50,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	handle_camera_movement(delta);
-	handle_zoom_input(delta);
+	#handle_zoom_input(delta);
 
 func handle_camera_movement(delta: float) -> void:
 	var movement_vec: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");

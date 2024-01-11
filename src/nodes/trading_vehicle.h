@@ -37,12 +37,7 @@ enum VehicleState {
  * is anything that can move, has animations
  * and carries cargo from A<->B.
  *
- * TradingVehicles are managed by associated Route.
- *
- * TODO (1)
- * TradingVehicle has build-time relative to
- * the its tier managed by BuildManager.
- * */
+ * TradingVehicles are managed by associated Route.*/
 class TradingVehicle : public Area2D {
     GDCLASS(TradingVehicle, Area2D)
    private:
@@ -91,14 +86,6 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
-    // create component and add to tree
-    template <typename T>
-    T* create_component_() {
-        T* obj = memnew(T);
-        add_child(obj);
-        obj->set_owner(this);
-        return obj;
-    }
 
    protected:
     static void _bind_methods();

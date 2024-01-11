@@ -1,13 +1,19 @@
 #include "city.h"
 
+#include <godot_cpp/classes/area2d.hpp>
+#include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/property_info.hpp>
 #include <godot_cpp/variant/node_path.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
+#include "../core/utils.h"
+#include "godot_cpp/classes/circle_shape2d.hpp"
+
 godot::CL::City::City()
-    : supply_(Array()),
+    : col_shape_(nullptr),
+      supply_(Array()),
       demand_(Array()),
       industries_(Array()),
       onshore_entries_(Array()),
@@ -28,9 +34,39 @@ void godot::CL::City::add_city_entry_point(const Vector2i coords,
     }
 }
 
+void godot::CL::City::r_assign_required_components_() {
+    if (col_shape_ == nullptr) {
+        Node* col{find_child("*CollisionShape*")};
+        ERR_FAIL_NULL_MSG(col, "required component CollisionShape missing");
+        col_shape_ = static_cast<CollisionShape2D*>(col);
+    }
+}
+
+void godot::CL::City::e_assign_required_components_() {
+    ERR_FAIL_COND_EDMSG(col_shape_ != nullptr,
+                        "component CollisionShape already assigned");
+    Node* col{find_child("*CollisionShape*")};
+    if (col == nullptr) {
+        col_shape_ = Utils::create_component<CollisionShape2D>(this);
+        auto shape = memnew(CircleShape2D);
+        shape->set_local_to_scene(true);
+        col_shape_->set_shape(shape);
+    } else {
+        col_shape_ = static_cast<CollisionShape2D*>(col);
+    }
+}
+
 void godot::CL::City::_ready() {
+    if (Utils::is_in_editor()) {
+        e_assign_required_components_();
+    } else {
+        r_assign_required_components_();
+    }
     set_y_sort_enabled(true);
     set_z_index(5);
+    set_monitorable(false);
+    set_collision_layer(COLLISION_LAYER_CITY);
+    set_collision_mask(COLLISION_LAYER_VEHICLE);
 }
 
 void godot::CL::City::_bind_methods() {

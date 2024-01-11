@@ -124,6 +124,11 @@ godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
         result.surface = TILE_SURFACE_OBSTACLE;
         return result;
     }
+    TileData* bridge_data{get_cell_tile_data(TILE_BRIDGE_LAYER, coords)};
+    if (bridge_data != nullptr) {
+        result.surface = TILE_SURFACE_BRIDGE;
+        return result;
+    }
     TileData* obs_data{get_cell_tile_data(TILE_OBSTACLE_LAYER, coords)};
     if (obs_data != nullptr) {
         result.surface = TILE_SURFACE_OBSTACLE;
@@ -149,7 +154,7 @@ void godot::CL::TileManager::ensure_layers_created_() {
     if (get_layers_count() == 1) {
         remove_layer(0);
         create_layer_(TILE_BACKGROUND_LAYER, "Background");
-        create_layer_(TILE_VEGETATION_LAYER, "Vegetation");
+        create_layer_(TILE_RESOURCE_LAYER, "Resource");
         create_layer_(TILE_OBSTACLE_LAYER, "Obstacle");
     }
     Ref<TileSet> tileset{get_tileset()};
@@ -240,8 +245,9 @@ void godot::CL::TileManager::_bind_methods() {
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(TILE_BACKGROUND_LAYER);
-    BIND_ENUM_CONSTANT(TILE_VEGETATION_LAYER);
+    BIND_ENUM_CONSTANT(TILE_RESOURCE_LAYER);
     BIND_ENUM_CONSTANT(TILE_OBSTACLE_LAYER);
+    BIND_ENUM_CONSTANT(TILE_BRIDGE_LAYER);
 
     BIND_ENUM_CONSTANT(TILE_DATA_LAYER_WEIGHT);
     BIND_ENUM_CONSTANT(TILE_DATA_LAYER_IS_WATER);

@@ -89,9 +89,8 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
             return astar_reconstruct_path_(start->coords, came_from, current);
         }
         for (auto* edge : current->edges) {
-            // boats cannot travel on ground
-            // wagons cannot travel on water
-            if (edge->surface != surface || has_occupant(edge->coords)) {
+            if (edge->surface != TILE_SURFACE_BRIDGE &&
+                (edge->surface != surface || has_occupant(edge->coords))) {
                 continue;
             }
             // distance from start to edge through current at cost weight

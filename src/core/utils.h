@@ -19,8 +19,11 @@ enum TileSurface {
     TILE_SURFACE_NONE,
     TILE_SURFACE_GROUND,
     TILE_SURFACE_WATER,
-    TILE_SURFACE_OBSTACLE
+    TILE_SURFACE_OBSTACLE,
+    TILE_SURFACE_BRIDGE
 };
+
+enum CollisionLayer { COLLISION_LAYER_VEHICLE = 1, COLLISION_LAYER_CITY = 2 };
 
 class Utils : public Object {
     GDCLASS(Utils, Object)
@@ -29,6 +32,16 @@ class Utils : public Object {
     static void _bind_methods();
 
    public:
+    template <typename T>
+    static T* create_component(Node* owner, bool add_child = true) {
+        T* obj = memnew(T);
+        if (add_child) {
+            owner->add_child(obj);
+            obj->set_owner(owner);
+        }
+        return obj;
+    }
+
     static bool is_in_editor();
     static bool is_in_game();
     static const char* convert_gd_string(const Node* n);
@@ -43,5 +56,6 @@ class Utils : public Object {
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::TileSurface);
+VARIANT_ENUM_CAST(godot::CL::CollisionLayer);
 
 #endif  // CL_TRADING_UTILS_H_

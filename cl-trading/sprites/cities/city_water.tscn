@@ -1,11 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://btfn8crdxt066"]
+[gd_scene load_steps=4 format=3 uid="uid://btfn8crdxt066"]
 
 [ext_resource type="PackedScene" uid="uid://dovhhg3bg0wmu" path="res://sprites/cities/houses/house_a.tscn" id="1_deve5"]
 [ext_resource type="PackedScene" uid="uid://r857xm6bjgiu" path="res://sprites/cities/houses/house_dock_down.tscn" id="2_o54sl"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_a1cjv"]
+resource_local_to_scene = true
+radius = 168.0
+
 [node name="CityWater" type="City"]
 z_index = 5
 y_sort_enabled = true
+collision_layer = 2
+monitorable = false
 
 [node name="HouseA" parent="." instance=ExtResource("1_deve5")]
 
@@ -26,3 +32,7 @@ gizmo_extents = 6.0
 visibility_layer = 2
 position = Vector2(8, 56)
 gizmo_extents = 6.0
+
+[node name="@CollisionShape2D@17487" type="CollisionShape2D" parent="."]
+position = Vector2(16, 32)
+shape = SubResource("CircleShape2D_a1cjv")

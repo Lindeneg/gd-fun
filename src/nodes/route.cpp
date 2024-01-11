@@ -107,6 +107,8 @@ bool godot::CL::Route::start(const bool initial_start) {
     ERR_FAIL_COND_V_MSG(
         !has_required_managers_(), false,
         vformat("start: required managers missing on %s", get_name()));
+    // TODO(5) probably dont take bool as arg
+    // rather just keep that state internal
     if (initial_start) {
         current_route_ = tile_manager_->construct_path(
             get_city_entry_(c1_), get_city_entry_(c2_), type_);

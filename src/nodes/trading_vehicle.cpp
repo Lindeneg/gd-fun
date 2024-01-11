@@ -69,14 +69,14 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
                         "component CollisionShape already assigned");
     Node* anim{find_child("*AnimatedSprite*")};
     if (anim == nullptr) {
-        animated_sprite_ = create_component_<AnimatedSprite2D>();
+        animated_sprite_ = Utils::create_component<AnimatedSprite2D>(this);
         initialize_sprite_frames_();
     } else {
         animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
     }
     Node* col{find_child("*CollisionShape*")};
     if (col == nullptr) {
-        collision_shape_ = create_component_<CollisionShape2D>();
+        collision_shape_ = Utils::create_component<CollisionShape2D>(this);
         auto shape = memnew(RectangleShape2D);
         shape->set_local_to_scene(true);
         collision_shape_->set_shape(shape);
@@ -184,7 +184,6 @@ void godot::CL::TradingVehicle::_ready() {
         r_assign_required_components_();
     }
     set_y_sort_enabled(true);
-    set_z_index(6);
 }
 
 void godot::CL::TradingVehicle::_process(double delta) {
