@@ -141,13 +141,15 @@ animations = [{
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7s74f"]
 resource_local_to_scene = true
+size = Vector2(16, 16)
 
 [node name="VehicleHorse" type="TradingVehicle"]
-tier = 65793
-speed = 50.0
-destination_threshold = 1.0
+vehicle_surface = 1
+speed = 40.0
+destination_threshold = 2.0
 z_index = 7
 y_sort_enabled = true
+input_pickable = false
 
 [node name="@AnimatedSprite2D@18088" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_57wpw")

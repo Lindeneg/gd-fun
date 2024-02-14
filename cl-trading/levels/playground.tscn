@@ -11,7 +11,6 @@
 [node name="Playground" type="Node2D"]
 
 [node name="CameraManager" parent="." instance=ExtResource("1_rr1md")]
-zoom = Vector2(2, 2)
 position_smoothing_speed = 100.0
 move_speed = 600.0
 
@@ -31,7 +30,7 @@ position = Vector2(544, 1232)
 position = Vector2(1136, 336)
 
 [node name="CityC" parent="CityManager" instance=ExtResource("5_2dkme")]
-position = Vector2(192, 240)
+position = Vector2(224, 256)
 
 [node name="CityC2" parent="CityManager" instance=ExtResource("5_2dkme")]
 position = Vector2(128, 448)
@@ -40,7 +39,7 @@ position = Vector2(128, 448)
 position = Vector2(736, 624)
 
 [node name="CityA2" parent="CityManager" instance=ExtResource("3_rkss4")]
-position = Vector2(832, 80)
+position = Vector2(576, 48)
 
 [node name="CityA3" parent="CityManager" instance=ExtResource("3_rkss4")]
 position = Vector2(720, 944)
@@ -52,7 +51,6 @@ position = Vector2(1328, 736)
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 z_index = 4096
-show_tiles = true
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]

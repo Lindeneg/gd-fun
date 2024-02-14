@@ -92,6 +92,9 @@ class TileManager : public TileMap {
                                              const TileSurface surface) {
         return tile_graph_.astar_construct_path(start, end, surface);
     }
+    Vector2i find_free_tile_on_surface(const Vector2i tile,
+                                       const TileSurface surface,
+                                       const Vector2 ignore_direction) const;
     void set_rebuild_debug_graph(const bool m);
     void set_debug_mode(const bool m);
     void set_map_size(const Vector2i v);

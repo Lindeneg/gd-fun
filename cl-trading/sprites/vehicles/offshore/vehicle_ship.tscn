@@ -58,8 +58,8 @@ animations = [{
 resource_local_to_scene = true
 
 [node name="VehicleShip" type="TradingVehicle"]
-tier = 2
-speed = 25.0
+vehicle_surface = 2
+speed = 30.0
 destination_threshold = 2.0
 z_index = 5
 y_sort_enabled = true

@@ -1,5 +1,6 @@
 #include "route.h"
 
+#include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/timer.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
@@ -16,6 +17,7 @@ godot::CL::Route::Route()
       city_manager_(nullptr),
       timeout_cb_(Callable(this, "handle_timeout_")),
       dest_reached_cb_(Callable(this, "handle_destination_reached_")),
+      collision_cb_(Callable(this, "handle_vehicle_collisions_")),
       c1_(""),
       c2_(""),
       state_(ROUTE_INACTIVE),
@@ -28,6 +30,7 @@ godot::CL::Route::~Route() { destroy(); }
 
 void godot::CL::Route::destroy() {
     Utils::disconnect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
+    Utils::disconnect(vehicle_, "area_entered", collision_cb_);
     Utils::disconnect(cooldown_timer_, "timeout", timeout_cb_);
     Utils::queue_delete(vehicle_);
     Utils::queue_delete(cooldown_timer_);
@@ -60,6 +63,11 @@ void godot::CL::Route::handle_destination_reached_(const Vector2 dest) {
     ERR_FAIL_NULL_MSG(cooldown_timer_,
                       vformat("dest_reached: timer is null %s", get_name()));
     cooldown_timer_->start();
+}
+
+void godot::CL::Route::handle_vehicle_collisions_(const Area2D* other) {
+    printf("WE MADE IT ROUTE\n");
+    emit_signal("vehicle_collision", vehicle_, other);
 }
 
 void godot::CL::Route::set_debug_mode(const bool m) {
@@ -139,6 +147,9 @@ void godot::CL::Route::set_vehicle(TradingVehicle* vehicle) {
     auto* tmp = vehicle_;
     vehicle_ = vehicle;
     if (tmp != nullptr) {
+        Utils::disconnect(vehicle_, TradingVehicle::SDestReached,
+                          dest_reached_cb_);
+        Utils::disconnect(vehicle_, "area_entered", collision_cb_);
         remove_child(tmp);
         Utils::queue_delete(tmp);
     }
@@ -146,10 +157,8 @@ void godot::CL::Route::set_vehicle(TradingVehicle* vehicle) {
     add_child(vehicle_);
     vehicle_->set_owner(this);
     Utils::connect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
+    Utils::connect(vehicle_, "area_entered", collision_cb_);
 }
-
-void godot::CL::Route::change_route_plan() {}
-void godot::CL::Route::change_trading_vehicle() {}
 
 void godot::CL::Route::setup_vehicle_from_tree_() {
     ERR_FAIL_COND_MSG(vehicle_ != nullptr,
@@ -163,7 +172,11 @@ void godot::CL::Route::setup_vehicle_from_tree_() {
         std::cout << "Vehicle is nullptr\n";
     }
     Utils::connect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
+    Utils::connect(vehicle_, "area_entered", collision_cb_);
 }
+
+void godot::CL::Route::change_route_plan() {}
+void godot::CL::Route::change_trading_vehicle() {}
 
 void godot::CL::Route::setup_timer_from_tree_or_create_() {
     ERR_FAIL_COND_MSG(cooldown_timer_ != nullptr,
@@ -221,6 +234,8 @@ void godot::CL::Route::_bind_methods() {
     ClassDB::bind_method(D_METHOD("handle_timeout_"), &Route::handle_timeout_);
     ClassDB::bind_method(D_METHOD("handle_destination_reached_", "dest"),
                          &Route::handle_destination_reached_);
+    ClassDB::bind_method(D_METHOD("handle_vehicle_collisions_", "other"),
+                         &Route::handle_vehicle_collisions_);
 
     ClassDB::bind_method(D_METHOD("start", "initial_start"), &Route::start);
     ClassDB::bind_method(D_METHOD("stop"), &Route::stop);
@@ -241,6 +256,15 @@ void godot::CL::Route::_bind_methods() {
                          &Route::set_debug_mode);
 
     // ADD SIGNALS
+    ClassDB::add_signal(
+        "Route",
+        MethodInfo(
+            "vehicle_collision",
+            PropertyInfo(Variant::OBJECT, "body1", PROPERTY_HINT_RESOURCE_TYPE,
+                         "TradingVehicle"),
+            PropertyInfo(Variant::OBJECT, "body2", PROPERTY_HINT_RESOURCE_TYPE,
+                         "TradingVehicle")));
+
     ClassDB::add_signal("Route",
                         MethodInfo("draw_debug_route",
                                    PropertyInfo(Variant::STRING, "route_name"),

@@ -101,6 +101,38 @@ void godot::CL::TileManager::create_graph_() {
 #endif
 }
 
+// TODO tidy up
+godot::Vector2i godot::CL::TileManager::find_free_tile_on_surface(
+    const Vector2i tile, const TileSurface surface,
+    const Vector2 ignore_direction) const {
+    auto result{Vector2i()};
+    if (int(ignore_direction.x) != 0 && int(ignore_direction.y) == 0) {
+        // handle x movement
+        result = tile + Vector2i(0, 1);
+        if (!tile_graph_.has_occupant_or_obstacle(result, surface)) {
+            return result;
+        }
+        result = tile + Vector2i(0, -1);
+        if (!tile_graph_.has_occupant_or_obstacle(result, surface)) {
+            return result;
+        }
+        return tile;
+    } else if (int(ignore_direction.y) != 0 && int(ignore_direction.x) == 0) {
+        // handle y movement
+        result = tile + Vector2i(1, 0);
+        if (!tile_graph_.has_occupant_or_obstacle(result, surface)) {
+            return result;
+        }
+        result = tile + Vector2i(-1, 0);
+        if (!tile_graph_.has_occupant_or_obstacle(result, surface)) {
+            return result;
+        }
+        return tile;
+    }
+    // TODO(6) NEXT handle xy movement
+    return tile;
+}
+
 void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
                                             TileVertex* current) {
     TileVertex* vertex{tile_graph_.get_vertex(coords)};
@@ -209,6 +241,9 @@ void godot::CL::TileManager::_bind_methods() {
                          &TileManager::construct_path);
     ClassDB::bind_method(D_METHOD("update_vertex_mat", "v", "mat"),
                          &TileManager::update_vertex_mat);
+    ClassDB::bind_method(D_METHOD("find_free_tile_on_surface", "tile",
+                                  "surface", "ignore_direction"),
+                         &TileManager::find_free_tile_on_surface);
     ClassDB::bind_method(D_METHOD("reset_occupants"),
                          &TileManager::reset_occupants);
 

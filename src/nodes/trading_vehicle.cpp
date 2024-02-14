@@ -1,7 +1,5 @@
 #include "trading_vehicle.h"
 
-#include <cstdint>
-#include <cstdio>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
@@ -28,6 +26,9 @@ const char* godot::CL::TradingVehicle::SDestReached{"destination_reached"};
 godot::CL::TradingVehicle::TradingVehicle()
     : map_route_inc_(true),
       map_route_(TypedArray<Vector2>()),
+      tier_(VEHICLE_TIER_COMMON),
+      priority_(VEHICLE_PRIORITY_MEDIUM),
+      surface_(TILE_SURFACE_NONE),
       current_map_route_idx_(0),
       speed_(0.0),
       destination_threshold_(0.0),
@@ -197,6 +198,14 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
     ClassDB::bind_method(D_METHOD("get_navigation_target"),
                          &TradingVehicle::get_navigation_target);
+    ClassDB::bind_method(D_METHOD("set_navigation_target", "t"),
+                         &TradingVehicle::set_navigation_target);
+    ClassDB::bind_method(D_METHOD("get_direction"),
+                         &TradingVehicle::get_direction);
+
+    ClassDB::bind_method(D_METHOD("get_surface"), &TradingVehicle::get_surface);
+    ClassDB::bind_method(D_METHOD("set_surface", "s"),
+                         &TradingVehicle::set_surface);
 
     ClassDB::bind_method(D_METHOD("get_map_path"),
                          &TradingVehicle::get_map_path);
@@ -219,15 +228,30 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_tier"), &TradingVehicle::get_tier);
     ClassDB::bind_method(D_METHOD("set_tier", "t"), &TradingVehicle::set_tier);
 
+    ClassDB::bind_method(D_METHOD("get_priority"),
+                         &TradingVehicle::get_priority);
+    ClassDB::bind_method(D_METHOD("set_priority", "p"),
+                         &TradingVehicle::set_priority);
+
     ClassDB::bind_method(D_METHOD("get_destination_threshold"),
                          &TradingVehicle::get_destination_threshold);
     ClassDB::bind_method(D_METHOD("set_destination_threshold", "t"),
                          &TradingVehicle::set_destination_threshold);
 
     ClassDB::add_property("TradingVehicle",
+                          PropertyInfo(Variant::INT, "vehicle_surface",
+                                       PROPERTY_HINT_ENUM, "Ground:1,Water:2"),
+                          "set_surface", "get_surface");
+
+    ClassDB::add_property("TradingVehicle",
                           PropertyInfo(Variant::INT, "tier", PROPERTY_HINT_ENUM,
                                        "Budget,Common,Premium"),
                           "set_tier", "get_tier");
+
+    ClassDB::add_property("TradingVehicle",
+                          PropertyInfo(Variant::INT, "vehicle_priority",
+                                       PROPERTY_HINT_ENUM, "Low,Medium,High"),
+                          "set_priority", "get_priority");
 
     ClassDB::add_property_group("TradingVehicle", "Navigation", "");
     ClassDB::add_property(
@@ -253,4 +277,8 @@ void godot::CL::TradingVehicle::_bind_methods() {
     BIND_ENUM_CONSTANT(VEHICLE_TIER_BUDGET);
     BIND_ENUM_CONSTANT(VEHICLE_TIER_COMMON);
     BIND_ENUM_CONSTANT(VEHICLE_TIER_PREMIUM);
+
+    BIND_ENUM_CONSTANT(VEHICLE_PRIORITY_LOW);
+    BIND_ENUM_CONSTANT(VEHICLE_PRIORITY_MEDIUM);
+    BIND_ENUM_CONSTANT(VEHICLE_PRIORITY_HIGH);
 }

@@ -1,3 +1,6 @@
-[gd_scene format=3 uid="uid://dddojef21iivu"]
+[gd_scene load_steps=2 format=3 uid="uid://dddojef21iivu"]
+
+[ext_resource type="Script" path="res://core/collision-manager/collision_manager.gd" id="1_flyts"]
 
 [node name="CollisionManager" type="Node"]
+script = ExtResource("1_flyts")

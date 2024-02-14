@@ -1,6 +1,7 @@
 #ifndef CL_TRADING_ROUTE_H_
 #define CL_TRADING_ROUTE_H_
 
+#include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/timer.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
@@ -41,6 +42,7 @@ class Route : public Node {
     // signal Callables
     Callable timeout_cb_;
     Callable dest_reached_cb_;
+    Callable collision_cb_;
     // city id 1
     StringName c1_;
     // city id 2
@@ -61,6 +63,8 @@ class Route : public Node {
     // callback to handle vehicle
     // destination reached signal
     void handle_destination_reached_(const Vector2 dest);
+    // callback to handle vehicle collision
+    void handle_vehicle_collisions_(const Area2D* other);
     // emits debug signal
     void emit_debug_signal_();
     // converts from tile coords to local coords

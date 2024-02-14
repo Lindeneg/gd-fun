@@ -132,9 +132,10 @@ func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return;
 	if show_route_ui:
+		var cam_rect = camera_manager.get_viewport_rect().size;
 		route_debug_ui.position = Vector2(
-			camera_manager.position.x,
-			camera_manager.position.y,
+			camera_manager.position.x - (cam_rect.x / camera_manager.zoom.x / 2),
+			camera_manager.position.y - (cam_rect.y / camera_manager.zoom.y / 2),
 		);
 
 func _draw() -> void:

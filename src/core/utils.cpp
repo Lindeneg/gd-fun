@@ -1,10 +1,13 @@
 #include "utils.h"
 
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/variant/callable.hpp>
+
+#include "godot_cpp/variant/variant.hpp"
 
 bool godot::CL::Utils::is_in_editor() {
     return godot::Engine::get_singleton()->is_editor_hint();
@@ -29,7 +32,10 @@ void godot::CL::Utils::connect(Node* node, const StringName name,
                                const Callable& callable) {
     ERR_FAIL_NULL_MSG(node, vformat("cannot connect to signal %s", name));
     if (!node->is_connected(name, callable)) {
-        node->connect(name, callable);
+        if (node->connect(name, callable) != OK) {
+            WARN_PRINT_ED(vformat("%s failed to connect to signal %s",
+                                  node->get_name(), name));
+        }
     }
 }
 

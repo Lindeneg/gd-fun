@@ -5,6 +5,8 @@
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/core/memory.hpp>
 
+#include "../core/utils.h"
+
 namespace godot {
 class AnimatedSprite2D;
 class CollisionShape2D;
@@ -33,6 +35,12 @@ enum VehicleState {
     VEHICLE_OFFLOADING
 };
 
+enum VehiclePriority {
+    VEHICLE_PRIORITY_LOW,
+    VEHICLE_PRIORITY_MEDIUM,
+    VEHICLE_PRIORITY_HIGH
+};
+
 /* TradingVehicle are part of Route and
  * is anything that can move, has animations
  * and carries cargo from A<->B.
@@ -56,6 +64,8 @@ class TradingVehicle : public Area2D {
 
     // tier of vehicle
     VehicleTier tier_;
+    VehiclePriority priority_;
+    TileSurface surface_;
     // speed multiplier
     double speed_;
     // stops movement if distance
@@ -111,13 +121,17 @@ class TradingVehicle : public Area2D {
     inline double get_speed() const { return speed_; }
     inline VehicleState get_state() const { return state_; }
     inline VehicleTier get_tier() const { return tier_; }
+    inline VehiclePriority get_priority() const { return priority_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
+    inline TileSurface get_surface() const { return surface_; }
+    inline Vector2 get_direction() const { return direction_; }
     inline TypedArray<Vector2> get_map_path() const { return map_route_; }
 
     inline void set_map_path(const TypedArray<Vector2> v) {
         map_route_ = v;
         current_map_route_idx_ = 0;
     }
+    inline void set_surface(const TileSurface s) { surface_ = s; }
     inline void set_navigation_target(const Vector2 t) {
         navigation_target_ = t;
     }
@@ -125,11 +139,13 @@ class TradingVehicle : public Area2D {
         destination_threshold_ = t;
     }
     inline void set_tier(const VehicleTier t) { tier_ = t; }
+    inline void set_priority(const VehiclePriority p) { priority_ = p; }
     inline void set_speed(const double s) { speed_ = s; }
 };
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::VehicleState);
 VARIANT_ENUM_CAST(godot::CL::VehicleTier);
+VARIANT_ENUM_CAST(godot::CL::VehiclePriority);
 
 #endif  // CL_TRADING_TRADING_VEHICLE_H_

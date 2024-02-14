@@ -41,9 +41,11 @@ func get_selected_id(btn: OptionButton) -> int:
 
 func _ready() -> void:
 	create_btn.disabled = true;
+	pass
 
 func _process(_delta: float) -> void:
 	create_btn.disabled = city1_opts.selected == city2_opts.selected;
+	pass
 
 func _on_create_route_btn_button_down() -> void:
 	emit_signal(

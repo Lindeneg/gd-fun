@@ -67,6 +67,17 @@ class TileGraph {
         }
         return false;
     }
+    inline bool has_occupant_or_obstacle(const Vector2i v,
+                                         const TileSurface surface) const {
+        if (has_occupant(v)) {
+            return true;
+        }
+        auto vertex{get_vertex(v)};
+        if (vertex == nullptr || vertex->surface != surface) {
+            return true;
+        }
+        return vertex->surface == TILE_SURFACE_OBSTACLE;
+    }
 
     PackedVector2Array astar_construct_path(TileVertex* start, TileVertex* end,
                                             const TileSurface surface);
