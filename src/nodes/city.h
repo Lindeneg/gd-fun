@@ -45,11 +45,6 @@ class City : public Area2D {
     Array offshore_entries_;
     // city size
     CitySize size_;
-    // maximum capacity i.e
-    // how many concurrent routes
-    int max_route_capacity_;
-    // current route size
-    int current_route_size_;
 
     void r_assign_required_components_();
     void e_assign_required_components_();
@@ -80,8 +75,6 @@ class City : public Area2D {
     //    inline Array get_demand() const { return demand_; }
     //    inline Array get_industries() const { return industries_; }
     inline CitySize get_size() const { return size_; }
-    inline int get_route_capacity() const { return max_route_capacity_; }
-    inline int get_current_route_size() const { return current_route_size_; }
 };
 }  // namespace godot::CL
 

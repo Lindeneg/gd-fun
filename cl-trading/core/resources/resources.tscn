@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://654d7awdntxl"]
+
+[ext_resource type="Script" path="res://core/resources/resources.gd" id="1_he0fr"]
+
+[node name="Resources" type="Node"]
+script = ExtResource("1_he0fr")
+
+[node name="Mail" type="BaseResource" parent="."]
+value = 4
+weight = 1
+resource_kind = 1
+
+[node name="Passengers" type="BaseResource" parent="."]
+value = 5
+weight = 1
+
+[node name="Grain" type="BaseResource" parent="."]
+value = 15
+weight = 1
+resource_kind = 2
+
+[node name="Wood" type="BaseResource" parent="."]
+value = 25
+weight = 1
+resource_kind = 6
+
+[node name="Fish" type="BaseResource" parent="."]
+value = 20
+weight = 1
+resource_kind = 3

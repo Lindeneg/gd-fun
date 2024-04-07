@@ -1,6 +1,7 @@
 #include "city.h"
 
 #include <godot_cpp/classes/area2d.hpp>
+#include <godot_cpp/classes/circle_shape2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -9,7 +10,6 @@
 #include <godot_cpp/variant/variant.hpp>
 
 #include "../core/utils.h"
-#include "godot_cpp/classes/circle_shape2d.hpp"
 
 godot::CL::City::City()
     : col_shape_(nullptr),
@@ -18,11 +18,15 @@ godot::CL::City::City()
       // industries_(Array()),
       onshore_entries_(Array()),
       offshore_entries_(Array()),
-      size_(CITY_SIZE_VILLAGE),
-      max_route_capacity_(0),
-      current_route_size_(0) {}
+      size_(CITY_SIZE_VILLAGE) {}
 
-godot::CL::City::~City() {}
+godot::CL::City::~City() {
+#ifdef CL_TRADING_DEBUG
+    printf("City: queuing shape for deletion\n");
+#endif
+    Utils::queue_delete(col_shape_);
+    col_shape_ = nullptr;
+}
 
 void godot::CL::City::add_city_entry_point(const Vector2i coords,
                                            const CityEntryType type) {

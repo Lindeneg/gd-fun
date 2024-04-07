@@ -37,5 +37,6 @@ position = Vector2(8, 24)
 gizmo_extents = 6.0
 
 [node name="@CollisionShape2D@17486" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(32, 16)
 shape = SubResource("CircleShape2D_u4ruq")
