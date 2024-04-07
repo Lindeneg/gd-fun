@@ -82,8 +82,8 @@ extends Node2D
 		route_debug_ui.visible = show_route_ui;
 		queue_redraw();
 
-													 # NONE        # GROUND    # WATER      # OBSTACLE
-const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED];
+													 # NONE        # GROUND    # WATER      # OBSTACLE # BRIDGE
+const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA];
 var tile_size: int = 0;
 var tile_array = [];
 var route_paths: Dictionary = {};
@@ -132,9 +132,10 @@ func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return;
 	if show_route_ui:
+		var cam_rect = camera_manager.get_viewport_rect().size;
 		route_debug_ui.position = Vector2(
-			camera_manager.position.x,
-			camera_manager.position.y,
+			camera_manager.position.x - (cam_rect.x / camera_manager.zoom.x / 2),
+			camera_manager.position.y - (cam_rect.y / camera_manager.zoom.y / 2),
 		);
 
 func _draw() -> void:
@@ -171,7 +172,7 @@ func _on_route_manager_clear_route_path(route_name: String) -> void:
 	queue_redraw();
 
 func _on_route_debug_create_debug_route(c1: String, c2: String, surface: int) -> void:
-	var is_water = surface == TileManager.TILE_MAT_WATER;
+	var is_water = surface == Utils.TILE_SURFACE_WATER
 	var vt = "OFFSHORE" if is_water else "ONSHORE";
 	var vv = "SHIP" if is_water else "HORSE";
 	var route = route_manager.create_and_init_route(c1, c2, vt, vv, surface);

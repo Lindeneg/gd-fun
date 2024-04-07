@@ -39,6 +39,12 @@ zoom_out={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Vehicle"
+2d_physics/layer_2="City"
+2d_physics/layer_3="Resource"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

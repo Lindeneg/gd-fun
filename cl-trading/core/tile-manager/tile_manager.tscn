@@ -4,12 +4,17 @@
 
 [node name="TileManager" type="TileManager"]
 y_sort_enabled = true
+texture_filter = 1
 tile_set = ExtResource("1_0o2b3")
 layer_0/name = "Background"
 layer_0/y_sort_enabled = true
-layer_1/name = "Vegetation"
+layer_1/name = "Resource"
 layer_1/y_sort_enabled = true
 layer_1/tile_data = PackedInt32Array()
 layer_2/name = "Obstacle"
 layer_2/y_sort_enabled = true
 layer_2/tile_data = PackedInt32Array()
+layer_3/name = "Bridge"
+layer_3/y_sort_enabled = true
+layer_3/z_index = 6
+layer_3/tile_data = PackedInt32Array()

@@ -10,10 +10,13 @@
 #include "./trading_vehicle.h"
 
 godot::CL::Route::Route()
-    : debug_mode_(false),
+    : initial_start_(true),
+      debug_mode_(false),
       type_(TILE_SURFACE_NONE),
       tile_manager_(nullptr),
       city_manager_(nullptr),
+      // timeout for time bewteen destination
+      // reached and resuming of route
       timeout_cb_(Callable(this, "handle_timeout_")),
       dest_reached_cb_(Callable(this, "handle_destination_reached_")),
       c1_(""),
@@ -78,7 +81,7 @@ void godot::CL::Route::emit_debug_signal_() {
 }
 
 godot::Vector2 godot::CL::Route::get_city_entry_(StringName city_name) const {
-    City* city = city_manager_->get_city(city_name);
+    City *city = city_manager_->get_city(city_name);
     ERR_FAIL_NULL_V_MSG(city, Vector2(),
                         vformat("get_city_entry: city %s is null on %s",
                                 city_name, get_name()));
@@ -101,13 +104,15 @@ godot::TypedArray<godot::Vector2> godot::CL::Route::get_local_path_() {
     return result;
 }
 
-bool godot::CL::Route::start(const bool initial_start) {
+bool godot::CL::Route::start() {
     ERR_FAIL_NULL_V_MSG(vehicle_, false,
                         vformat("start: vehicle is null on %s", get_name()));
     ERR_FAIL_COND_V_MSG(
         !has_required_managers_(), false,
         vformat("start: required managers missing on %s", get_name()));
-    if (initial_start) {
+    // TODO(5) probably dont take bool as arg
+    // rather just keep that state internal
+    if (initial_start_) {
         current_route_ = tile_manager_->construct_path(
             get_city_entry_(c1_), get_city_entry_(c2_), type_);
         auto local_path = get_local_path_();
@@ -116,6 +121,7 @@ bool godot::CL::Route::start(const bool initial_start) {
             vformat("start: could not calculate path on %s", get_name()));
         vehicle_->set_map_path(local_path);
         vehicle_->set_position(local_path[0]);
+        initial_start_ = false;
     }
     vehicle_->start_navigating();
     state_ = ROUTE_ACTIVE;
@@ -131,10 +137,10 @@ void godot::CL::Route::stop() {
     state_ = ROUTE_INACTIVE;
 }
 
-void godot::CL::Route::set_vehicle(TradingVehicle* vehicle) {
+void godot::CL::Route::set_vehicle(TradingVehicle *vehicle) {
     ERR_FAIL_NULL_MSG(
         vehicle, vformat("set_vehicle: new vehicle is null on %s", get_name()));
-    auto* tmp = vehicle_;
+    auto *tmp = vehicle_;
     vehicle_ = vehicle;
     if (tmp != nullptr) {
         remove_child(tmp);
@@ -152,11 +158,11 @@ void godot::CL::Route::change_trading_vehicle() {}
 void godot::CL::Route::setup_vehicle_from_tree_() {
     ERR_FAIL_COND_MSG(vehicle_ != nullptr,
                       vformat("vehicle is already assigned on %s", get_name()));
-    Node* vehicle{find_child("*Vehicle")};
+    Node *vehicle{find_child("*Vehicle")};
     if (vehicle == nullptr) {
         return;
     }
-    vehicle_ = static_cast<TradingVehicle*>(vehicle);
+    vehicle_ = static_cast<TradingVehicle *>(vehicle);
     if (vehicle_ == nullptr) {
         std::cout << "Vehicle is nullptr\n";
     }
@@ -166,9 +172,9 @@ void godot::CL::Route::setup_vehicle_from_tree_() {
 void godot::CL::Route::setup_timer_from_tree_or_create_() {
     ERR_FAIL_COND_MSG(cooldown_timer_ != nullptr,
                       vformat("timer is already assigned on %s", get_name()));
-    Node* timer_node{find_child("*Timer*")};
+    Node *timer_node{find_child("*Timer*")};
     if (timer_node != nullptr) {
-        cooldown_timer_ = static_cast<Timer*>(timer_node);
+        cooldown_timer_ = static_cast<Timer *>(timer_node);
     } else {
         cooldown_timer_ = memnew(Timer);
         cooldown_timer_->set_one_shot(true);
@@ -197,13 +203,13 @@ void godot::CL::Route::_enter_tree() {
     if (Utils::is_in_editor()) {
         return;
     }
-    auto* tile_manager = get_node_or_null(NodePath("../../TileManager"));
-    auto* city_manager = get_node_or_null(NodePath("../../CityManager"));
+    auto *tile_manager = get_node_or_null(NodePath("../../TileManager"));
+    auto *city_manager = get_node_or_null(NodePath("../../CityManager"));
     if (tile_manager != nullptr) {
-        tile_manager_ = static_cast<TileManager*>(tile_manager);
+        tile_manager_ = static_cast<TileManager *>(tile_manager);
     }
     if (city_manager != nullptr) {
-        city_manager_ = static_cast<CityManager*>(city_manager);
+        city_manager_ = static_cast<CityManager *>(city_manager);
     }
 }
 
@@ -220,7 +226,7 @@ void godot::CL::Route::_bind_methods() {
     ClassDB::bind_method(D_METHOD("handle_destination_reached_", "dest"),
                          &Route::handle_destination_reached_);
 
-    ClassDB::bind_method(D_METHOD("start", "initial_start"), &Route::start);
+    ClassDB::bind_method(D_METHOD("start"), &Route::start);
     ClassDB::bind_method(D_METHOD("stop"), &Route::stop);
     ClassDB::bind_method(D_METHOD("get_vehicle"), &Route::get_vehicle);
     ClassDB::bind_method(D_METHOD("set_vehicle", "vehicle"),

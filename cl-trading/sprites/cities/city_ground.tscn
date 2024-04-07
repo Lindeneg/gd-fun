@@ -1,10 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://ctoa158yq0esu"]
+[gd_scene load_steps=3 format=3 uid="uid://ctoa158yq0esu"]
 
 [ext_resource type="PackedScene" uid="uid://dovhhg3bg0wmu" path="res://sprites/cities/houses/house_a.tscn" id="1_snhyq"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_u4ruq"]
+resource_local_to_scene = true
+radius = 168.0
 
 [node name="CityGround" type="City"]
 z_index = 5
 y_sort_enabled = true
+collision_layer = 2
+monitorable = false
 
 [node name="HouseA" parent="." instance=ExtResource("1_snhyq")]
 
@@ -29,3 +35,8 @@ position = Vector2(48, 0)
 [node name="CityEntryGroundPoint" type="Marker2D" parent="."]
 position = Vector2(8, 24)
 gizmo_extents = 6.0
+
+[node name="@CollisionShape2D@17486" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(32, 16)
+shape = SubResource("CircleShape2D_u4ruq")

@@ -1,9 +1,13 @@
 #ifndef CL_TRADING_CITY_H_
 #define CL_TRADING_CITY_H_
 
-#include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/core/binder_common.hpp>
+
+namespace godot {
+class CollisionShape2D;
+}  // namespace godot
 
 namespace godot::CL {
 
@@ -23,28 +27,27 @@ enum CityEntryType { CITY_ENTRY_ONSHORE = 1, CITY_ENTRY_OFFSHORE = 2 };
  *
  * City size grows over time allowing
  * for more supply, demand and Industry. */
-class City : public Node2D {
-    GDCLASS(City, Node2D)
+class City : public Area2D {
+    GDCLASS(City, Area2D)
 
    private:
+    CollisionShape2D *col_shape_;
     // TODO (2) use typed array
     // resource supply
-    Array supply_;
-    // resource demand
-    Array demand_;
+    //    Array supply_;
+    //    // resource demand
+    //    Array demand_;
     // industries in city
-    Array industries_;
+    //    Array industries_;
     // onshore entry points for trading vehicles
     Array onshore_entries_;
     // offshore entry points for trading vehicles
     Array offshore_entries_;
     // city size
     CitySize size_;
-    // maximum capacity i.e
-    // how many concurrent routes
-    int max_route_capacity_;
-    // current route size
-    int current_route_size_;
+
+    void r_assign_required_components_();
+    void e_assign_required_components_();
 
    protected:
     static void _bind_methods();
@@ -68,12 +71,10 @@ class City : public Node2D {
 
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }
-    inline Array get_supply() const { return supply_; }
-    inline Array get_demand() const { return demand_; }
-    inline Array get_industries() const { return industries_; }
+    //    inline Array get_supply() const { return supply_; }
+    //    inline Array get_demand() const { return demand_; }
+    //    inline Array get_industries() const { return industries_; }
     inline CitySize get_size() const { return size_; }
-    inline int get_route_capacity() const { return max_route_capacity_; }
-    inline int get_current_route_size() const { return current_route_size_; }
 };
 }  // namespace godot::CL
 

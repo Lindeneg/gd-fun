@@ -58,10 +58,11 @@ animations = [{
 resource_local_to_scene = true
 
 [node name="VehicleShip" type="TradingVehicle"]
+vehicle_surface = 2
 tier = 2
 speed = 25.0
 destination_threshold = 2.0
-z_index = 6
+z_index = 5
 y_sort_enabled = true
 
 [node name="@AnimatedSprite2D@42727" type="AnimatedSprite2D" parent="."]

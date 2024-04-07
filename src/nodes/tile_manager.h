@@ -14,19 +14,20 @@ class PackedVector2Array;
 
 namespace godot::CL {
 
-// DEPRECATED - DO NOT USE
-enum TileMat {
-    TILE_MAT_NONE,
-    TILE_MAT_GROUND,
-    TILE_MAT_WATER,
-    TILE_MAT_OBSTACLE
-};
+// DEPRECATED - do not use!!!
+// enum TileMat {
+//    TILE_MAT_NONE,
+//    TILE_MAT_GROUND,
+//    TILE_MAT_WATER,
+//    TILE_MAT_OBSTACLE
+//};
 
 // tile layers
 enum TileLayer {
     TILE_BACKGROUND_LAYER,
-    TILE_VEGETATION_LAYER,
-    TILE_OBSTACLE_LAYER
+    TILE_RESOURCE_LAYER,
+    TILE_OBSTACLE_LAYER,
+    TILE_BRIDGE_LAYER
 };
 
 // custom tile data
@@ -63,7 +64,7 @@ class TileManager : public TileMap {
     // recreates debug array
     void set_debug_array_();
     // adds edge to tile
-    void add_tile_edge_(const Vector2i coords, TileVertex* current);
+    void add_tile_edge_(const Vector2i coords, TileVertex *current);
     // creates weighted tile graph
     void create_graph_();
     // ensures required tile layers are created
@@ -94,8 +95,8 @@ class TileManager : public TileMap {
     void set_rebuild_debug_graph(const bool m);
     void set_debug_mode(const bool m);
     void set_map_size(const Vector2i v);
-    void update_vertex_mat(const Vector2i v, const int m);
-
+    void add_occupant(const Vector2i v);
+    void remove_occupant(const Vector2i v);
     inline void reset_occupants() { tile_graph_.reset_occupants(); }
     inline bool get_rebuild_debug_graph() const { return rebuild_debug_graph_; }
     inline bool get_debug_mode() const { return debug_mode_; }
@@ -108,6 +109,6 @@ class TileManager : public TileMap {
 
 VARIANT_ENUM_CAST(godot::CL::TileLayer);
 VARIANT_ENUM_CAST(godot::CL::TileDataLayer);
-VARIANT_ENUM_CAST(godot::CL::TileMat);
+// VARIANT_ENUM_CAST(godot::CL::TileMat);
 
 #endif  // CL_TRADING_TILE_MANAGER_H_

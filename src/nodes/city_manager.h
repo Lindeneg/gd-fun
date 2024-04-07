@@ -20,14 +20,14 @@ class CityManager : public Node {
     GDCLASS(CityManager, Node)
 
    private:
-    std::map<StringName, City*> cities_;
-    TileManager* tile_manager_;
+    std::map<StringName, City *> cities_;
+    TileManager *tile_manager_;
     Callable tile_manager_ready_cb_;
 
     void setup_tile_manager_();
-    void handle_sprite_tile_manager_notification_(Sprite2D* sprite,
-                                                  Node2D* parent);
-    void iterate_children_(TypedArray<Node> nodes, Node2D* parent);
+    void handle_sprite_tile_manager_notification_(Sprite2D *sprite,
+                                                  Node2D *parent);
+    void iterate_children_(TypedArray<Node> nodes, Node2D *parent);
 
    protected:
     static void _bind_methods();
@@ -39,13 +39,7 @@ class CityManager : public Node {
     void _enter_tree() override;
     void _exit_tree() override;
 
-    City* get_city(StringName name) const {
-        auto city = cities_.find(name);
-        if (city == cities_.end()) {
-            return nullptr;
-        }
-        return city->second;
-    }
+    City *get_city(StringName name) const;
     void notify_tile_manager_of_cities();
 };
 }  // namespace godot::CL

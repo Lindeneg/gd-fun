@@ -19,16 +19,18 @@
 
 // STRING CONSTANTS
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
-const char* godot::CL::TradingVehicle::AnimationNames
+const char *godot::CL::TradingVehicle::AnimationNames
     [godot::CL::TradingVehicle::AnimationSize]{"left", "up", "right", "down"};
 
 // SIGNALS
-const char* godot::CL::TradingVehicle::SDestReached{"destination_reached"};
+const char *godot::CL::TradingVehicle::SDestReached{"destination_reached"};
 
 godot::CL::TradingVehicle::TradingVehicle()
-    : map_route_inc_(true),
+    : move_dir_(VEHICLE_MOVE_DIR_AB),
       map_route_(TypedArray<Vector2>()),
       current_map_route_idx_(0),
+      tile_surface_(TILE_SURFACE_GROUND),
+      tier_(VEHICLE_TIER_COMMON),
       speed_(0.0),
       destination_threshold_(0.0),
       state_(VEHICLE_IDLE),
@@ -50,14 +52,14 @@ godot::CL::TradingVehicle::~TradingVehicle() {
 // this is called on _ready notification at runtime
 void godot::CL::TradingVehicle::r_assign_required_components_() {
     if (animated_sprite_ == nullptr) {
-        Node* anim{find_child("*AnimatedSprite*")};
+        Node *anim{find_child("*AnimatedSprite*")};
         ERR_FAIL_NULL_MSG(anim, "required component AnimatedSprite missing");
-        animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
+        animated_sprite_ = static_cast<AnimatedSprite2D *>(anim);
     }
     if (collision_shape_ == nullptr) {
-        Node* col{find_child("*CollisionShape*")};
+        Node *col{find_child("*CollisionShape*")};
         ERR_FAIL_NULL_MSG(col, "required component CollisionShape missing");
-        collision_shape_ = static_cast<CollisionShape2D*>(col);
+        collision_shape_ = static_cast<CollisionShape2D *>(col);
     }
 }
 
@@ -67,26 +69,26 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
                         "component AnimatedSprite already assigned");
     ERR_FAIL_COND_EDMSG(collision_shape_ != nullptr,
                         "component CollisionShape already assigned");
-    Node* anim{find_child("*AnimatedSprite*")};
+    Node *anim{find_child("*AnimatedSprite*")};
     if (anim == nullptr) {
-        animated_sprite_ = create_component_<AnimatedSprite2D>();
+        animated_sprite_ = Utils::create_component<AnimatedSprite2D>(this);
         initialize_sprite_frames_();
     } else {
-        animated_sprite_ = static_cast<AnimatedSprite2D*>(anim);
+        animated_sprite_ = static_cast<AnimatedSprite2D *>(anim);
     }
-    Node* col{find_child("*CollisionShape*")};
+    Node *col{find_child("*CollisionShape*")};
     if (col == nullptr) {
-        collision_shape_ = create_component_<CollisionShape2D>();
+        collision_shape_ = Utils::create_component<CollisionShape2D>(this);
         auto shape = memnew(RectangleShape2D);
         shape->set_local_to_scene(true);
         collision_shape_->set_shape(shape);
     } else {
-        collision_shape_ = static_cast<CollisionShape2D*>(col);
+        collision_shape_ = static_cast<CollisionShape2D *>(col);
     }
 }
 
 void godot::CL::TradingVehicle::initialize_sprite_frames_() {
-    auto* sprite_frames{memnew(SpriteFrames)};
+    auto *sprite_frames{memnew(SpriteFrames)};
     if (sprite_frames->has_animation("default")) {
         sprite_frames->remove_animation("default");
     }
@@ -97,8 +99,16 @@ void godot::CL::TradingVehicle::initialize_sprite_frames_() {
     animated_sprite_->set_sprite_frames(sprite_frames);
 }
 
+void godot::CL::TradingVehicle::switch_move_dir_() {
+    if (move_dir_ == VEHICLE_MOVE_DIR_AB) {
+        move_dir_ = VEHICLE_MOVE_DIR_BA;
+    } else {
+        move_dir_ = VEHICLE_MOVE_DIR_AB;
+    }
+}
+
 void godot::CL::TradingVehicle::handle_movement_(double delta) {
-    if (state_ != VEHICLE_MOVING || Utils::is_in_editor()) {
+    if (!is_moving() || Utils::is_in_editor()) {
         return;
     }
     const Vector2 pos{get_position()};
@@ -110,7 +120,7 @@ void godot::CL::TradingVehicle::handle_movement_(double delta) {
         } else {
             auto tmp = navigation_target_;
             state_ = VEHICLE_IDLE;
-            map_route_inc_ = !map_route_inc_;
+            switch_move_dir_();
             navigation_target_ = Vector2();
             // stop animation
             update_animation_(true);
@@ -138,12 +148,12 @@ void godot::CL::TradingVehicle::stop_navigating() {
     animated_sprite_->stop();
 }
 
+// TODO(5) refactor this
 godot::CL::NextNavResult
 godot::CL::TradingVehicle::get_next_navigation_target_() {
-    // TODO(5) refactor this
     int64_t route_size{map_route_.size()};
     NextNavResult result{};
-    if (map_route_inc_) {
+    if (move_dir_ == VEHICLE_MOVE_DIR_AB) {
         if (current_map_route_idx_ < route_size) {
             result.target = map_route_[current_map_route_idx_];
             result.is_valid_target = result.target != navigation_target_;
@@ -184,7 +194,6 @@ void godot::CL::TradingVehicle::_ready() {
         r_assign_required_components_();
     }
     set_y_sort_enabled(true);
-    set_z_index(6);
 }
 
 void godot::CL::TradingVehicle::_process(double delta) {
@@ -196,6 +205,8 @@ void godot::CL::TradingVehicle::_process(double delta) {
 void godot::CL::TradingVehicle::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
+    ClassDB::bind_method(D_METHOD("get_move_dir"),
+                         &TradingVehicle::get_move_dir);
     ClassDB::bind_method(D_METHOD("get_navigation_target"),
                          &TradingVehicle::get_navigation_target);
 
@@ -205,6 +216,11 @@ void godot::CL::TradingVehicle::_bind_methods() {
                          &TradingVehicle::set_map_path);
     ClassDB::bind_method(D_METHOD("clear_map_path"),
                          &TradingVehicle::clear_map_path);
+
+    ClassDB::bind_method(D_METHOD("get_tile_surface"),
+                         &TradingVehicle::get_tile_surface);
+    ClassDB::bind_method(D_METHOD("set_tile_surface", "s"),
+                         &TradingVehicle::set_tile_surface);
 
     ClassDB::bind_method(D_METHOD("start_navigating"),
                          &TradingVehicle::start_navigating);
@@ -224,6 +240,11 @@ void godot::CL::TradingVehicle::_bind_methods() {
                          &TradingVehicle::get_destination_threshold);
     ClassDB::bind_method(D_METHOD("set_destination_threshold", "t"),
                          &TradingVehicle::set_destination_threshold);
+
+    ClassDB::add_property("TradingVehicle",
+                          PropertyInfo(Variant::INT, "vehicle_surface",
+                                       PROPERTY_HINT_ENUM, "Ground:1,Water:2"),
+                          "set_tile_surface", "get_tile_surface");
 
     ClassDB::add_property("TradingVehicle",
                           PropertyInfo(Variant::INT, "tier", PROPERTY_HINT_ENUM,
@@ -254,4 +275,7 @@ void godot::CL::TradingVehicle::_bind_methods() {
     BIND_ENUM_CONSTANT(VEHICLE_TIER_BUDGET);
     BIND_ENUM_CONSTANT(VEHICLE_TIER_COMMON);
     BIND_ENUM_CONSTANT(VEHICLE_TIER_PREMIUM);
+
+    BIND_ENUM_CONSTANT(VEHICLE_MOVE_DIR_AB);
+    BIND_ENUM_CONSTANT(VEHICLE_MOVE_DIR_BA);
 }

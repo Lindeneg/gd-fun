@@ -29,6 +29,7 @@ class Route : public Node {
     GDCLASS(Route, Node)
 
    private:
+    bool initial_start_;
     // draw route (if any)
     bool debug_mode_;
     // packed array of current route
@@ -36,8 +37,8 @@ class Route : public Node {
     // intended tile surface
     TileSurface type_;
     // pointers to needed managers
-    TileManager* tile_manager_;
-    CityManager* city_manager_;
+    TileManager *tile_manager_;
+    CityManager *city_manager_;
     // signal Callables
     Callable timeout_cb_;
     Callable dest_reached_cb_;
@@ -47,13 +48,13 @@ class Route : public Node {
     StringName c2_;
     // current state
     RouteState state_;
-    Timer* cooldown_timer_;
+    Timer *cooldown_timer_;
     // distance betweem them
     int distance_;
     // cost to player
     int gold_cost_;
     // trading vehicle instance
-    TradingVehicle* vehicle_;
+    TradingVehicle *vehicle_;
 
     // callback to handle reaction
     // to Timer.timeout signal
@@ -89,7 +90,7 @@ class Route : public Node {
     void _enter_tree() override;
     void _exit_tree() override;
 
-    bool start(const bool initial_start = false);
+    bool start();
     void stop();
     void destroy();
     void change_trading_vehicle();
@@ -99,7 +100,7 @@ class Route : public Node {
     inline int get_gold_cost() const { return gold_cost_; }
     inline bool get_debug_mode() const { return debug_mode_; }
     inline RouteState get_route_state() const { return state_; }
-    inline TradingVehicle* get_vehicle() const { return vehicle_; }
+    inline TradingVehicle *get_vehicle() const { return vehicle_; }
     inline StringName get_city_one() const { return c1_; }
     inline StringName get_city_two() const { return c2_; }
     inline TileSurface get_type() const { return type_; }
@@ -109,7 +110,7 @@ class Route : public Node {
     inline void set_city_two(const StringName id) { c2_ = id; }
     inline void set_type(const TileSurface t) { type_ = t; }
 
-    void set_vehicle(TradingVehicle* vehicle);
+    void set_vehicle(TradingVehicle *vehicle);
 };
 }  // namespace godot::CL
 

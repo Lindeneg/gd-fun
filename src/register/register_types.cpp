@@ -5,6 +5,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "../nodes/base_resource.h"
 #include "../nodes/city.h"
 #include "../nodes/city_manager.h"
 #include "../nodes/route.h"
@@ -17,11 +18,13 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
+    ClassDB::register_class<CL::Utils>();
     ClassDB::register_class<CL::City>();
+    ClassDB::register_class<CL::BaseResource>();
+    ClassDB::register_class<CL::TradingVehicle>();
     ClassDB::register_class<CL::Route>();
     ClassDB::register_class<CL::TileManager>();
     ClassDB::register_class<CL::CityManager>();
-    ClassDB::register_class<CL::TradingVehicle>();
 }
 
 void uninitialize_cl_trading_module(ModuleInitializationLevel p_level) {

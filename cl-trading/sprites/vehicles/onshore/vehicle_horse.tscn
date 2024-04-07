@@ -146,7 +146,7 @@ resource_local_to_scene = true
 tier = 65793
 speed = 50.0
 destination_threshold = 1.0
-z_index = 6
+z_index = 7
 y_sort_enabled = true
 
 [node name="@AnimatedSprite2D@18088" type="AnimatedSprite2D" parent="."]
