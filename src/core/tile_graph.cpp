@@ -25,7 +25,7 @@ godot::CL::TileGraph::~TileGraph() {
 void godot::CL::TileGraph::destroy() {
     const auto size{vertices_.size()};
     for (int32_t i = 0; i < size; i++) {
-        TileVertex* tmp{vertices_[i]};
+        TileVertex *tmp{vertices_[i]};
         vertices_[i] = nullptr;
         delete tmp;
     }
@@ -34,8 +34,8 @@ void godot::CL::TileGraph::destroy() {
 
 godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     Vector2i start, Vector2i end, const TileSurface surface) {
-    auto* start_vertex = get_vertex(start);
-    auto* end_vertex = get_vertex(end);
+    auto *start_vertex = get_vertex(start);
+    auto *end_vertex = get_vertex(end);
     ERR_FAIL_NULL_V_EDMSG(start_vertex, PackedVector2Array(),
                           vformat("start vertex (%d,%d) was not found in graph",
                                   start.x, start.y));
@@ -47,7 +47,7 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
 
 // https://en.wikipedia.org/wiki/A*_search_algorithm
 godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
-    TileVertex* start, TileVertex* end, const TileSurface surface) {
+    TileVertex *start, TileVertex *end, const TileSurface surface) {
     // prio queue doesn't contain a method to see if it contains an element
     // so, because im stupid, I have another map that keeps track of that
     AStarPrioQueueMember open_set_members{};
@@ -60,7 +60,7 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     AStarFScoreMap f_score{};
 
     // prio queue comparator function, best f_score wins
-    auto cmp = [&f_score](TileVertex* a, TileVertex* b) {
+    auto cmp = [&f_score](TileVertex *a, TileVertex *b) {
         const auto a_score{f_score.find(a)};
         const auto b_score{f_score.find(b)};
         ERR_FAIL_COND_V_EDMSG(
@@ -72,7 +72,7 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
         return b_score->second.val < a_score->second.val;
     };
     // set of nodes whose edges may need to be visited
-    std::priority_queue<TileVertex*, std::vector<TileVertex*>, decltype(cmp)>
+    std::priority_queue<TileVertex *, std::vector<TileVertex *>, decltype(cmp)>
         open_set(cmp);
 
     // setup initial state
@@ -82,13 +82,13 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     open_set_members[start] = 1;
 
     while (!open_set.empty()) {
-        auto* current = open_set.top();
+        auto *current = open_set.top();
         open_set.pop();
         open_set_members[current] = 0;
         if (current == end) {
             return astar_reconstruct_path_(start->coords, came_from, current);
         }
-        for (auto* edge : current->edges) {
+        for (auto *edge : current->edges) {
             if (edge->surface != TILE_SURFACE_BRIDGE &&
                 (edge->surface != surface || has_occupant(edge->coords))) {
                 continue;
@@ -116,14 +116,14 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
 }
 
 godot::PackedVector2Array godot::CL::TileGraph::astar_reconstruct_path_(
-    const Vector2i start, AStarCameFromMap came_from, TileVertex* current) {
+    const Vector2i start, AStarCameFromMap came_from, TileVertex *current) {
     auto path = PackedVector2Array();
     if (came_from.size() < 2) {
         return path;
     }
     path.append(current->coords);
     int iters{0};
-    TileVertex* tmp{current};
+    TileVertex *tmp{current};
     while (iters < MaxPathLength_) {
         if (tmp->coords == start) {
             break;
@@ -136,29 +136,29 @@ godot::PackedVector2Array godot::CL::TileGraph::astar_reconstruct_path_(
     return path;
 }
 
-int godot::CL::TileGraph::astar_calculate_heuristic_(TileVertex* current,
-                                                     TileVertex* goal) const {
+int godot::CL::TileGraph::astar_calculate_heuristic_(TileVertex *current,
+                                                     TileVertex *goal) const {
     auto x_diff{current->coords.x - goal->coords.x};
     auto y_diff{current->coords.y - goal->coords.y};
     auto mag{(x_diff * x_diff) + (y_diff * y_diff)};
     return int(std::sqrt(mag) * 10);
 }
 
-void godot::CL::TileGraph::add_edge(TileVertex* v1, TileVertex* v2) {
+void godot::CL::TileGraph::add_edge(TileVertex *v1, TileVertex *v2) {
     v1->edges.push_back(v2);
     v2->edges.push_back(v1);
 }
 void godot::CL::TileGraph::add_edge(const Vector2i v1, const Vector2i v2) {
-    TileVertex* t1{get_vertex(v1)};
+    TileVertex *t1{get_vertex(v1)};
     ERR_FAIL_NULL_EDMSG(t1, vformat("vertex (%d,%d) not found", v1.x, v1.y));
-    TileVertex* t2{get_vertex(v2)};
+    TileVertex *t2{get_vertex(v2)};
     ERR_FAIL_NULL_EDMSG(t2, vformat("vertex (%d,%d) not found", v2.x, v2.y));
     add_edge(t1, t2);
 }
 
-godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(
+godot::CL::TileVertex *godot::CL::TileGraph::add_vertex(
     const Vector2i indicies, const int weight, const TileSurface surface) {
-    auto* vertex{new TileVertex()};
+    auto *vertex{new TileVertex()};
     vertex->coords = indicies;
     vertex->weight = weight;
     vertex->surface = surface;
@@ -166,9 +166,9 @@ godot::CL::TileVertex* godot::CL::TileGraph::add_vertex(
     return vertex;
 }
 
-godot::CL::TileVertex* godot::CL::TileGraph::get_vertex(
+godot::CL::TileVertex *godot::CL::TileGraph::get_vertex(
     const Vector2i indicies) const {
-    for (auto* vertex : vertices_) {
+    for (auto *vertex : vertices_) {
         if (vertex->coords == indicies) {
             return vertex;
         }
@@ -177,7 +177,7 @@ godot::CL::TileVertex* godot::CL::TileGraph::get_vertex(
 }
 
 void godot::CL::TileGraph::add_foreign_occupant(const Vector2i v) {
-    auto* vertex = get_vertex(v);
+    auto *vertex = get_vertex(v);
     if (vertex == nullptr) {
         return;
     }
@@ -186,7 +186,7 @@ void godot::CL::TileGraph::add_foreign_occupant(const Vector2i v) {
 }
 
 void godot::CL::TileGraph::remove_foreign_occupant(const Vector2i v) {
-    auto* vertex = get_vertex(v);
+    auto *vertex = get_vertex(v);
     if (vertex == nullptr) {
         return;
     }
@@ -195,12 +195,12 @@ void godot::CL::TileGraph::remove_foreign_occupant(const Vector2i v) {
 }
 
 void godot::CL::TileGraph::print() const {
-    for (const auto& vertex : vertices_) {
+    for (const auto &vertex : vertices_) {
         std::cout << "Vertex (" << vertex->coords.x << ", " << vertex->coords.y
                   << "):" << '\n';
         std::cout << "  -> Has Surface (" << vertex->surface << ")\n";
         std::cout << "  -> Has Weight (" << vertex->weight << ")\n";
-        for (const auto& edge : vertex->edges) {
+        for (const auto &edge : vertex->edges) {
             std::cout << "      -> Has Edges (" << edge->coords.x << ", "
                       << edge->coords.y << ") with weight " << edge->weight
                       << '\n';

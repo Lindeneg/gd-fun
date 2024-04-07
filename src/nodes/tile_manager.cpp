@@ -66,10 +66,10 @@ void godot::CL::TileManager::set_debug_array_() {
     if (size > debug_array_.size()) {
         debug_array_.resize(size);
     }
-    const auto& vertices{tile_graph_.get_vertices_()};
+    const auto &vertices{tile_graph_.get_vertices_()};
     const auto vertices_size = vertices.size();
     for (int32_t i = 0; i < vertices_size; i++) {
-        const auto& vertex{vertices[i]};
+        const auto &vertex{vertices[i]};
         auto dict{Dictionary()};
         dict["coords"] = map_to_local(vertex->coords);
         dict["surface"] = vertex->surface;
@@ -84,7 +84,7 @@ void godot::CL::TileManager::create_graph_() {
         for (int j = 0; j < map_size_.x; j++) {
             const auto coords{Vector2i(j, i)};
             const CellTileContext tile_context{get_tile_context_(coords)};
-            TileVertex* new_vertex{tile_graph_.add_vertex(
+            TileVertex *new_vertex{tile_graph_.add_vertex(
                 coords, tile_context.weight, tile_context.surface)};
             // add up neighbor
             if (i > 0) {
@@ -102,19 +102,19 @@ void godot::CL::TileManager::create_graph_() {
 }
 
 void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
-                                            TileVertex* current) {
-    TileVertex* vertex{tile_graph_.get_vertex(coords)};
+                                            TileVertex *current) {
+    TileVertex *vertex{tile_graph_.get_vertex(coords)};
     ERR_FAIL_NULL_EDMSG(vertex, vformat("vertex (%d,%d) was not found in graph",
                                         coords.x, coords.y));
     tile_graph_.add_edge(current, vertex);
 }
 
-void godot::CL::TileManager::update_vertex_mat(const Vector2i v, const int m) {
-    if (m == 1) {
-        tile_graph_.add_foreign_occupant(v);
-    } else {
-        tile_graph_.remove_foreign_occupant(v);
-    }
+void godot::CL::TileManager::add_occupant(const Vector2i v) {
+    tile_graph_.add_foreign_occupant(v);
+}
+
+void godot::CL::TileManager::remove_occupant(const Vector2i v) {
+    tile_graph_.remove_foreign_occupant(v);
 }
 
 godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
@@ -124,17 +124,17 @@ godot::CL::CellTileContext godot::CL::TileManager::get_tile_context_(
         result.surface = TILE_SURFACE_OBSTACLE;
         return result;
     }
-    TileData* bridge_data{get_cell_tile_data(TILE_BRIDGE_LAYER, coords)};
+    TileData *bridge_data{get_cell_tile_data(TILE_BRIDGE_LAYER, coords)};
     if (bridge_data != nullptr) {
         result.surface = TILE_SURFACE_BRIDGE;
         return result;
     }
-    TileData* obs_data{get_cell_tile_data(TILE_OBSTACLE_LAYER, coords)};
+    TileData *obs_data{get_cell_tile_data(TILE_OBSTACLE_LAYER, coords)};
     if (obs_data != nullptr) {
         result.surface = TILE_SURFACE_OBSTACLE;
         return result;
     }
-    TileData* bg_data{get_cell_tile_data(TILE_BACKGROUND_LAYER, coords)};
+    TileData *bg_data{get_cell_tile_data(TILE_BACKGROUND_LAYER, coords)};
     if (bg_data != nullptr) {
         const auto weight{
             static_cast<float>(bg_data->get_custom_data("weight"))};
@@ -207,8 +207,6 @@ void godot::CL::TileManager::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("construct_path", "start", "end", "mat"),
                          &TileManager::construct_path);
-    ClassDB::bind_method(D_METHOD("update_vertex_mat", "v", "mat"),
-                         &TileManager::update_vertex_mat);
     ClassDB::bind_method(D_METHOD("reset_occupants"),
                          &TileManager::reset_occupants);
 
@@ -252,8 +250,8 @@ void godot::CL::TileManager::_bind_methods() {
     BIND_ENUM_CONSTANT(TILE_DATA_LAYER_WEIGHT);
     BIND_ENUM_CONSTANT(TILE_DATA_LAYER_IS_WATER);
 
-    BIND_ENUM_CONSTANT(TILE_MAT_NONE);
-    BIND_ENUM_CONSTANT(TILE_MAT_GROUND);
-    BIND_ENUM_CONSTANT(TILE_MAT_WATER);
-    BIND_ENUM_CONSTANT(TILE_MAT_OBSTACLE);
+    //    BIND_ENUM_CONSTANT(TILE_MAT_NONE);
+    //    BIND_ENUM_CONSTANT(TILE_MAT_GROUND);
+    //    BIND_ENUM_CONSTANT(TILE_MAT_WATER);
+    //    BIND_ENUM_CONSTANT(TILE_MAT_OBSTACLE);
 }

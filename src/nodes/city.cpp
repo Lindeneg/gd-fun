@@ -13,9 +13,9 @@
 
 godot::CL::City::City()
     : col_shape_(nullptr),
-      supply_(Array()),
-      demand_(Array()),
-      industries_(Array()),
+      //      supply_(Array()),
+      //      demand_(Array()),
+      // industries_(Array()),
       onshore_entries_(Array()),
       offshore_entries_(Array()),
       size_(CITY_SIZE_VILLAGE),
@@ -36,23 +36,23 @@ void godot::CL::City::add_city_entry_point(const Vector2i coords,
 
 void godot::CL::City::r_assign_required_components_() {
     if (col_shape_ == nullptr) {
-        Node* col{find_child("*CollisionShape*")};
+        Node *col{find_child("*CollisionShape*")};
         ERR_FAIL_NULL_MSG(col, "required component CollisionShape missing");
-        col_shape_ = static_cast<CollisionShape2D*>(col);
+        col_shape_ = static_cast<CollisionShape2D *>(col);
     }
 }
 
 void godot::CL::City::e_assign_required_components_() {
     ERR_FAIL_COND_EDMSG(col_shape_ != nullptr,
                         "component CollisionShape already assigned");
-    Node* col{find_child("*CollisionShape*")};
+    Node *col{find_child("*CollisionShape*")};
     if (col == nullptr) {
         col_shape_ = Utils::create_component<CollisionShape2D>(this);
         auto shape = memnew(CircleShape2D);
         shape->set_local_to_scene(true);
         col_shape_->set_shape(shape);
     } else {
-        col_shape_ = static_cast<CollisionShape2D*>(col);
+        col_shape_ = static_cast<CollisionShape2D *>(col);
     }
 }
 

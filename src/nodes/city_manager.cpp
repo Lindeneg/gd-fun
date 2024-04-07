@@ -20,9 +20,9 @@ godot::CL::CityManager::CityManager()
 godot::CL::CityManager::~CityManager() {}
 
 void godot::CL::CityManager::setup_tile_manager_() {
-    Node* node{get_node_or_null("../TileManager")};
+    Node *node{get_node_or_null("../TileManager")};
     ERR_FAIL_NULL_EDMSG(node, "TileManager not found in tree");
-    tile_manager_ = static_cast<TileManager*>(node);
+    tile_manager_ = static_cast<TileManager *>(node);
     if (tile_manager_->is_node_ready()) {
         notify_tile_manager_of_cities();
     } else {
@@ -31,10 +31,10 @@ void godot::CL::CityManager::setup_tile_manager_() {
 }
 
 void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
-                                               Node2D* parent = nullptr) {
+                                               Node2D *parent = nullptr) {
     auto size{nodes.size()};
     for (auto i = 0; i < size; i++) {
-        auto* node{cast_to<Node2D>(nodes[i])};
+        auto *node{cast_to<Node2D>(nodes[i])};
         if (node == nullptr) {
             continue;
         }
@@ -42,9 +42,9 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
         if (grand_children.size() == 0 && parent != nullptr) {
             if (typeid(*node) == typeid(Sprite2D)) {
                 handle_sprite_tile_manager_notification_(
-                    static_cast<Sprite2D*>(node), parent);
+                    static_cast<Sprite2D *>(node), parent);
             } else if (typeid(*node) == typeid(Marker2D)) {
-                auto* city{static_cast<City*>(parent)};
+                auto *city{static_cast<City *>(parent)};
                 Vector2 marker_position = node->get_position();
                 Vector2i coords{tile_manager_->local_to_map(
                     parent->to_global(marker_position))};
@@ -55,8 +55,9 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
                 cities_[city->get_name()] = city;
 
             } else {
-                // WARN_PRINT_ED(
-                //    vformat("%s is unhandled city node", node->get_name()));
+                //                WARN_PRINT_ED(
+                //                    vformat("%s is unhandled city node",
+                //                    node->get_name()));
             }
         } else {
             iterate_children_(grand_children, node);
@@ -65,12 +66,12 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
 }
 
 void godot::CL::CityManager::handle_sprite_tile_manager_notification_(
-    Sprite2D* sprite, Node2D* parent) {
+    Sprite2D *sprite, Node2D *parent) {
     // convert position to tile grid coordinates
     Vector2i coords{
         tile_manager_->local_to_map(parent->to_global(sprite->get_position()))};
     // the first tile is taken by default
-    tile_manager_->update_vertex_mat(coords, 1);
+    tile_manager_->add_occupant(coords);
     // now we need to figure out if we have more tiles to occupy
     int32_t tile_size{tile_manager_->get_tileset()->get_tile_size().x};
     Rect2 rect = sprite->get_region_rect();
@@ -78,11 +79,19 @@ void godot::CL::CityManager::handle_sprite_tile_manager_notification_(
     auto y_limit = int((rect.size.y / tile_size) - 1);
     // update any offset tiles from origin
     for (auto x_offset = 0; x_offset < x_limit; x_offset++) {
-        tile_manager_->update_vertex_mat(coords + Vector2i(x_offset + 1, 0), 1);
+        tile_manager_->add_occupant(coords + Vector2i(x_offset + 1, 0));
     }
     for (auto y_offset = 0; y_offset < y_limit; y_offset++) {
-        tile_manager_->update_vertex_mat(coords + Vector2i(0, y_offset + 1), 1);
+        tile_manager_->add_occupant(coords + Vector2i(0, y_offset + 1));
     }
+}
+
+godot::CL::City *godot::CL::CityManager::get_city(StringName name) const {
+    auto city = cities_.find(name);
+    if (city == cities_.end()) {
+        return nullptr;
+    }
+    return city->second;
 }
 
 void godot::CL::CityManager::notify_tile_manager_of_cities() {

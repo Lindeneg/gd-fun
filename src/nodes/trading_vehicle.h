@@ -5,6 +5,8 @@
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/core/memory.hpp>
 
+#include "../core/utils.h"
+
 namespace godot {
 class AnimatedSprite2D;
 class CollisionShape2D;
@@ -15,6 +17,11 @@ namespace godot::CL {
 struct NextNavResult {
     Vector2 target;
     bool is_valid_target;
+};
+
+enum VehicleMoveDir {
+    VEHICLE_MOVE_DIR_AB,
+    VEHICLE_MOVE_DIR_BA,
 };
 
 // vehicle tiers determine
@@ -41,18 +48,18 @@ enum VehicleState {
 class TradingVehicle : public Area2D {
     GDCLASS(TradingVehicle, Area2D)
    private:
-    static const char* AnimationNames[];
+    static const char *AnimationNames[];
     static const int32_t AnimationSize;
     // TODO (1) int cargo_space_;
     // TODO (1) int maintenance_cost_;
     // TODO (1) Node* cargo_container_;
 
-    // increment or decrement route_idx
-    // i.e are we going from
+    // are we going from
     // cityX->cityY or cityY->cityX
-    bool map_route_inc_;
+    VehicleMoveDir move_dir_;
     int64_t current_map_route_idx_;
     TypedArray<Vector2> map_route_;
+    TileSurface tile_surface_;
 
     // tier of vehicle
     VehicleTier tier_;
@@ -64,9 +71,9 @@ class TradingVehicle : public Area2D {
     // current state
     VehicleState state_;
     // control sprite animations
-    AnimatedSprite2D* animated_sprite_;
+    AnimatedSprite2D *animated_sprite_;
     // definition of sprite collision shape
-    CollisionShape2D* collision_shape_;
+    CollisionShape2D *collision_shape_;
     // movement direction
     Vector2 direction_;
     // moves towards target if VehicleState is moving
@@ -86,6 +93,7 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
+    void switch_move_dir_();
 
    protected:
     static void _bind_methods();
@@ -94,7 +102,7 @@ class TradingVehicle : public Area2D {
     TradingVehicle();
     ~TradingVehicle();
 
-    const static char* SDestReached;
+    const static char *SDestReached;
 
     void _ready() override;
     void _process(double delta) override;
@@ -110,9 +118,11 @@ class TradingVehicle : public Area2D {
     }
     inline double get_speed() const { return speed_; }
     inline VehicleState get_state() const { return state_; }
+    inline VehicleMoveDir get_move_dir() const { return move_dir_; }
     inline VehicleTier get_tier() const { return tier_; }
     inline Vector2 get_navigation_target() const { return navigation_target_; }
     inline TypedArray<Vector2> get_map_path() const { return map_route_; }
+    inline TileSurface get_tile_surface() const { return tile_surface_; }
 
     inline void set_map_path(const TypedArray<Vector2> v) {
         map_route_ = v;
@@ -126,10 +136,12 @@ class TradingVehicle : public Area2D {
     }
     inline void set_tier(const VehicleTier t) { tier_ = t; }
     inline void set_speed(const double s) { speed_ = s; }
+    inline void set_tile_surface(const TileSurface s) { tile_surface_ = s; }
 };
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::VehicleState);
 VARIANT_ENUM_CAST(godot::CL::VehicleTier);
+VARIANT_ENUM_CAST(godot::CL::VehicleMoveDir);
 
 #endif  // CL_TRADING_TRADING_VEHICLE_H_

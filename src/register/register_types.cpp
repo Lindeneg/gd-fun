@@ -17,6 +17,7 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
+    ClassDB::register_class<CL::Utils>();
     ClassDB::register_class<CL::City>();
     ClassDB::register_class<CL::TradingVehicle>();
     ClassDB::register_class<CL::Route>();

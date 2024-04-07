@@ -16,8 +16,8 @@ extends Camera2D
 
 @export var move_speed: float = 100.0;
 @export var zoom_speed: int = 10;
-@export var max_zoom: float = 3.0;
-@export var min_zoom: float = 1.5;
+@export var max_zoom: float = 1;
+@export var min_zoom: float = 1;
 
 @onready var tile_manager: TileManager = $"../TileManager";
 
@@ -59,20 +59,19 @@ func handle_camera_movement(delta: float) -> void:
 	# it to update the actual camera position itself.
 	var new_pos = position + (movement_vec * move_speed * delta);
 
-	# The viewport (i.e what you see on your screen) is a rectangle
-	# the camera.position is actually top-left of that rectangle
-	# we need to account for this and the zoom-level.
 	var viewport_rect = get_viewport_rect();
-	var viewport_x_offset = (viewport_rect.size.x / zoom.x);
-	var viewport_y_offset = (viewport_rect.size.y / zoom.y);
+	var half_x = (viewport_rect.size.x / zoom.x) / 2;
+	var half_y = (viewport_rect.size.y / zoom.y) / 2;
+	if new_pos.x - half_x < 0:
+		new_pos.x = half_x;
+	elif new_pos.x + half_x > limit_right:
+		new_pos.x = limit_right - half_x;
+	if new_pos.y - half_y < 0:
+		new_pos.y = half_y;
+	elif new_pos.y + half_y > limit_bottom:
+		new_pos.y = limit_bottom - half_y;
 
-	# Now we update camera position but we ensure the following:
-	# - never go below limit_left or above limit_right on x-axis.
-	# - never go below limit_top or above limit_bottom on y-axis.
-	position = Vector2(
-		clampf(new_pos.x, limit_left, limit_right - viewport_x_offset),
-		clampf(new_pos.y, limit_top, limit_bottom - viewport_y_offset)
-	);
+	position = new_pos;
 
 func handle_zoom_input(delta: float) -> void:
 	if Input.is_action_just_pressed("zoom_in"):

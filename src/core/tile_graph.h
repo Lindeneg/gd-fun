@@ -14,7 +14,7 @@ struct TileVertex {
     Vector2i coords;
     int weight;
     TileSurface surface;
-    std::vector<TileVertex*> edges;
+    std::vector<TileVertex *> edges;
 
     TileVertex()
         : coords(Vector2i()),
@@ -31,10 +31,10 @@ struct AStarScoreNode {
     AStarScoreNode(int i) : val(i) {}
 };
 
-using AStarCameFromMap = std::map<TileVertex*, TileVertex*>;
-using AStarGScoreMap = std::map<TileVertex*, AStarScoreNode>;
-using AStarFScoreMap = std::map<TileVertex*, AStarScoreNode>;
-using AStarPrioQueueMember = std::map<TileVertex*, int>;
+using AStarCameFromMap = std::map<TileVertex *, TileVertex *>;
+using AStarGScoreMap = std::map<TileVertex *, AStarScoreNode>;
+using AStarFScoreMap = std::map<TileVertex *, AStarScoreNode>;
+using AStarPrioQueueMember = std::map<TileVertex *, int>;
 
 /* TileGraph is a weighted undirected graph
  * structure that is used for pathfinding */
@@ -45,18 +45,18 @@ class TileGraph {
     static const int MaxPathLength_;
 
     std::map<const Vector2i, int> foreign_occupants_;
-    std::vector<TileVertex*> vertices_;
+    std::vector<TileVertex *> vertices_;
 
-    int astar_calculate_heuristic_(TileVertex* current, TileVertex* goal) const;
+    int astar_calculate_heuristic_(TileVertex *current, TileVertex *goal) const;
     PackedVector2Array astar_reconstruct_path_(const Vector2i start,
                                                AStarCameFromMap came_from,
-                                               TileVertex* current);
+                                               TileVertex *current);
 
    public:
     TileGraph();
     ~TileGraph();
 
-    inline const std::vector<TileVertex*>& get_vertices_() const {
+    inline const std::vector<TileVertex *> &get_vertices_() const {
         return vertices_;
     }
     inline void reset_occupants() { foreign_occupants_.clear(); }
@@ -68,17 +68,17 @@ class TileGraph {
         return false;
     }
 
-    PackedVector2Array astar_construct_path(TileVertex* start, TileVertex* end,
+    PackedVector2Array astar_construct_path(TileVertex *start, TileVertex *end,
                                             const TileSurface surface);
     PackedVector2Array astar_construct_path(Vector2i start, Vector2i end,
                                             const TileSurface surface);
-    void add_edge(TileVertex* v1, TileVertex* v2);
+    void add_edge(TileVertex *v1, TileVertex *v2);
     void add_edge(const Vector2i v1, const Vector2i v2);
     void add_foreign_occupant(const Vector2i v);
     void remove_foreign_occupant(const Vector2i v);
-    TileVertex* add_vertex(const Vector2i indicies, const int weight,
+    TileVertex *add_vertex(const Vector2i indicies, const int weight,
                            const TileSurface surface);
-    TileVertex* get_vertex(const Vector2i indicies) const;
+    TileVertex *get_vertex(const Vector2i indicies) const;
     void print() const;
     void destroy();
 };

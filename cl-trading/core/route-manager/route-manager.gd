@@ -77,7 +77,7 @@ func create_and_init_route(
 	route.set_debug_mode(true);
 
 	# TODO remove
-	var did_start = route.start(true);
+	var did_start = route.start();
 	if !did_start:
 		remove_child(route);
 		return null;

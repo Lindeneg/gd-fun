@@ -31,14 +31,14 @@ class City : public Area2D {
     GDCLASS(City, Area2D)
 
    private:
-    CollisionShape2D* col_shape_;
+    CollisionShape2D *col_shape_;
     // TODO (2) use typed array
     // resource supply
-    Array supply_;
-    // resource demand
-    Array demand_;
+    //    Array supply_;
+    //    // resource demand
+    //    Array demand_;
     // industries in city
-    Array industries_;
+    //    Array industries_;
     // onshore entry points for trading vehicles
     Array onshore_entries_;
     // offshore entry points for trading vehicles
@@ -76,9 +76,9 @@ class City : public Area2D {
 
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }
-    inline Array get_supply() const { return supply_; }
-    inline Array get_demand() const { return demand_; }
-    inline Array get_industries() const { return industries_; }
+    //    inline Array get_supply() const { return supply_; }
+    //    inline Array get_demand() const { return demand_; }
+    //    inline Array get_industries() const { return industries_; }
     inline CitySize get_size() const { return size_; }
     inline int get_route_capacity() const { return max_route_capacity_; }
     inline int get_current_route_size() const { return current_route_size_; }
