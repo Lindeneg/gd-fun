@@ -23,7 +23,11 @@ enum TileSurface {
     TILE_SURFACE_BRIDGE
 };
 
-enum CollisionLayer { COLLISION_LAYER_VEHICLE = 1, COLLISION_LAYER_CITY = 2 };
+enum CollisionLayer {
+    COLLISION_LAYER_VEHICLE = 1,
+    COLLISION_LAYER_CITY = 2,
+    COLLISION_LAYER_RESOURCE = 3
+};
 
 class Utils : public Object {
     GDCLASS(Utils, Object)

@@ -1,6 +1,5 @@
 #include "city_manager.h"
 
-#include <cstdio>
 #include <godot_cpp/classes/marker2d.hpp>
 #include <godot_cpp/classes/node2d.hpp>
 #include <godot_cpp/classes/sprite2d.hpp>
@@ -38,12 +37,9 @@ void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
                     parent->to_global(marker_position))};
                 // TODO(5) Use an actual property:
                 auto city_entry_type =
-                    static_cast<CityEntryType>(node->get_visibility_layer());
-                city->add_city_entry_point(coords, city_entry_type);
+                    static_cast<TileEntryType>(node->get_visibility_layer());
+                city->add_entry_point(coords, city_entry_type);
                 cities_[city->get_name()] = city;
-                printf("adding city: %s - %zu\n",
-                       Utils::convert_gd_string(city->get_name()),
-                       cities_.size());
             }
         } else {
             iterate_children_(grand_children, node);

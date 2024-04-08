@@ -5,10 +5,13 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "../core/entryable.h"
 #include "../core/tile_placeable.h"
 #include "../nodes/base_resource.h"
 #include "../nodes/city.h"
 #include "../nodes/city_manager.h"
+#include "../nodes/resource.h"
+#include "../nodes/resource_manager.h"
 #include "../nodes/route.h"
 #include "../nodes/tile_manager.h"
 #include "../nodes/trading_vehicle.h"
@@ -21,11 +24,14 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     }
     ClassDB::register_class<CL::Utils>();
     ClassDB::register_class<CL::TilePlaceable>();
+    ClassDB::register_class<CL::Entryable>();
     ClassDB::register_class<CL::City>();
     ClassDB::register_class<CL::BaseResource>();
+    ClassDB::register_class<CL::ResourceTile>();
     ClassDB::register_class<CL::TradingVehicle>();
     ClassDB::register_class<CL::Route>();
     ClassDB::register_class<CL::TileManager>();
+    ClassDB::register_class<CL::ResourceManager>();
     ClassDB::register_class<CL::CityManager>();
 }
 
