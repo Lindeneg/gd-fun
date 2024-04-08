@@ -6,6 +6,7 @@
 #include <godot_cpp/variant/callable.hpp>
 #include <map>
 
+#include "../core/tile_placeable.h"
 #include "./city.h"
 
 namespace godot {
@@ -16,31 +17,22 @@ class Node2D;
 namespace godot::CL {
 class TileManager;
 
-class CityManager : public Node {
-    GDCLASS(CityManager, Node)
+class CityManager : public TilePlaceable {
+    GDCLASS(CityManager, TilePlaceable)
 
    private:
     std::map<StringName, City *> cities_;
-    TileManager *tile_manager_;
-    Callable tile_manager_ready_cb_;
-
-    void setup_tile_manager_();
-    void handle_sprite_tile_manager_notification_(Sprite2D *sprite,
-                                                  Node2D *parent);
-    void iterate_children_(TypedArray<Node> nodes, Node2D *parent);
 
    protected:
     static void _bind_methods();
+
+    void iterate_children_(TypedArray<Node> nodes, Node2D *parent) override;
 
    public:
     CityManager();
     ~CityManager();
 
-    void _enter_tree() override;
-    void _exit_tree() override;
-
     City *get_city(StringName name) const;
-    void notify_tile_manager_of_cities();
 };
 }  // namespace godot::CL
 

@@ -10,6 +10,11 @@
 
 namespace godot::CL {
 
+struct ForeignOccupant {
+    int surface;
+    int kind;
+};
+
 struct TileVertex {
     Vector2i coords;
     int weight;
@@ -44,7 +49,7 @@ class TileGraph {
    private:
     static const int MaxPathLength_;
 
-    std::map<const Vector2i, int> foreign_occupants_;
+    std::map<const Vector2i, ForeignOccupant> foreign_occupants_;
     std::vector<TileVertex *> vertices_;
 
     int astar_calculate_heuristic_(TileVertex *current, TileVertex *goal) const;
@@ -62,7 +67,16 @@ class TileGraph {
     inline void reset_occupants() { foreign_occupants_.clear(); }
     inline bool has_occupant(const Vector2i v) const {
         auto occupant{foreign_occupants_.find(v)};
-        if (occupant != foreign_occupants_.end() && occupant->second > 0) {
+        if (occupant != foreign_occupants_.end() &&
+            occupant->second.surface > 0) {
+            return true;
+        }
+        return false;
+    }
+    inline bool has_occupant_kind(const Vector2i v, const int k) const {
+        auto occupant{foreign_occupants_.find(v)};
+        if (occupant != foreign_occupants_.end() &&
+            occupant->second.surface > 0 && occupant->second.kind == k) {
             return true;
         }
         return false;
@@ -74,7 +88,8 @@ class TileGraph {
                                             const TileSurface surface);
     void add_edge(TileVertex *v1, TileVertex *v2);
     void add_edge(const Vector2i v1, const Vector2i v2);
-    void add_foreign_occupant(const Vector2i v);
+    void reset_occupants_kind(const int kind);
+    void add_foreign_occupant(const Vector2i v, const int kind);
     void remove_foreign_occupant(const Vector2i v);
     TileVertex *add_vertex(const Vector2i indicies, const int weight,
                            const TileSurface surface);

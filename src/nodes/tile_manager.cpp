@@ -109,8 +109,8 @@ void godot::CL::TileManager::add_tile_edge_(const Vector2i coords,
     tile_graph_.add_edge(current, vertex);
 }
 
-void godot::CL::TileManager::add_occupant(const Vector2i v) {
-    tile_graph_.add_foreign_occupant(v);
+void godot::CL::TileManager::add_occupant(const Vector2i v, const int k) {
+    tile_graph_.add_foreign_occupant(v, k);
 }
 
 void godot::CL::TileManager::remove_occupant(const Vector2i v) {
@@ -209,6 +209,8 @@ void godot::CL::TileManager::_bind_methods() {
                          &TileManager::construct_path);
     ClassDB::bind_method(D_METHOD("reset_occupants"),
                          &TileManager::reset_occupants);
+    ClassDB::bind_method(D_METHOD("reset_occupants_kind", "k"),
+                         &TileManager::reset_occupants_kind);
 
     // MAP EDITOR PROPS
     ClassDB::bind_method(D_METHOD("get_map_size"), &TileManager::get_map_size);

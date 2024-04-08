@@ -1,5 +1,6 @@
 #include "tile_graph.h"
 
+#include <algorithm>
 #include <cmath>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
@@ -176,12 +177,13 @@ godot::CL::TileVertex *godot::CL::TileGraph::get_vertex(
     return nullptr;
 }
 
-void godot::CL::TileGraph::add_foreign_occupant(const Vector2i v) {
+void godot::CL::TileGraph::add_foreign_occupant(const Vector2i v,
+                                                const int kind) {
     auto *vertex = get_vertex(v);
     if (vertex == nullptr) {
         return;
     }
-    foreign_occupants_[v] = vertex->surface;
+    foreign_occupants_[v] = ForeignOccupant{vertex->surface, kind};
     vertex->surface = TILE_SURFACE_OBSTACLE;
 }
 
@@ -190,8 +192,19 @@ void godot::CL::TileGraph::remove_foreign_occupant(const Vector2i v) {
     if (vertex == nullptr) {
         return;
     }
-    vertex->surface = static_cast<TileSurface>(foreign_occupants_[v]);
-    foreign_occupants_[v] = 0;
+    vertex->surface = static_cast<TileSurface>(foreign_occupants_[v].surface);
+    foreign_occupants_[v] = ForeignOccupant{0, 0};
+}
+
+void godot::CL::TileGraph::reset_occupants_kind(const int kind) {
+    auto iter = foreign_occupants_.begin();
+    for (; iter != foreign_occupants_.end();) {
+        if (iter->second.surface > 0 && iter->second.kind == kind) {
+            iter = foreign_occupants_.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
 }
 
 void godot::CL::TileGraph::print() const {
