@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://43jcnhqkw61d"]
+
+[ext_resource type="Texture2D" uid="uid://c2sjm2kvnp34u" path="res://assets/Buildings/Wood/Resources.png" id="1_65ly7"]
+
+[node name="GrainMill" type="Node2D"]
+
+[node name="GrainMillSprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_65ly7")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 16, 16, 16)

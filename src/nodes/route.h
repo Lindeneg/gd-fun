@@ -13,9 +13,11 @@
 namespace godot::CL {
 
 class CityManager;
+class ResourceManager;
 class TradingVehicle;
 
 enum RouteState { ROUTE_INACTIVE, ROUTE_ACTIVE };
+enum RouteKind { ROUTE_CITY_CITY, ROUTE_CITY_RESOURCE };
 
 /* Route connects two Cities via TradingVehicle to trade ressources.
  *
@@ -32,6 +34,7 @@ class Route : public Node {
     bool initial_start_;
     // draw route (if any)
     bool debug_mode_;
+    RouteKind kind_;
     // packed array of current route
     PackedVector2Array current_route_;
     // intended tile surface
@@ -39,18 +42,18 @@ class Route : public Node {
     // pointers to needed managers
     TileManager *tile_manager_;
     CityManager *city_manager_;
+    ResourceManager *resource_manager_;
     // signal Callables
     Callable timeout_cb_;
     Callable dest_reached_cb_;
-    // city id 1
-    StringName c1_;
-    // city id 2
-    StringName c2_;
+    // from and to entries
+    StringName start_;
+    StringName end_;
+    // distance betweem them
+    int distance_;
     // current state
     RouteState state_;
     Timer *cooldown_timer_;
-    // distance betweem them
-    int distance_;
     // cost to player
     int gold_cost_;
     // trading vehicle instance
@@ -66,8 +69,8 @@ class Route : public Node {
     void emit_debug_signal_();
     // converts from tile coords to local coords
     TypedArray<Vector2> get_local_path_();
-    // finds an entry to city respecting type_
-    Vector2 get_city_entry_(StringName city_name) const;
+    // finds an entry respecting surface
+    Vector2 get_entry_tile_(StringName name) const;
     // checks if tile and city managers are assinged
     bool has_required_managers_() const;
     // checks if timer already in tree,
@@ -101,19 +104,22 @@ class Route : public Node {
     inline bool get_debug_mode() const { return debug_mode_; }
     inline RouteState get_route_state() const { return state_; }
     inline TradingVehicle *get_vehicle() const { return vehicle_; }
-    inline StringName get_city_one() const { return c1_; }
-    inline StringName get_city_two() const { return c2_; }
+    inline StringName get_start() const { return start_; }
+    inline StringName get_end() const { return end_; }
     inline TileSurface get_type() const { return type_; }
+    inline RouteKind get_kind() const { return kind_; }
 
     void set_debug_mode(const bool m);
-    inline void set_city_one(const StringName id) { c1_ = id; }
-    inline void set_city_two(const StringName id) { c2_ = id; }
+    inline void set_start(const StringName name) { start_ = name; }
+    inline void set_end(const StringName name) { end_ = name; }
     inline void set_type(const TileSurface t) { type_ = t; }
+    inline void set_kind(const int k) { kind_ = static_cast<RouteKind>(k); }
 
     void set_vehicle(TradingVehicle *vehicle);
 };
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::RouteState);
+VARIANT_ENUM_CAST(godot::CL::RouteKind);
 
 #endif  // CL_TRADING_ROUTE_H_

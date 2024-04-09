@@ -19,7 +19,7 @@ class ResourceManager : public TilePlaceable {
     GDCLASS(ResourceManager, TilePlaceable)
 
    private:
-    std::map<ResourceKind, CL::ResourceTile *> resources_;
+    std::map<StringName, CL::ResourceTile *> resources_;
 
    protected:
     static void _bind_methods();
@@ -29,6 +29,8 @@ class ResourceManager : public TilePlaceable {
    public:
     ResourceManager();
     ~ResourceManager();
+
+    ResourceTile *get_resource(StringName name) const;
 };
 }  // namespace godot::CL
 

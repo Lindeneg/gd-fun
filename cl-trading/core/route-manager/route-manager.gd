@@ -54,7 +54,7 @@ func create_and_init_route(
 	vehicle_name: String,
 	surface: int
 ) -> Route:
-	var route = Route.new();
+	var route: Route = Route.new();
 	var vehicle = instanciate_vehicle(vehicle_type, vehicle_name);
 	if !vehicle:
 		printerr("failed to create route {c1}<->{c2} with vehicle {v} - {t}".format(
@@ -69,8 +69,9 @@ func create_and_init_route(
 	add_child(route);
 
 	route.set_type(surface);
-	route.set_city_one(city1);
-	route.set_city_two(city2);
+	route.set_kind(Route.ROUTE_CITY_RESOURCE);
+	route.set_start(city1);
+	route.set_end(city2);
 	route.set_vehicle(vehicle);
 
 	# TODO remove debug code

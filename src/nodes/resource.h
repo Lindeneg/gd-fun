@@ -24,13 +24,18 @@ class ResourceTile : public Entryable {
     ResourceTile();
     ~ResourceTile();
 
+    const static char *SAmountChanged;
+
     inline ResourceKind get_resource_kind() const { return resource_kind_; }
     inline int get_capacity_amount() const { return capacity_amount_; }
     inline int get_current_amount() const { return current_amount_; }
 
     inline void set_resource_kind(const ResourceKind k) { resource_kind_ = k; }
     inline void set_capacity_amount(const int c) { capacity_amount_ = c; }
-    inline void set_current_amount(const int c) { current_amount_ = c; }
+    inline void set_current_amount(const int c) {
+        current_amount_ = c;
+        emit_signal(SAmountChanged, current_amount_);
+    }
 
     void _ready() override;
 };

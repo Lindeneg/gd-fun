@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://baghmx4lurhw4"]
+
+[ext_resource type="Texture2D" uid="uid://b6rtoiju8nkms" path="res://assets/Nature/Wheatfield.png" id="1_s0xn7"]
+
+[node name="BaseGrain" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_s0xn7")
+centered = false
+region_enabled = true
+region_rect = Rect2(48, 0, 16, 16)

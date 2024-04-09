@@ -1,29 +1,21 @@
 """
 CameraManger is reponsible for handling camera
-updates via user inputs, such as movement and zooming.
-
-Right now it reactes on arrow-keys and mouse-scroll.
-
-TODO:
-	(1) Support mouse-drag for movement.
-	(2) Play with smoothing settings to make the "feel" right.
-	(3) Perhaps change Anchor Mode to "Drag Center" instead of "Fixed TopLeft".
-
-(1) NOTE: this seem to be configureable via the numerous "Drag" options on camera itself.
-(3) NOTE: this will affect the current limit logic inside "handle_camera_movement".
+updates via mouse-movement and displaying related UI.
 """
 extends Camera2D
 
-@export var move_speed: float = 100.0;
-@export var zoom_speed: int = 10;
-@export var max_zoom: float = 1;
-@export var min_zoom: float = 1;
+signal cam_speed_changed(new_speed: float);
+
+@export var base_move_speed: float = 1.5;
+@export var change_step: float = 0.5;
+@export var max_move_speed: float = 10;
+@export var min_move_speed: float = 0.0;
+@export var move_cutoff: float = 200;
 
 @onready var tile_manager: TileManager = $"../TileManager";
 
-const ZOOM_VEC = Vector2(1, 1);
-
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_CONFINED;
 	# We need to know the max x and y of our map.
 	# TileManager can tell us about it but we get
 	# the result back in tile-space coords i.e
@@ -49,41 +41,53 @@ func _ready() -> void:
 	limit_bottom = int(max_coords.y - half_tile_size);
 
 func _process(delta: float) -> void:
+	handle_change_speed();
 	handle_camera_movement(delta);
-	#handle_zoom_input(delta);
 
-func handle_camera_movement(delta: float) -> void:
-	var movement_vec: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
-	# Save what-would-be the new position in a temporary variable
-	# we need to check that it is not out-of-bounds before we use
-	# it to update the actual camera position itself.
-	var new_pos = position + (movement_vec * move_speed * delta);
-
+func get_half_xy() -> Dictionary:
 	var viewport_rect = get_viewport_rect();
 	var half_x = (viewport_rect.size.x / zoom.x) / 2;
 	var half_y = (viewport_rect.size.y / zoom.y) / 2;
-	if new_pos.x - half_x < 0:
-		new_pos.x = half_x;
-	elif new_pos.x + half_x > limit_right:
-		new_pos.x = limit_right - half_x;
-	if new_pos.y - half_y < 0:
-		new_pos.y = half_y;
-	elif new_pos.y + half_y > limit_bottom:
-		new_pos.y = limit_bottom - half_y;
+	return {
+		"x": half_x,
+		"y": half_y
+	};
+
+func handle_camera_movement(delta: float) -> void:
+	var diff = get_global_mouse_position() - get_screen_center_position();
+	var movement_vec = Vector2.ZERO;
+	if abs(diff.x) > move_cutoff:
+		movement_vec.x = diff.x;
+	if abs(diff.y) > move_cutoff:
+		movement_vec.y = diff.y;
+	if movement_vec.x == 0 and movement_vec.y == 0:
+		return;
+	# Save what-would-be the new position in a temporary variable
+	# we need to check that it is not out-of-bounds before we use
+	# it to update the actual camera position itself.
+	var new_pos = position + (movement_vec * base_move_speed * delta);
+	var half = get_half_xy();
+	if new_pos.x - half.x < 0:
+		new_pos.x = half.x;
+	elif new_pos.x + half.x > limit_right:
+		new_pos.x = limit_right - half.x;
+	if new_pos.y - half.y < 0:
+		new_pos.y = half.y;
+	elif new_pos.y + half.y > limit_bottom:
+		new_pos.y = limit_bottom - half.y;
 
 	position = new_pos;
 
-func handle_zoom_input(delta: float) -> void:
+func handle_change_speed() -> void:
+	var multiplier = 0;
 	if Input.is_action_just_pressed("zoom_in"):
-		handle_zoom_action(delta);
+		multiplier = 1;
 	elif Input.is_action_just_pressed("zoom_out"):
-		handle_zoom_action(delta, -1);
-
-func handle_zoom_action(delta: float, multiplier = 1) -> void:
-	var new_zoom = zoom;
-	new_zoom += (ZOOM_VEC * zoom_speed * delta) * multiplier;
-	# Never go below min_zoom or above max_zoom.
-	zoom = Vector2(
-		clampf(new_zoom.x, min_zoom, max_zoom),
-		clampf(new_zoom.y, min_zoom, max_zoom)
-	);
+		multiplier = -1;
+	if multiplier == 0:
+		return;
+	var new_speed = clampf(base_move_speed + (change_step * multiplier), min_move_speed, max_move_speed);
+	if base_move_speed == new_speed:
+		return;
+	base_move_speed = new_speed;
+	cam_speed_changed.emit(base_move_speed);

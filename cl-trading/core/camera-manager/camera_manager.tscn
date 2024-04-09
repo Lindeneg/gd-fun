@@ -4,4 +4,3 @@
 
 [node name="CameraManager" type="Camera2D"]
 script = ExtResource("1_20s1l")
-move_speed = 400.0

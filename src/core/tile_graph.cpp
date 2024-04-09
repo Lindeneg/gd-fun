@@ -1,6 +1,5 @@
 #include "tile_graph.h"
 
-#include <algorithm>
 #include <cmath>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>

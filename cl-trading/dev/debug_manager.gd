@@ -36,12 +36,18 @@ extends Node2D
 			route_debug_ui.visible = show_route_ui;
 		queue_redraw();
 
-@export_group("City")
+@export_group("Placeable")
 @export var notify_city_change: bool = false:
 	get:
 		return notify_city_change;
 	set(value):
-		city_manager.notify_tile_manager_of_cities();
+		city_manager.notify_tile_manager();
+
+@export var notify_resource_change: bool = false:
+	get:
+		return notify_resource_change;
+	set(value):
+		resource_manager.notify_tile_manager();
 
 @export_group("Tile Map")
 @export var show_tiles: bool = false:
@@ -91,6 +97,7 @@ var route_paths: Dictionary = {};
 var camera_manager: Camera2D;
 var tile_manager: TileManager;
 var city_manager: CityManager;
+var resource_manager: ResourceManager;
 var route_manager: Node;
 var route_debug_ui: Control;
 var route_debug_tab: HBoxContainer;
@@ -119,6 +126,7 @@ func _ready() -> void:
 	tile_manager = get_node_or_null("../TileManager");
 	city_manager = get_node_or_null("../CityManager");
 	route_manager = get_node_or_null("../RouteManager");
+	resource_manager = get_node_or_null("../ResourceManager");
 	route_debug_ui = get_node_or_null("DebugUIContainer");
 	route_debug_tab = get_node_or_null("DebugUIContainer/DebugTabs/RouteDebug");
 
@@ -127,6 +135,7 @@ func _ready() -> void:
 
 	if !Engine.is_editor_hint():
 		route_debug_tab.add_city_nodes(city_manager.get_children());
+		route_debug_tab.add_city_nodes(resource_manager.get_children());
 
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():

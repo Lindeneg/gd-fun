@@ -1,0 +1,65 @@
+[gd_scene load_steps=6 format=3 uid="uid://3w8ovvrrf6iy"]
+
+[ext_resource type="PackedScene" uid="uid://baghmx4lurhw4" path="res://sprites/resources/base_grain.tscn" id="1_d43r4"]
+[ext_resource type="PackedScene" uid="uid://43jcnhqkw61d" path="res://sprites/resources/grain_mill.tscn" id="2_xgwhk"]
+[ext_resource type="PackedScene" uid="uid://d4efngg2k7ksv" path="res://gui/amount_label.tscn" id="3_byeew"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5kl2n"]
+bg_color = Color(0.796078, 0.682353, 0.133333, 0.627451)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pkfdd"]
+resource_local_to_scene = true
+
+[node name="Grain" type="ResourceTile"]
+capacity_amount = 10
+start_amount = 7
+resource_kind = 2
+z_index = 5
+y_sort_enabled = true
+collision_layer = 3
+monitorable = false
+
+[node name="BaseGrain" parent="." instance=ExtResource("1_d43r4")]
+
+[node name="BaseGrain2" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(16, 0)
+
+[node name="BaseGrain3" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(0, 16)
+
+[node name="BaseGrain4" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(48, 0)
+
+[node name="BaseGrain5" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(16, 16)
+
+[node name="GrainMill" parent="." instance=ExtResource("2_xgwhk")]
+position = Vector2(32, 0)
+
+[node name="BaseGrain6" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(48, 16)
+
+[node name="BaseGrain7" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(64, 16)
+
+[node name="BaseGrain8" parent="." instance=ExtResource("1_d43r4")]
+position = Vector2(64, 0)
+
+[node name="GrainEntryGroundPoint" type="Marker2D" parent="."]
+position = Vector2(40, 24)
+gizmo_extents = 6.0
+
+[node name="AmountLabel" parent="." instance=ExtResource("3_byeew")]
+offset_left = 30.0
+offset_top = -23.0
+offset_right = 49.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_5kl2n")
+text = "7"
+
+[node name="@CollisionShape2D@35681" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_pkfdd")

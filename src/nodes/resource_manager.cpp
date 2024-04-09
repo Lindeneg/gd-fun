@@ -9,8 +9,7 @@
 #include <godot_cpp/variant/node_path.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
-// #include "../core/utils.h"
-// #include "./tile_manager.h"
+#include "./tile_manager.h"
 
 godot::CL::ResourceManager::ResourceManager()
     : TilePlaceable(PLACEABLE_RESOURCE), resources_({}) {}
@@ -31,17 +30,14 @@ void godot::CL::ResourceManager::iterate_children_(TypedArray<Node> nodes,
                 handle_sprite_tile_manager_notification_(
                     static_cast<Sprite2D *>(node), parent);
             } else if (typeid(*node) == typeid(Marker2D)) {
-                //                auto *city{static_cast<City *>(parent)};
-                //                Vector2 marker_position =
-                //                node->get_position(); Vector2i
-                //                coords{tile_manager_->local_to_map(
-                //                    parent->to_global(marker_position))};
-                //                // TODO(5) Use an actual property:
-                //                auto city_entry_type =
-                //                    static_cast<TileEntryType>(node->get_visibility_layer());
-                //                city->add_entry_point(coords,
-                //                city_entry_type); cities_[city->get_name()] =
-                //                city;
+                auto *resource{static_cast<ResourceTile *>(parent)};
+                Vector2 marker_position = node->get_position();
+                Vector2i coords{tile_manager_->local_to_map(
+                    parent->to_global(marker_position))};
+                auto resource_entry_type =
+                    static_cast<TileEntryType>(node->get_visibility_layer());
+                resource->add_entry_point(coords, resource_entry_type);
+                resources_[resource->get_name()] = resource;
             }
         } else {
             iterate_children_(grand_children, node);
@@ -49,4 +45,16 @@ void godot::CL::ResourceManager::iterate_children_(TypedArray<Node> nodes,
     }
 }
 
-void godot::CL::ResourceManager::_bind_methods() {}
+godot::CL::ResourceTile *godot::CL::ResourceManager::get_resource(
+    StringName name) const {
+    auto resource = resources_.find(name);
+    if (resource == resources_.end()) {
+        return nullptr;
+    }
+    return resource->second;
+}
+
+void godot::CL::ResourceManager::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("get_resource", "name"),
+                         &ResourceManager::get_resource);
+}

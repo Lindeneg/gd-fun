@@ -6,6 +6,9 @@
 #include "../core/utils.h"
 #include "./base_resource.h"
 
+// SIGNALS
+const char *godot::CL::ResourceTile::SAmountChanged{"amount_changed"};
+
 godot::CL::ResourceTile::ResourceTile()
     : Entryable(),
       resource_kind_(RESOURCE_PASSENGER),
@@ -61,4 +64,8 @@ void godot::CL::ResourceTile::_bind_methods() {
                      "Boar:7,Pig:8,Chicken:9,Sheep:10,Poppy:11,Food:12,Beer:13,"
                      "Cobble:14,Tools:15,Textiles:16,Medicine:17"),
         "set_resource_kind", "get_resource_kind");
+
+    ClassDB::add_signal(
+        "ResourceTile",
+        MethodInfo(SAmountChanged, PropertyInfo(Variant::INT, "amount")));
 }
