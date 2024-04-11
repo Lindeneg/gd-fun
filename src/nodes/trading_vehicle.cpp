@@ -134,6 +134,9 @@ void godot::CL::TradingVehicle::handle_movement_(double delta) {
 }
 
 void godot::CL::TradingVehicle::start_navigating() {
+    if (is_moving()) {
+        return;
+    }
     auto next{get_next_navigation_target_()};
     if (!next.is_valid_target) {
         // TODO (4) err message

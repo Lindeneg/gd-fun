@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://ctoa158yq0esu"]
+[gd_scene load_steps=4 format=3 uid="uid://ctoa158yq0esu"]
 
 [ext_resource type="PackedScene" uid="uid://dovhhg3bg0wmu" path="res://sprites/cities/houses/house_a.tscn" id="1_snhyq"]
+[ext_resource type="PackedScene" uid="uid://cijieiiv0pdsd" path="res://gui/city_ui.tscn" id="2_q4scp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_u4ruq"]
 resource_local_to_scene = true
@@ -40,3 +41,7 @@ gizmo_extents = 6.0
 visible = false
 position = Vector2(32, 16)
 shape = SubResource("CircleShape2D_u4ruq")
+
+[node name="CityUI" parent="." instance=ExtResource("2_q4scp")]
+offset_top = 0.0
+offset_right = 0.0

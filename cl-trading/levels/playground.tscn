@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://fhxcmytplax2"]
+[gd_scene load_steps=14 format=3 uid="uid://fhxcmytplax2"]
 
 [ext_resource type="PackedScene" uid="uid://dqftsxjx78obm" path="res://core/camera-manager/camera_manager.tscn" id="1_rr1md"]
 [ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile-manager/tile_manager.tscn" id="3_0dhwo"]
@@ -8,7 +8,16 @@
 [ext_resource type="PackedScene" uid="uid://3w8ovvrrf6iy" path="res://sprites/resources/grain.tscn" id="4_t4uab"]
 [ext_resource type="PackedScene" uid="uid://bhfi0udcbb1dk" path="res://sprites/cities/city_water2.tscn" id="5_2dkme"]
 [ext_resource type="PackedScene" uid="uid://df4ax3qupqdh7" path="res://core/route-manager/route_manager.tscn" id="5_nbv6i"]
-[ext_resource type="Script" path="res://gui/CamLabelTimer.gd" id="8_b0f5u"]
+[ext_resource type="Script" path="res://gui/cam_label_timer.gd" id="8_b0f5u"]
+
+[sub_resource type="CityResource" id="CityResource_q40ce"]
+capacity = 5
+amount = 4
+
+[sub_resource type="CityResource" id="CityResource_4l0v7"]
+resource_kind = 2
+capacity = 5
+amount = 3
 
 [sub_resource type="Theme" id="Theme_wa76b"]
 
@@ -24,6 +33,7 @@ layer_2/tile_data = PackedInt32Array(851968, 10, 0, 851969, 10, 0, 655379, 10, 0
 layer_3/tile_data = PackedInt32Array(1507361, 17, 1, 1507362, 65553, 1, 1572897, 17, 1, 1572898, 65553, 1, 1638433, 17, 1, 1638434, 65553, 1, 1703969, 17, 1, 1703970, 65553, 1, 1769505, 17, 1, 1769506, 65553, 1, 1835041, 17, 1, 1835042, 65553, 1, 1900577, 17, 1, 1900578, 65553, 1, 1966113, 17, 1, 1966114, 65553, 1, 2031649, 17, 1, 2031650, 65553, 1, 2097185, 17, 1, 2097186, 65553, 1, 2162721, 17, 1, 2162722, 65553, 1, 2228257, 17, 1, 2228258, 65553, 1, 2293793, 17, 1, 2293794, 65553, 1, 2359329, 17, 1, 2359330, 65553, 1, 2424865, 17, 1, 2424866, 65553, 1, 2490401, 17, 1, 2490402, 65553, 1, 2555937, 17, 1, 2555938, 65553, 1, 2621473, 17, 2, 2621474, 65553, 2, 1441825, 17, 1, 1441826, 65553, 1, 1376289, 17, 0, 1376290, 65553, 0)
 
 [node name="BaseResources" parent="." instance=ExtResource("3_wjkja")]
+unique_name_in_owner = true
 
 [node name="ResourceManager" type="ResourceManager" parent="."]
 
@@ -34,6 +44,7 @@ position = Vector2(480, 176)
 [node name="CityManager" type="CityManager" parent="."]
 
 [node name="CityA" parent="CityManager" instance=ExtResource("3_rkss4")]
+supplies = Array[CityResource]([SubResource("CityResource_q40ce"), SubResource("CityResource_4l0v7")])
 position = Vector2(544, 1232)
 
 [node name="CityC" parent="CityManager" instance=ExtResource("5_2dkme")]
@@ -59,33 +70,67 @@ position_smoothing_speed = 100.0
 max_move_speed = 5.0
 
 [node name="GUI" type="Control" parent="CameraManager"]
+custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 3
-anchors_preset = 0
-offset_left = 768.0
-offset_top = -512.0
-offset_right = 808.0
-offset_bottom = -472.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="CamLabelTimer" type="Container" parent="CameraManager/GUI"]
+[node name="TopRight" type="Control" parent="CameraManager/GUI"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 25.0
+offset_right = -150.0
+grow_horizontal = 0
+
+[node name="CamLabelTimer" type="Container" parent="CameraManager/GUI/TopRight"]
 layout_mode = 0
 script = ExtResource("8_b0f5u")
 
-[node name="CamLabel" type="Label" parent="CameraManager/GUI/CamLabelTimer"]
+[node name="CamLabel" type="Label" parent="CameraManager/GUI/TopRight/CamLabelTimer"]
 layout_mode = 2
 theme = SubResource("Theme_wa76b")
 theme_override_styles/normal = SubResource("StyleBoxFlat_wywbp")
 text = "Cam Speed: X.X"
 
-[node name="CamLabelTimer" type="Timer" parent="CameraManager/GUI/CamLabelTimer/CamLabel"]
+[node name="CamLabelTimer" type="Timer" parent="CameraManager/GUI/TopRight/CamLabelTimer/CamLabel"]
 wait_time = 0.5
 one_shot = true
+
+[node name="CityMenu" type="Control" parent="CameraManager/GUI"]
+visible = false
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CityMenuRect" type="ColorRect" parent="CameraManager/GUI/CityMenu"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.294118, 0.294118, 0.294118, 0.470588)
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 z_index = 4096
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
-[connection signal="clear_route_path" from="RouteManager" to="DebugManager" method="_on_route_manager_clear_route_path"]
-[connection signal="draw_route_path" from="RouteManager" to="DebugManager" method="_on_route_manager_draw_route_path"]
-[connection signal="cam_speed_changed" from="CameraManager" to="CameraManager/GUI/CamLabelTimer" method="_on_camera_manager_cam_speed_changed"]
-[connection signal="timeout" from="CameraManager/GUI/CamLabelTimer/CamLabel/CamLabelTimer" to="CameraManager/GUI/CamLabelTimer" method="_on_cam_label_timer_timeout"]
+[connection signal="cam_speed_changed" from="CameraManager" to="CameraManager/GUI/TopRight/CamLabelTimer" method="_on_camera_manager_cam_speed_changed"]
+[connection signal="timeout" from="CameraManager/GUI/TopRight/CamLabelTimer/CamLabel/CamLabelTimer" to="CameraManager/GUI/TopRight/CamLabelTimer" method="_on_cam_label_timer_timeout"]

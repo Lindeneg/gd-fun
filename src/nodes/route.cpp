@@ -12,7 +12,6 @@
 
 godot::CL::Route::Route()
     : initial_start_(true),
-      debug_mode_(false),
       kind_(ROUTE_CITY_CITY),
       type_(TILE_SURFACE_NONE),
       tile_manager_(nullptr),
@@ -69,21 +68,6 @@ void godot::CL::Route::handle_destination_reached_(const Vector2 dest) {
     cooldown_timer_->start();
 }
 
-void godot::CL::Route::set_debug_mode(const bool m) {
-    debug_mode_ = m;
-    emit_debug_signal_();
-}
-
-void godot::CL::Route::emit_debug_signal_() {
-#ifdef CL_TRADING_DEBUG
-    if (debug_mode_ && current_route_.size() > 0) {
-        emit_signal("draw_debug_route", get_name(), current_route_);
-    } else {
-        emit_signal("remove_debug_route", get_name());
-    }
-#endif
-}
-
 godot::Vector2 godot::CL::Route::get_entry_tile_(StringName name) const {
     Entryable *entry = nullptr;
     if (kind_ == ROUTE_CITY_CITY || name == start_) {
@@ -134,8 +118,6 @@ bool godot::CL::Route::start() {
     }
     vehicle_->start_navigating();
     state_ = ROUTE_ACTIVE;
-    cooldown_timer_->start();
-    emit_debug_signal_();
     return true;
 }
 
@@ -241,6 +223,9 @@ void godot::CL::Route::_bind_methods() {
     ClassDB::bind_method(D_METHOD("handle_destination_reached_", "dest"),
                          &Route::handle_destination_reached_);
 
+    ClassDB::bind_method(D_METHOD("get_current_route"),
+                         &Route::get_current_route);
+
     ClassDB::bind_method(D_METHOD("start"), &Route::start);
     ClassDB::bind_method(D_METHOD("stop"), &Route::stop);
     ClassDB::bind_method(D_METHOD("get_vehicle"), &Route::get_vehicle);
@@ -257,19 +242,6 @@ void godot::CL::Route::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_kind"), &Route::get_kind);
     ClassDB::bind_method(D_METHOD("set_kind", "k"), &Route::set_kind);
-
-    ClassDB::bind_method(D_METHOD("get_debug_mode"), &Route::get_debug_mode);
-    ClassDB::bind_method(D_METHOD("set_debug_mode", "m"),
-                         &Route::set_debug_mode);
-
-    // ADD SIGNALS
-    ClassDB::add_signal("Route",
-                        MethodInfo("draw_debug_route",
-                                   PropertyInfo(Variant::STRING, "route_name"),
-                                   PropertyInfo(Variant::ARRAY, "route")));
-    ClassDB::add_signal(
-        "Route", MethodInfo("remove_debug_route",
-                            PropertyInfo(Variant::STRING, "route_name")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(ROUTE_INACTIVE);

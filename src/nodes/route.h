@@ -32,8 +32,6 @@ class Route : public Node {
 
    private:
     bool initial_start_;
-    // draw route (if any)
-    bool debug_mode_;
     RouteKind kind_;
     // packed array of current route
     PackedVector2Array current_route_;
@@ -65,8 +63,6 @@ class Route : public Node {
     // callback to handle vehicle
     // destination reached signal
     void handle_destination_reached_(const Vector2 dest);
-    // emits debug signal
-    void emit_debug_signal_();
     // converts from tile coords to local coords
     TypedArray<Vector2> get_local_path_();
     // finds an entry respecting surface
@@ -101,7 +97,9 @@ class Route : public Node {
 
     inline int get_distance() const { return distance_; }
     inline int get_gold_cost() const { return gold_cost_; }
-    inline bool get_debug_mode() const { return debug_mode_; }
+    inline PackedVector2Array get_current_route() const {
+        return current_route_;
+    }
     inline RouteState get_route_state() const { return state_; }
     inline TradingVehicle *get_vehicle() const { return vehicle_; }
     inline StringName get_start() const { return start_; }
@@ -109,7 +107,6 @@ class Route : public Node {
     inline TileSurface get_type() const { return type_; }
     inline RouteKind get_kind() const { return kind_; }
 
-    void set_debug_mode(const bool m);
     inline void set_start(const StringName name) { start_ = name; }
     inline void set_end(const StringName name) { end_ = name; }
     inline void set_type(const TileSurface t) { type_ = t; }

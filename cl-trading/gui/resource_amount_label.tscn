@@ -1,10 +1,10 @@
 [gd_scene load_steps=2 format=3 uid="uid://d4efngg2k7ksv"]
 
-[ext_resource type="Script" path="res://gui/amount_label.gd" id="1_3ic1g"]
+[ext_resource type="Script" path="res://gui/resource_amount_label.gd" id="1_r5peu"]
 
 [node name="AmountLabel" type="Label"]
 text = "0
 "
 horizontal_alignment = 1
 vertical_alignment = 1
-script = ExtResource("1_3ic1g")
+script = ExtResource("1_r5peu")

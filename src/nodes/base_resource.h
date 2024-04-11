@@ -44,6 +44,14 @@ class BaseResource : public Node2D {
     BaseResource();
     ~BaseResource();
 
+    inline static PropertyInfo get_kind_prop_info(String name) {
+        return PropertyInfo(
+            Variant::INT, name, PROPERTY_HINT_ENUM,
+            "Passenger:0,Mail:1,Grain:2,Fish:3,Rock:4,Iron:5,Wood:6,"
+            "Boar:7,Pig:8,Chicken:9,Sheep:10,Poppy:11,Food:12,Beer:13,"
+            "Cobble:14,Tools:15,Textiles:16,Medicine:17");
+    }
+
     inline ResourceKind get_kind() const { return kind_; }
     inline int get_value() const { return value_; }
     inline int get_weight() const { return weight_; }

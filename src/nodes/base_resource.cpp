@@ -35,13 +35,8 @@ void godot::CL::BaseResource::_bind_methods() {
         PropertyInfo(Variant::INT, "weight", PROPERTY_HINT_RANGE, "1,10"),
         "set_weight", "get_weight");
 
-    ClassDB::add_property(
-        "BaseResource",
-        PropertyInfo(Variant::INT, "resource_kind", PROPERTY_HINT_ENUM,
-                     "Passenger:0,Mail:1,Grain:2,Fish:3,Rock:4,Iron:5,Wood:6,"
-                     "Boar:7,Pig:8,Chicken:9,Sheep:10,Poppy:11,Food:12,Beer:13,"
-                     "Cobble:14,Tools:15,Textiles:16,Medicine:17"),
-        "set_kind", "get_kind");
+    ClassDB::add_property("BaseResource", get_kind_prop_info("resource_kind"),
+                          "set_kind", "get_kind");
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(RESOURCE_PASSENGER);

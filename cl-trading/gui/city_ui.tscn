@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://cijieiiv0pdsd"]
+
+[ext_resource type="Script" path="res://gui/city_ui.gd" id="1_bbfl3"]
+
+[node name="CityUI" type="ColorRect"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 110.0
+grow_vertical = 0
+color = Color(0.184314, 0.184314, 0.184314, 0.454902)
+script = ExtResource("1_bbfl3")
+
+[node name="SupplyContainer" type="GridContainer" parent="."]
+layout_mode = 1
+offset_right = 112.0
+offset_bottom = 24.0
+theme_override_constants/h_separation = -2
+columns = 5
+
+[node name="DemandContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -24.0
+offset_right = 72.0
+grow_vertical = 0
+theme_override_constants/h_separation = -2
+columns = 5

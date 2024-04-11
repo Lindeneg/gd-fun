@@ -13,6 +13,7 @@ signal cam_speed_changed(new_speed: float);
 @export var move_cutoff: float = 200;
 
 @onready var tile_manager: TileManager = $"../TileManager";
+@onready var gui: Control = $GUI;
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED;
@@ -40,17 +41,20 @@ func _ready() -> void:
 	limit_right = int(max_coords.x - half_tile_size);
 	limit_bottom = int(max_coords.y - half_tile_size);
 
+	# Adjust main GUI container size accouting for current zoom.
+	var viewport_rect = get_viewport_rect();
+	gui.custom_minimum_size.x = viewport_rect.size.x / zoom.x;
+	gui.custom_minimum_size.y = viewport_rect.size.y / zoom.y;
+
 func _process(delta: float) -> void:
 	handle_change_speed();
 	handle_camera_movement(delta);
 
 func get_half_xy() -> Dictionary:
 	var viewport_rect = get_viewport_rect();
-	var half_x = (viewport_rect.size.x / zoom.x) / 2;
-	var half_y = (viewport_rect.size.y / zoom.y) / 2;
 	return {
-		"x": half_x,
-		"y": half_y
+		"x": (viewport_rect.size.x / zoom.x) / 2,
+		"y": (viewport_rect.size.y / zoom.y) / 2
 	};
 
 func handle_camera_movement(delta: float) -> void:

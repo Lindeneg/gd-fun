@@ -30,10 +30,6 @@ extends Node2D
 		return debug_mode;
 	set(value):
 		debug_mode = value;
-		if not debug_mode:
-			route_debug_ui.visible = false;
-		elif route_debug_ui != null:
-			route_debug_ui.visible = show_route_ui;
 		queue_redraw();
 
 @export_group("Placeable")
@@ -70,37 +66,16 @@ extends Node2D
 		return rebuild_debug_graph;
 	set(value):
 		tile_manager.set_rebuild_debug_graph(true);
-
-@export_group("Routes")
-@export var show_route_paths: bool = false:
-	get:
-		return show_route_paths;
-	set(value):
-		show_route_paths = value;
-		queue_redraw();
-@export var show_route_ui: bool = false:
-	get:
-		return show_route_ui;
-	set(value):
-		if !route_debug_ui:
-			return;
-		show_route_ui = value;
-		route_debug_ui.visible = show_route_ui;
-		queue_redraw();
-
 													 # NONE        # GROUND    # WATER      # OBSTACLE # BRIDGE
 const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA];
 var tile_size: int = 0;
 var tile_array = [];
-var route_paths: Dictionary = {};
 
 var camera_manager: Camera2D;
 var tile_manager: TileManager;
 var city_manager: CityManager;
 var resource_manager: ResourceManager;
 var route_manager: Node;
-var route_debug_ui: Control;
-var route_debug_tab: HBoxContainer;
 
 # NOTIFICATION CALLBACKS
 
@@ -116,10 +91,6 @@ func _unhandled_input(event):
 			show_tiles = !show_tiles;
 		if event.keycode == KEY_C:
 			show_tile_coords = !show_tile_coords;
-		if event.keycode == KEY_P:
-			show_route_paths = !show_route_paths;
-		if event.keycode == KEY_U:
-			show_route_ui = !show_route_ui;
 
 func _ready() -> void:
 	camera_manager = get_node_or_null("../CameraManager");
@@ -127,38 +98,24 @@ func _ready() -> void:
 	city_manager = get_node_or_null("../CityManager");
 	route_manager = get_node_or_null("../RouteManager");
 	resource_manager = get_node_or_null("../ResourceManager");
-	route_debug_ui = get_node_or_null("DebugUIContainer");
-	route_debug_tab = get_node_or_null("DebugUIContainer/DebugTabs/RouteDebug");
 
 	debug_mode = false;
-	route_debug_ui.visible = false;
-
-	if !Engine.is_editor_hint():
-		route_debug_tab.add_city_nodes(city_manager.get_children());
-		route_debug_tab.add_city_nodes(resource_manager.get_children());
 
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return;
-	if show_route_ui:
-		var cam_rect = camera_manager.get_viewport_rect().size;
-		route_debug_ui.position = Vector2(
-			camera_manager.position.x - (cam_rect.x / camera_manager.zoom.x / 2),
-			camera_manager.position.y - (cam_rect.y / camera_manager.zoom.y / 2),
-		);
+	#if show_route_ui:
+	#	var cam_rect = camera_manager.get_viewport_rect().size;
+		#route_debug_ui.position = Vector2(
+		#	camera_manager.position.x - (cam_rect.x / camera_manager.zoom.x / 2),
+		#	camera_manager.position.y - (cam_rect.y / camera_manager.zoom.y / 2),
+		#);
 
 func _draw() -> void:
 	if not debug_mode:
 		return;
 	if show_tiles and tile_array and tile_array.size() > 0:
 		draw_tile_manager_grid();
-	if show_route_paths:
-		for route_key in route_paths.keys():
-			var route_path: Array = route_paths[route_key];
-			if route_path and route_path.size() > 0:
-				draw_route_path(route_path);
-	if show_route_ui:
-		draw_city_names();
 
 # SIGNAL CALLBACKS
 
@@ -172,35 +129,7 @@ func _on_tile_manager_remove_debug_grid() -> void:
 	tile_size = 0;
 	queue_redraw();
 
-func _on_route_manager_draw_route_path(route_name: String, route: PackedVector2Array) -> void:
-	route_paths[route_name] = route;
-	queue_redraw();
-
-func _on_route_manager_clear_route_path(route_name: String) -> void:
-	route_paths[route_name] = [];
-	queue_redraw();
-
-func _on_route_debug_create_debug_route(c1: String, c2: String, surface: int) -> void:
-	var is_water = surface == Utils.TILE_SURFACE_WATER
-	var vt = "OFFSHORE" if is_water else "ONSHORE";
-	var vv = "SHIP" if is_water else "HORSE";
-	var route = route_manager.create_and_init_route(c1, c2, vt, vv, surface);
-	if route != null:
-		route_debug_tab.created_routes.append(route);
-
 # DRAWING FUNCTIONS
-
-func draw_city_names():
-		for child in city_manager.get_children():
-			draw_string(
-				ThemeDB.fallback_font,
-				child.position,
-				child.name,
-				HORIZONTAL_ALIGNMENT_FILL,
-				-1,
-				14,
-				Color.BLACK,
-			);
 
 func draw_tile_manager_grid():
 	var half_tile_size = int(tile_size / 2.0);
@@ -235,6 +164,20 @@ func draw_tile_coord_string(vec: Vector2, s: String):
 			HORIZONTAL_ALIGNMENT_FILL,
 			-1,
 			8,
+			Color.BLACK,
+		);
+
+
+
+func draw_city_names():
+	for child in city_manager.get_children():
+		draw_string(
+			ThemeDB.fallback_font,
+			child.position,
+			child.name,
+			HORIZONTAL_ALIGNMENT_FILL,
+			-1,
+			14,
 			Color.BLACK,
 		);
 

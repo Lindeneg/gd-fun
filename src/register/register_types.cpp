@@ -25,6 +25,7 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     ClassDB::register_class<CL::Utils>();
     ClassDB::register_class<CL::TilePlaceable>();
     ClassDB::register_class<CL::Entryable>();
+    ClassDB::register_class<CL::CityResource>();
     ClassDB::register_class<CL::City>();
     ClassDB::register_class<CL::BaseResource>();
     ClassDB::register_class<CL::ResourceTile>();

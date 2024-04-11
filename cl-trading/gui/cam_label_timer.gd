@@ -1,6 +1,6 @@
 extends Container
 
-@onready var camera_manager: Camera2D = $"../..";
+@onready var camera_manager: Camera2D = $"../../..";
 @onready var cam_label: Label = $CamLabel;
 @onready var cam_timer: Timer = $CamLabel/CamLabelTimer;
 
