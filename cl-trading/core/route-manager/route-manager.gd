@@ -1,32 +1,7 @@
 """
 RouteManager knows everything about how to create, update and delete Routes.
-
-Say in game-play scenario where a Player uses a UI to create a Route.
-In the UI, they'd chose the two cities, the appropiate vehicle, which cargo to transport etc..
-
-When Player has entered all required information, UIMangager can simply tell RouteManager,
-Hey, create me a Route for this Player with this information, and the RouteManager will:
-	(1) - Instanciate needed entites
-	(2) - Configure them appropiately
-	(3) - Spawn Route into the world.
-
-Same should work for edit/delete, which also happens via UI.
-
-TODO:
-	(1) - Cleanup debug-code and get out what we can of RouteManager
-	(2) - Find a better way to handle/save known vehicle scenes
-
-NOTE(cl):
-	All the hard-work is being done by the actual Route node (which is C++ code), so the RouteManager
-	here is just a conductor so-to-speak, and thus I'm fine with having this in GDScript.
-	It tells others what to do, it actually doesn't do any expensive calculations itself.
 """
 extends Node
-
-# DEBUG SIGNALS
-
-signal draw_route_path(route_name: String, route: PackedVector2Array);
-signal clear_route_path(route_name: String);
 
 # CONSTANTS
 
@@ -87,11 +62,3 @@ func instanciate_vehicle(vehicle_type: String, vehicle_name: String) -> TradingV
 		printerr("could not find vehicle: {v} with type {t}".format({"v": vehicle_name, "t": vehicle_type}));
 		return null;
 	return vehicle_scene.instantiate();
-
-# DEBUG FUNCTIONS
-
-func handle_draw_route_signal(route_name: String, route: Array) -> void:
-	emit_signal("draw_route_path", route_name, route);
-
-func handle_clear_route_signal(route_name: String) -> void:
-	emit_signal("clear_route_path", route_name);

@@ -5,7 +5,8 @@
 #include <godot_cpp/core/binder_common.hpp>
 
 #include "../core/entryable.h"
-#include "./base_resource.h"
+#include "./city_resource.h"
+#include "./industry.h"
 
 namespace godot::CL {
 
@@ -15,31 +16,6 @@ enum CitySize {
     CITY_SIZE_URBAN,
     CITY_SIZE_REGIO,
     CITY_SIZE_METRO
-};
-
-class CityResource : public Resource {
-    GDCLASS(CityResource, Resource)
-
-   private:
-    ResourceKind resource_kind_;
-    int capacity_;
-    int amount_;
-
-   protected:
-    static void _bind_methods();
-
-   public:
-    CityResource();
-    ~CityResource();
-
-
-    inline ResourceKind get_resource_kind() const { return resource_kind_; }
-    inline int get_capacity() const { return capacity_; }
-    inline int get_amount() const { return amount_; }
-
-    inline void set_resource_kind(const ResourceKind k) { resource_kind_ = k; }
-    inline void set_capacity(const int c) { capacity_ = c; }
-    inline void set_amount(const int a) { amount_ = a; }
 };
 
 /* City has supply, demand and a size.
@@ -55,6 +31,7 @@ class City : public Entryable {
     CitySize size_;
     TypedArray<CityResource> supplies_;
     TypedArray<CityResource> demands_;
+    TypedArray<Industry> industries_;
 
    protected:
     static void _bind_methods();
@@ -63,14 +40,31 @@ class City : public Entryable {
     City();
     ~City();
 
+    const static char *SSupplyChanged;
+    const static char *SDemandChanged;
+    const static char *SSuppliesChanged;
+    const static char *SDemandsChanged;
+    const static char *SIndustriesChanged;
+
     void _ready() override;
 
     inline CitySize get_size() const { return size_; }
     inline void set_size(const CitySize s) { size_ = s; }
     inline TypedArray<CityResource> get_supplies() const { return supplies_; }
-    inline void set_supplies(TypedArray<CityResource> s) { supplies_ = s; }
+    inline void set_supplies(TypedArray<CityResource> s) {
+        supplies_ = s;
+        emit_signal(SSuppliesChanged, s);
+    }
+    inline TypedArray<Industry> get_industries() const { return industries_; }
+    inline void set_industries(TypedArray<Industry> i) {
+        industries_ = i;
+        emit_signal(SIndustriesChanged, i);
+    }
     inline TypedArray<CityResource> get_demands() const { return demands_; }
-    inline void set_demands(TypedArray<CityResource> d) { demands_ = d; }
+    inline void set_demands(TypedArray<CityResource> d) {
+        demands_ = d;
+        emit_signal(SDemandsChanged, d);
+    }
 };
 }  // namespace godot::CL
 

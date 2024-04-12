@@ -6,16 +6,18 @@
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -40.0
-offset_right = 110.0
+offset_top = -1080.0
+offset_bottom = -1080.0
 grow_vertical = 0
+focus_mode = 1
+mouse_filter = 2
 color = Color(0.184314, 0.184314, 0.184314, 0.454902)
 script = ExtResource("1_bbfl3")
+y_container_offset = null
+y_btn_offset = null
 
 [node name="SupplyContainer" type="GridContainer" parent="."]
 layout_mode = 1
-offset_right = 112.0
-offset_bottom = 24.0
 theme_override_constants/h_separation = -2
 columns = 5
 
@@ -24,8 +26,16 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -24.0
-offset_right = 72.0
 grow_vertical = 0
 theme_override_constants/h_separation = -2
 columns = 5
+
+[node name="BtnLayer" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
+
+[node name="NameBtn" type="Button" parent="BtnLayer"]
+offset_right = 8.0
+offset_bottom = 31.0
+focus_mode = 0
+text = "
+"

@@ -11,6 +11,7 @@ radius = 168.0
 z_index = 5
 y_sort_enabled = true
 collision_layer = 2
+input_pickable = false
 monitorable = false
 
 [node name="HouseA" parent="." instance=ExtResource("1_snhyq")]
@@ -43,5 +44,5 @@ position = Vector2(32, 16)
 shape = SubResource("CircleShape2D_u4ruq")
 
 [node name="CityUI" parent="." instance=ExtResource("2_q4scp")]
-offset_top = 0.0
-offset_right = 0.0
+y_container_offset = 0.0
+y_btn_offset = 32.0

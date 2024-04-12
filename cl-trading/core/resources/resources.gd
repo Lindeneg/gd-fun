@@ -2,11 +2,13 @@
 class_name Resources extends Node
 
 var _icon_paths = {
-	BaseResource.RESOURCE_PASSENGER: "res://assets/Icons/grain.png",
-	BaseResource.RESOURCE_MAIL: "res://assets/Icons/grain.png",
+	BaseResource.RESOURCE_PASSENGER: "res://assets/Icons/passenger.png",
+	BaseResource.RESOURCE_MAIL: "res://assets/Icons/mail.png",
 	BaseResource.RESOURCE_GRAIN: "res://assets/Icons/grain.png",
 	BaseResource.RESOURCE_WOOD: "res://assets/Icons/wood.png",
 	BaseResource.RESOURCE_FISH: "res://assets/Icons/grain.png",
+	BaseResource.RESOURCE_FOOD: "res://assets/Icons/food.png",
+	BaseResource.RESOURCE_TOOLS: "res://assets/Icons/wood.png"
 }
 
 var _resources: Dictionary = {};

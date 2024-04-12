@@ -10,6 +10,8 @@
 #include "../nodes/base_resource.h"
 #include "../nodes/city.h"
 #include "../nodes/city_manager.h"
+#include "../nodes/city_resource.h"
+#include "../nodes/industry.h"
 #include "../nodes/resource.h"
 #include "../nodes/resource_manager.h"
 #include "../nodes/route.h"
@@ -27,6 +29,7 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     ClassDB::register_class<CL::Entryable>();
     ClassDB::register_class<CL::CityResource>();
     ClassDB::register_class<CL::City>();
+    ClassDB::register_class<CL::Industry>();
     ClassDB::register_class<CL::BaseResource>();
     ClassDB::register_class<CL::ResourceTile>();
     ClassDB::register_class<CL::TradingVehicle>();

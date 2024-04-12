@@ -1,7 +1,7 @@
 @tool
 extends ColorRect
 
-enum ResourceKind {
+enum ResourceType {
 	SUPPLY,
 	DEMAND
 }
@@ -9,8 +9,13 @@ enum ResourceKind {
 const BASE_ITEM_SIZE: float = 23.3;
 const BASE_UI_HEIGHT: int = 50;
 
+@export var y_container_offset: float = 0.0;
+@export var y_btn_offset: float = 32;
+
 @onready var supply = $SupplyContainer;
 @onready var demand = $DemandContainer;
+@onready var btn_layer = $BtnLayer;
+@onready var btn = $BtnLayer/NameBtn;
 
 var city_resource_icon = preload("res://gui/city_resource_icon.tscn");
 
@@ -18,44 +23,48 @@ var city: City;
 var resources: Resources;
 
 func _ready() -> void:
+	# set required members
 	var nullable_city = get_node_or_null("..");
 	var nullable_resources = get_node_or_null("../../../BaseResources");
 	if !nullable_resources or !nullable_city:
 		return;
 	city = nullable_city;
 	resources = nullable_resources;
-	position.y = -BASE_UI_HEIGHT;
-	size.x = BASE_ITEM_SIZE * city.supplies.size();
+	# adjust container size
+	position.y = -(BASE_UI_HEIGHT + y_container_offset);
+	size.x = BASE_ITEM_SIZE * _get_largest_resource_size();
 	size.y = BASE_UI_HEIGHT;
+	btn_layer.transform = Transform2D(0, Vector2(city.global_position.x, city.global_position.y + (y_btn_offset - y_container_offset)));
+	btn.text = city.name;
+	# display city resources
 	for cs in city.supplies:
-		create_supply_demand(cs, ResourceKind.SUPPLY);
+		_create_supply_demand(cs.resource_kind, cs.amount, ResourceType.SUPPLY);
 	for cd in city.demands:
-		create_supply_demand(cd, ResourceKind.DEMAND);
+		_create_supply_demand(cd.resource_kind, 0, ResourceType.DEMAND);
+	for industry in city.industries:
+		_create_supply_demand(industry.out, industry.amount, ResourceType.SUPPLY);
+		_create_supply_demand(industry.in, 0, ResourceType.DEMAND);
 
-func create_supply_demand(cr: CityResource, kind: ResourceKind) -> void:
-	var city_resource = create_city_resource(cr);
-	if !city_resource:
+func _create_supply_demand(resource_kind: int, amount: int, type: ResourceType) -> void:
+	if !city_resource_icon.can_instantiate():
+		printerr("failed to instanciate icon for resource %d" % resource_kind);
 		return;
-	var icon_path = get_icon_path(cr);
+	var city_resource = city_resource_icon.instantiate() as CityResourceIcon;
+	var icon_path = resources.get_resource_icon_path(resource_kind);
 	if !icon_path:
+		printerr("failed to find icon path for resource %d" % resource_kind);
 		return;
-	if kind == ResourceKind.SUPPLY:
-		city_resource.create_supply(icon_path, cr.amount);
+	if type == ResourceType.SUPPLY:
+		city_resource.create_supply(icon_path, amount);
 		supply.add_child(city_resource);
-	elif kind == ResourceKind.DEMAND:
+	elif type == ResourceType.DEMAND:
 		city_resource.create_demand(icon_path);
 		demand.add_child(city_resource);
 
-func get_icon_path(cr: CityResource) -> String:
-	var icon_path = resources.get_resource_icon_path(cr.resource_kind);
-	if !icon_path:
-		printerr("failed to find icon path for resource %d" % cr.resource_kind);
-		return "";
-	return icon_path;
-
-func create_city_resource(cr: CityResource) -> CityResourceIcon:
-	if !city_resource_icon.can_instantiate():
-		printerr("failed to instanciate icon for resource %d" % cr.resource_kind);
-		return null;
-	var city_resource = city_resource_icon.instantiate() as CityResourceIcon;
-	return city_resource;
+func _get_largest_resource_size() -> int:
+	var supplies = city.supplies.size();
+	var demands = city.demands.size();
+	var industries = city.industries.size();
+	if supplies >= demands:
+		return supplies + industries;
+	return demands + industries;

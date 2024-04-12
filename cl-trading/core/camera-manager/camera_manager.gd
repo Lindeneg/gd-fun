@@ -16,7 +16,7 @@ signal cam_speed_changed(new_speed: float);
 @onready var gui: Control = $GUI;
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED;
+	#Input.mouse_mode = Input.MOUSE_MODE_CONFINED;
 	# We need to know the max x and y of our map.
 	# TileManager can tell us about it but we get
 	# the result back in tile-space coords i.e

@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://cyfexk15nhjub"]
+
+[ext_resource type="Script" path="res://gui/city_ui.gd" id="1_8s6ha"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_8s6ha")
+
+[node name="SupplyContainer" type="GridContainer" parent="ColorRect"]
+theme_override_constants/h_separation = -2
+columns = 5
+
+[node name="DemandContainer" type="GridContainer" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = 1040.0
+offset_bottom = 1040.0
+grow_vertical = 0
+theme_override_constants/h_separation = -2
+columns = 5
+
+[node name="Button" type="Button" parent="."]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "TEST"

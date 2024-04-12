@@ -4,38 +4,21 @@
 #include <godot_cpp/core/property_info.hpp>
 
 #include "../core/utils.h"
+#include "industry.h"
 
-godot::CL::CityResource::CityResource()
-    : resource_kind_(RESOURCE_PASSENGER), capacity_(0), amount_(0) {}
-
-godot::CL::CityResource::~CityResource() {}
-
-void godot::CL::CityResource::_bind_methods() {
-    // BIND METHODS
-    ClassDB::bind_method(D_METHOD("get_resource_kind"),
-                         &CityResource::get_resource_kind);
-    ClassDB::bind_method(D_METHOD("set_resource_kind"),
-                         &CityResource::set_resource_kind);
-    ClassDB::bind_method(D_METHOD("get_capacity"), &CityResource::get_capacity);
-    ClassDB::bind_method(D_METHOD("set_capacity"), &CityResource::set_capacity);
-    ClassDB::bind_method(D_METHOD("get_amount"), &CityResource::get_amount);
-    ClassDB::bind_method(D_METHOD("set_amount"), &CityResource::set_amount);
-
-    ClassDB::add_property("CityResource",
-                          BaseResource::get_kind_prop_info("resource_kind"),
-                          "set_resource_kind", "get_resource_kind");
-    ClassDB::add_property("CityResource",
-                          PropertyInfo(Variant::INT, "capacity"),
-                          "set_capacity", "get_capacity");
-    ClassDB::add_property("CityResource", PropertyInfo(Variant::INT, "amount"),
-                          "set_amount", "get_amount");
-}
+// SIGNALS
+const char *godot::CL::City::SSuppliesChanged{"supplies_changed"};
+const char *godot::CL::City::SDemandsChanged{"demands_changed"};
+const char *godot::CL::City::SSupplyChanged{"supply_changed"};
+const char *godot::CL::City::SDemandChanged{"demand_changed"};
+const char *godot::CL::City::SIndustriesChanged{"industries"};
 
 godot::CL::City::City()
     : Entryable(),
       size_(CITY_SIZE_VILLAGE),
       supplies_(TypedArray<CityResource>{}),
-      demands_(TypedArray<CityResource>{}) {}
+      demands_(TypedArray<CityResource>{}),
+      industries_(TypedArray<Industry>{}) {}
 
 godot::CL::City::~City() {}
 
@@ -60,6 +43,9 @@ void godot::CL::City::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_supplies", "s"), &City::set_supplies);
     ClassDB::bind_method(D_METHOD("get_demands"), &City::get_demands);
     ClassDB::bind_method(D_METHOD("set_demands", "d"), &City::set_demands);
+    ClassDB::bind_method(D_METHOD("get_industries"), &City::get_industries);
+    ClassDB::bind_method(D_METHOD("set_industries", "d"),
+                         &City::set_industries);
 
     ClassDB::add_property(
         "City",
@@ -67,10 +53,23 @@ void godot::CL::City::_bind_methods() {
                      "Village,Town,Urban,Regiopolis,Metropolis"),
         "set_size", "get_size");
 
-    ClassDB::add_property("City", PropertyInfo(Variant::ARRAY, "supplies"),
-                          "set_supplies", "get_supplies");
-    ClassDB::add_property("City", PropertyInfo(Variant::ARRAY, "demands"),
-                          "set_demands", "get_demands");
+    ClassDB::add_property(
+        "City",
+        PropertyInfo(Variant::ARRAY, "supplies", PROPERTY_HINT_ARRAY_TYPE,
+                     MAKE_RESOURCE_TYPE_HINT("CityResource")),
+        "set_supplies", "get_supplies");
+
+    ClassDB::add_property(
+        "City",
+        PropertyInfo(Variant::ARRAY, "demands", PROPERTY_HINT_ARRAY_TYPE,
+                     MAKE_RESOURCE_TYPE_HINT("CityResource")),
+        "set_demands", "get_demands");
+
+    ClassDB::add_property(
+        "City",
+        PropertyInfo(Variant::ARRAY, "industries", PROPERTY_HINT_ARRAY_TYPE,
+                     MAKE_RESOURCE_TYPE_HINT("Industry")),
+        "set_industries", "get_industries");
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(CITY_SIZE_VILLAGE);
@@ -78,4 +77,12 @@ void godot::CL::City::_bind_methods() {
     BIND_ENUM_CONSTANT(CITY_SIZE_URBAN);
     BIND_ENUM_CONSTANT(CITY_SIZE_REGIO);
     BIND_ENUM_CONSTANT(CITY_SIZE_METRO);
+
+    // SIGNALS
+    ClassDB::add_signal(
+        "City",
+        MethodInfo(SSuppliesChanged, PropertyInfo(Variant::ARRAY, "supplies")));
+    ClassDB::add_signal(
+        "City",
+        MethodInfo(SDemandsChanged, PropertyInfo(Variant::ARRAY, "demands")));
 }

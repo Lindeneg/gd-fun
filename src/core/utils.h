@@ -6,6 +6,8 @@
 #include <godot_cpp/core/binder_common.hpp>
 
 #define NAMEOF(name) #name
+#define MAKE_RESOURCE_TYPE_HINT(m_type) \
+    vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, m_type)
 
 namespace godot {
 class String;

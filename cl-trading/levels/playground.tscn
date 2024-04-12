@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://fhxcmytplax2"]
+[gd_scene load_steps=27 format=3 uid="uid://fhxcmytplax2"]
 
 [ext_resource type="PackedScene" uid="uid://dqftsxjx78obm" path="res://core/camera-manager/camera_manager.tscn" id="1_rr1md"]
 [ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile-manager/tile_manager.tscn" id="3_0dhwo"]
@@ -11,13 +11,54 @@
 [ext_resource type="Script" path="res://gui/cam_label_timer.gd" id="8_b0f5u"]
 
 [sub_resource type="CityResource" id="CityResource_q40ce"]
-capacity = 5
+capacity = 6
 amount = 4
 
 [sub_resource type="CityResource" id="CityResource_4l0v7"]
-resource_kind = 2
+resource_kind = 1
+capacity = 8
+amount = 6
+
+[sub_resource type="CityResource" id="CityResource_8ykkg"]
+
+[sub_resource type="CityResource" id="CityResource_bquv1"]
+resource_kind = 1
+
+[sub_resource type="Industry" id="Industry_1hx1g"]
+in = 2
+out = 12
+capacity = 12
+amount = 6
+
+[sub_resource type="CityResource" id="CityResource_e36wm"]
+amount = 5
+
+[sub_resource type="CityResource" id="CityResource_7kf6t"]
+resource_kind = 1
 capacity = 5
-amount = 3
+amount = 5
+
+[sub_resource type="CityResource" id="CityResource_xpyil"]
+
+[sub_resource type="CityResource" id="CityResource_yue5w"]
+resource_kind = 1
+
+[sub_resource type="CityResource" id="CityResource_0bp7h"]
+resource_kind = 12
+
+[sub_resource type="CityResource" id="CityResource_t8dlo"]
+
+[sub_resource type="CityResource" id="CityResource_uai38"]
+resource_kind = 1
+
+[sub_resource type="CityResource" id="CityResource_bmubx"]
+
+[sub_resource type="CityResource" id="CityResource_8qcpl"]
+resource_kind = 1
+
+[sub_resource type="Industry" id="Industry_s2rlo"]
+in = 6
+out = 15
 
 [sub_resource type="Theme" id="Theme_wa76b"]
 
@@ -33,34 +74,32 @@ layer_2/tile_data = PackedInt32Array(851968, 10, 0, 851969, 10, 0, 655379, 10, 0
 layer_3/tile_data = PackedInt32Array(1507361, 17, 1, 1507362, 65553, 1, 1572897, 17, 1, 1572898, 65553, 1, 1638433, 17, 1, 1638434, 65553, 1, 1703969, 17, 1, 1703970, 65553, 1, 1769505, 17, 1, 1769506, 65553, 1, 1835041, 17, 1, 1835042, 65553, 1, 1900577, 17, 1, 1900578, 65553, 1, 1966113, 17, 1, 1966114, 65553, 1, 2031649, 17, 1, 2031650, 65553, 1, 2097185, 17, 1, 2097186, 65553, 1, 2162721, 17, 1, 2162722, 65553, 1, 2228257, 17, 1, 2228258, 65553, 1, 2293793, 17, 1, 2293794, 65553, 1, 2359329, 17, 1, 2359330, 65553, 1, 2424865, 17, 1, 2424866, 65553, 1, 2490401, 17, 1, 2490402, 65553, 1, 2555937, 17, 1, 2555938, 65553, 1, 2621473, 17, 2, 2621474, 65553, 2, 1441825, 17, 1, 1441826, 65553, 1, 1376289, 17, 0, 1376290, 65553, 0)
 
 [node name="BaseResources" parent="." instance=ExtResource("3_wjkja")]
-unique_name_in_owner = true
 
 [node name="ResourceManager" type="ResourceManager" parent="."]
 
 [node name="Grain" parent="ResourceManager" instance=ExtResource("4_t4uab")]
-start_amount = 6
+capacity_amount = 15
+start_amount = 12
 position = Vector2(480, 176)
 
 [node name="CityManager" type="CityManager" parent="."]
 
-[node name="CityA" parent="CityManager" instance=ExtResource("3_rkss4")]
+[node name="Garland" parent="CityManager" instance=ExtResource("3_rkss4")]
 supplies = Array[CityResource]([SubResource("CityResource_q40ce"), SubResource("CityResource_4l0v7")])
-position = Vector2(544, 1232)
+demands = Array[CityResource]([SubResource("CityResource_8ykkg"), SubResource("CityResource_bquv1")])
+industries = Array[Industry]([SubResource("Industry_1hx1g")])
+position = Vector2(864, 304)
 
-[node name="CityC" parent="CityManager" instance=ExtResource("5_2dkme")]
+[node name="Coltrane" parent="CityManager" instance=ExtResource("5_2dkme")]
+supplies = Array[CityResource]([SubResource("CityResource_e36wm"), SubResource("CityResource_7kf6t")])
+demands = Array[CityResource]([SubResource("CityResource_xpyil"), SubResource("CityResource_yue5w"), SubResource("CityResource_0bp7h")])
 position = Vector2(192, 256)
 
-[node name="CityC3" parent="CityManager" instance=ExtResource("5_2dkme")]
+[node name="Adderly" parent="CityManager" instance=ExtResource("5_2dkme")]
+supplies = Array[CityResource]([SubResource("CityResource_t8dlo"), SubResource("CityResource_uai38")])
+demands = Array[CityResource]([SubResource("CityResource_bmubx"), SubResource("CityResource_8qcpl")])
+industries = Array[Industry]([SubResource("Industry_s2rlo")])
 position = Vector2(752, 624)
-
-[node name="CityA2" parent="CityManager" instance=ExtResource("3_rkss4")]
-position = Vector2(2064, 176)
-
-[node name="CityB3" parent="CityManager" instance=ExtResource("3_rkss4")]
-position = Vector2(1680, 912)
-
-[node name="CityC4" parent="CityManager" instance=ExtResource("5_2dkme")]
-position = Vector2(1584, 576)
 
 [node name="RouteManager" parent="." instance=ExtResource("5_nbv6i")]
 
