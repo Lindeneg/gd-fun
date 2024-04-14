@@ -1,7 +1,7 @@
 """
 RouteManager knows everything about how to create, update and delete Routes.
 """
-extends Node
+class_name RouteManager extends Node
 
 # CONSTANTS
 

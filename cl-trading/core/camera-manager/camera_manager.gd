@@ -15,8 +15,10 @@ signal cam_speed_changed(new_speed: float);
 @onready var tile_manager: TileManager = $"../TileManager";
 @onready var gui: Control = $GUI;
 
+var cam_locked: bool = false;
+
 func _ready() -> void:
-	#Input.mouse_mode = Input.MOUSE_MODE_CONFINED;
+	Input.mouse_mode = Input.MOUSE_MODE_CONFINED;
 	# We need to know the max x and y of our map.
 	# TileManager can tell us about it but we get
 	# the result back in tile-space coords i.e
@@ -47,6 +49,8 @@ func _ready() -> void:
 	gui.custom_minimum_size.y = viewport_rect.size.y / zoom.y;
 
 func _process(delta: float) -> void:
+	if cam_locked:
+		return;
 	handle_change_speed();
 	handle_camera_movement(delta);
 
@@ -56,6 +60,12 @@ func get_half_xy() -> Dictionary:
 		"x": (viewport_rect.size.x / zoom.x) / 2,
 		"y": (viewport_rect.size.y / zoom.y) / 2
 	};
+
+func lock_cam() -> void:
+	cam_locked = true;
+
+func unlock_cam() -> void:
+	cam_locked = false;
 
 func handle_camera_movement(delta: float) -> void:
 	var diff = get_global_mouse_position() - get_screen_center_position();

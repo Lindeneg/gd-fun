@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://fhxcmytplax2"]
+[gd_scene load_steps=26 format=3 uid="uid://fhxcmytplax2"]
 
 [ext_resource type="PackedScene" uid="uid://dqftsxjx78obm" path="res://core/camera-manager/camera_manager.tscn" id="1_rr1md"]
 [ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile-manager/tile_manager.tscn" id="3_0dhwo"]
@@ -8,7 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://3w8ovvrrf6iy" path="res://sprites/resources/grain.tscn" id="4_t4uab"]
 [ext_resource type="PackedScene" uid="uid://bhfi0udcbb1dk" path="res://sprites/cities/city_water2.tscn" id="5_2dkme"]
 [ext_resource type="PackedScene" uid="uid://df4ax3qupqdh7" path="res://core/route-manager/route_manager.tscn" id="5_nbv6i"]
-[ext_resource type="Script" path="res://gui/cam_label_timer.gd" id="8_b0f5u"]
+[ext_resource type="PackedScene" uid="uid://bh4owj8k1r3y0" path="res://gui/gui.tscn" id="8_wqw8b"]
+
+[sub_resource type="Environment" id="Environment_ivcfd"]
 
 [sub_resource type="CityResource" id="CityResource_q40ce"]
 capacity = 6
@@ -29,6 +31,7 @@ in = 2
 out = 12
 capacity = 12
 amount = 6
+conversion = 2
 
 [sub_resource type="CityResource" id="CityResource_e36wm"]
 amount = 5
@@ -47,9 +50,13 @@ resource_kind = 1
 resource_kind = 12
 
 [sub_resource type="CityResource" id="CityResource_t8dlo"]
+capacity = 12
+amount = 2
 
 [sub_resource type="CityResource" id="CityResource_uai38"]
 resource_kind = 1
+capacity = 12
+amount = 1
 
 [sub_resource type="CityResource" id="CityResource_bmubx"]
 
@@ -59,13 +66,14 @@ resource_kind = 1
 [sub_resource type="Industry" id="Industry_s2rlo"]
 in = 6
 out = 15
-
-[sub_resource type="Theme" id="Theme_wa76b"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wywbp"]
-bg_color = Color(0.552941, 0.611765, 0.639216, 0.219608)
+capacity = 12
+amount = 5
+conversion = 3
 
 [node name="Playground" type="Node2D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ivcfd")
 
 [node name="TileManager" parent="." instance=ExtResource("3_0dhwo")]
 map_size = Vector2i(150, 100)
@@ -107,69 +115,17 @@ position = Vector2(752, 624)
 z_index = 4000
 position_smoothing_speed = 100.0
 max_move_speed = 5.0
+move_cutoff = 250.0
 
-[node name="GUI" type="Control" parent="CameraManager"]
-custom_minimum_size = Vector2(1920, 1080)
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TopRight" type="Control" parent="CameraManager/GUI"]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_top = 25.0
-offset_right = -150.0
-grow_horizontal = 0
-
-[node name="CamLabelTimer" type="Container" parent="CameraManager/GUI/TopRight"]
-layout_mode = 0
-script = ExtResource("8_b0f5u")
-
-[node name="CamLabel" type="Label" parent="CameraManager/GUI/TopRight/CamLabelTimer"]
-layout_mode = 2
-theme = SubResource("Theme_wa76b")
-theme_override_styles/normal = SubResource("StyleBoxFlat_wywbp")
-text = "Cam Speed: X.X"
-
-[node name="CamLabelTimer" type="Timer" parent="CameraManager/GUI/TopRight/CamLabelTimer/CamLabel"]
-wait_time = 0.5
-one_shot = true
-
-[node name="CityMenu" type="Control" parent="CameraManager/GUI"]
-visible = false
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -250.0
-offset_right = 250.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="CityMenuRect" type="ColorRect" parent="CameraManager/GUI/CityMenu"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.294118, 0.294118, 0.294118, 0.470588)
+[node name="GUI" parent="CameraManager" node_paths=PackedStringArray("camera_manager", "city_manager", "route_manager", "resources") instance=ExtResource("8_wqw8b")]
+camera_manager = NodePath("..")
+city_manager = NodePath("../../CityManager")
+route_manager = NodePath("../../RouteManager")
+resources = NodePath("../../BaseResources")
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 z_index = 4096
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
-[connection signal="cam_speed_changed" from="CameraManager" to="CameraManager/GUI/TopRight/CamLabelTimer" method="_on_camera_manager_cam_speed_changed"]
-[connection signal="timeout" from="CameraManager/GUI/TopRight/CamLabelTimer/CamLabel/CamLabelTimer" to="CameraManager/GUI/TopRight/CamLabelTimer" method="_on_cam_label_timer_timeout"]
+[connection signal="city_clicked" from="CityManager" to="CameraManager/GUI" method="_on_city_manager_city_clicked"]

@@ -23,6 +23,10 @@ class CityManager : public TilePlaceable {
    private:
     std::map<StringName, City *> cities_;
 
+    Callable city_clicked_cb_;
+
+    void handle_city_clicked_(StringName city_name);
+
    protected:
     static void _bind_methods();
 
@@ -32,6 +36,12 @@ class CityManager : public TilePlaceable {
     CityManager();
     ~CityManager();
 
+    const static char *SCityClicked;
+
+    void lock_all_buttons();
+    void unlock_all_buttons();
+    void lock_buttons(TypedArray<StringName> ignore);
+    void unlock_buttons(TypedArray<StringName> ignore);
     City *get_city(StringName name) const;
 };
 }  // namespace godot::CL

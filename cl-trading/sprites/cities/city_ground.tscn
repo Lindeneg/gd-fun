@@ -44,5 +44,3 @@ position = Vector2(32, 16)
 shape = SubResource("CircleShape2D_u4ruq")
 
 [node name="CityUI" parent="." instance=ExtResource("2_q4scp")]
-y_container_offset = 0.0
-y_btn_offset = 32.0

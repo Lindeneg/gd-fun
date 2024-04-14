@@ -1,26 +1,9 @@
 """
 DebugManager is reponsible for connecting all debug information.
-It should not know anything about other entities but it should
-be able to be told about them via signals and then update accordingly.
 
 Performance is not that critical here, as this is not production-code i.e
 in a hypothetical release of the game, this code will not be shipped, so
 we can afford to be a bit lazy without having too many concerns.
-
-IMPORTANT: All code in this file runs in the editor AND the game.
-
-If you want to control when code is run, you can make an if-statement:
-
-if Engine.is_editor_hint():
-	# code in this block runs inside editor only
-else:
-	# code in this block runs inside game only
-
-Without it, code you write will run both places.
-
-TODO:
-	(1) Split into multiple files else this is going to become very big at some point.
-	(2) Clearly segregate drawing functions and UI functions.
 """
 @tool
 extends Node2D
@@ -83,7 +66,7 @@ func _unhandled_input(event):
 	if Engine.is_editor_hint():
 		return;
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE:
+		if event.keycode == KEY_0:
 			get_tree().quit();
 		if event.keycode == KEY_D:
 			debug_mode = !debug_mode;
@@ -100,16 +83,6 @@ func _ready() -> void:
 	resource_manager = get_node_or_null("../ResourceManager");
 
 	debug_mode = false;
-
-func _process(_delta: float) -> void:
-	if Engine.is_editor_hint():
-		return;
-	#if show_route_ui:
-	#	var cam_rect = camera_manager.get_viewport_rect().size;
-		#route_debug_ui.position = Vector2(
-		#	camera_manager.position.x - (cam_rect.x / camera_manager.zoom.x / 2),
-		#	camera_manager.position.y - (cam_rect.y / camera_manager.zoom.y / 2),
-		#);
 
 func _draw() -> void:
 	if not debug_mode:
@@ -166,31 +139,3 @@ func draw_tile_coord_string(vec: Vector2, s: String):
 			8,
 			Color.BLACK,
 		);
-
-
-
-func draw_city_names():
-	for child in city_manager.get_children():
-		draw_string(
-			ThemeDB.fallback_font,
-			child.position,
-			child.name,
-			HORIZONTAL_ALIGNMENT_FILL,
-			-1,
-			14,
-			Color.BLACK,
-		);
-
-func draw_route_path(path: Array):
-	var path_size = path.size();
-	for i in range(path_size):
-		var current = path[i];
-		if (i < path_size - 1):
-			var next = path[i+1]
-			var color = Color.CORNSILK if i == 0 else Color.BLACK;
-			draw_line(
-				tile_manager.map_to_local(current),
-				tile_manager.map_to_local(next),
-				color,
-				2
-			);

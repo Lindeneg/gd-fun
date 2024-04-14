@@ -12,6 +12,7 @@ class Industry : public Resource {
    private:
     ResourceKind in_kind_;
     ResourceKind out_kind_;
+    int conversion_amount_;
     int capacity_;
     int amount_;
 
@@ -24,12 +25,14 @@ class Industry : public Resource {
 
     inline ResourceKind get_in_kind() const { return in_kind_; }
     inline ResourceKind get_out_kind() const { return out_kind_; }
+    inline int get_conversion_amount() const { return conversion_amount_; }
     inline int get_capacity() const { return capacity_; }
     inline int get_amount() const { return amount_; }
 
     inline void set_in_kind(const ResourceKind k) { in_kind_ = k; }
     inline void set_out_kind(const ResourceKind k) { out_kind_ = k; }
     inline void set_capacity(const int c) { capacity_ = c; }
+    inline void set_conversion_amount(const int c) { conversion_amount_ = c; }
     inline void set_amount(const int a) { amount_ = a; }
 };
 }  // namespace godot::CL

@@ -1,0 +1,168 @@
+[gd_scene load_steps=7 format=3 uid="uid://bh4owj8k1r3y0"]
+
+[ext_resource type="Script" path="res://gui/gui.gd" id="1_d1v18"]
+[ext_resource type="Script" path="res://gui/cam_label_timer.gd" id="1_uu4hx"]
+[ext_resource type="Script" path="res://gui/city_menu.gd" id="2_rex7j"]
+[ext_resource type="Script" path="res://gui/create_route.gd" id="4_irgej"]
+
+[sub_resource type="Theme" id="Theme_wa76b"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wywbp"]
+bg_color = Color(0.552941, 0.611765, 0.639216, 0.219608)
+
+[node name="GUI" type="Control"]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_d1v18")
+
+[node name="TopRight" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 25.0
+offset_right = -150.0
+grow_horizontal = 0
+
+[node name="CamLabelTimer" type="Container" parent="TopRight"]
+layout_mode = 0
+script = ExtResource("1_uu4hx")
+
+[node name="CamLabel" type="Label" parent="TopRight/CamLabelTimer"]
+layout_mode = 2
+theme = SubResource("Theme_wa76b")
+theme_override_styles/normal = SubResource("StyleBoxFlat_wywbp")
+text = "Cam Speed: X.X"
+
+[node name="CamLabelTimer" type="Timer" parent="TopRight/CamLabelTimer/CamLabel"]
+wait_time = 0.5
+one_shot = true
+
+[node name="CityMenu" type="Control" parent="."]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_rex7j")
+
+[node name="CityMenuRect" type="ColorRect" parent="CityMenu"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.180392, 0.180392, 0.180392, 1)
+
+[node name="CityMenuContainer" type="VBoxContainer" parent="CityMenu/CityMenuRect"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -109.5
+offset_right = 109.5
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_constants/separation = 25
+
+[node name="CityHeader" type="VSplitContainer" parent="CityMenu/CityMenuRect/CityMenuContainer"]
+layout_mode = 2
+
+[node name="CityLabel" type="RichTextLabel" parent="CityMenu/CityMenuRect/CityMenuContainer/CityHeader"]
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Test"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="BuildButtons" type="BoxContainer" parent="CityMenu/CityMenuRect/CityMenuContainer/CityHeader"]
+layout_mode = 2
+alignment = 1
+
+[node name="BuildRouteBtn" type="Button" parent="CityMenu/CityMenuRect/CityMenuContainer/CityHeader/BuildButtons"]
+layout_mode = 2
+text = "Build Route"
+
+[node name="BuildIndustryBtn" type="Button" parent="CityMenu/CityMenuRect/CityMenuContainer/CityHeader/BuildButtons"]
+layout_mode = 2
+text = "Build Industry"
+
+[node name="SupplyContainer" type="VBoxContainer" parent="CityMenu/CityMenuRect/CityMenuContainer"]
+layout_mode = 2
+
+[node name="SupplyHeader" type="Label" parent="CityMenu/CityMenuRect/CityMenuContainer/SupplyContainer"]
+layout_mode = 2
+text = "SUPPLY"
+horizontal_alignment = 1
+
+[node name="CitySupply" type="GridContainer" parent="CityMenu/CityMenuRect/CityMenuContainer/SupplyContainer"]
+layout_mode = 2
+columns = 5
+
+[node name="DemandContainer" type="VBoxContainer" parent="CityMenu/CityMenuRect/CityMenuContainer"]
+layout_mode = 2
+
+[node name="DemandHeader" type="Label" parent="CityMenu/CityMenuRect/CityMenuContainer/DemandContainer"]
+layout_mode = 2
+text = "DEMAND"
+horizontal_alignment = 1
+
+[node name="CityDemand" type="GridContainer" parent="CityMenu/CityMenuRect/CityMenuContainer/DemandContainer"]
+layout_mode = 2
+columns = 5
+
+[node name="IndustriesContainer" type="VBoxContainer" parent="CityMenu/CityMenuRect/CityMenuContainer"]
+layout_mode = 2
+
+[node name="IndustriesHeader" type="Label" parent="CityMenu/CityMenuRect/CityMenuContainer/IndustriesContainer"]
+layout_mode = 2
+text = "INDUSTRIES"
+horizontal_alignment = 1
+
+[node name="CityIndustry" type="GridContainer" parent="CityMenu/CityMenuRect/CityMenuContainer/IndustriesContainer"]
+layout_mode = 2
+columns = 5
+
+[node name="CreateRoute" type="Control" parent="."]
+visible = false
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_irgej")
+
+[node name="CreateRouteRect" type="ColorRect" parent="CreateRoute"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.180392, 0.180392, 0.180392, 1)
+
+[connection signal="timeout" from="TopRight/CamLabelTimer/CamLabel/CamLabelTimer" to="TopRight/CamLabelTimer" method="_on_cam_label_timer_timeout"]
+[connection signal="open_create_route_ui" from="CityMenu" to="CreateRoute" method="_on_city_menu_open_create_route_ui"]
+[connection signal="button_down" from="CityMenu/CityMenuRect/CityMenuContainer/CityHeader/BuildButtons/BuildRouteBtn" to="CityMenu" method="_on_build_route_btn_button_down"]
