@@ -9,17 +9,17 @@ signal open_create_route_ui(from: City);
 @onready var menu_industry: GridContainer = $CityMenuRect/CityMenuContainer/IndustriesContainer/CityIndustry;
 
 var _open: bool = false;
+var _focused: bool = false;
 var _city: City = null;
-
-func _unhandled_input(event):
-	if Engine.is_editor_hint() or !_open:
-		return;
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE:
-			close_menu();
 
 func _ready() -> void:
 	visible = false;
+
+func _input(event: InputEvent) -> void:
+	if Engine.is_editor_hint() or !_open:
+		return
+	if !_focused and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		close_menu();
 
 func is_open() -> bool:
 	return _open;
@@ -46,7 +46,7 @@ func open_menu(city: City) -> void:
 		gui.create_demand_item(demand.resource_kind, menu_demand);
 	for industry in _city.industries:
 		gui.create_supply_item(industry.out, industry.amount, menu_supply);
-		gui.create_demand_item(industry.out, menu_demand);
+		gui.create_demand_item(industry.in, menu_demand);
 		gui.create_industry_item(industry, menu_industry);
 
 func close_menu() -> void:
@@ -65,3 +65,9 @@ func _on_build_route_btn_button_down() -> void:
 		return;
 	emit_signal("open_create_route_ui", _city);
 	close_menu();
+
+func _on_mouse_entered() -> void:
+	_focused = true;
+
+func _on_mouse_exited() -> void:
+	_focused = false;

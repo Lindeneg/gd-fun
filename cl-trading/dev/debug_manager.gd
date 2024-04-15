@@ -66,7 +66,7 @@ func _unhandled_input(event):
 	if Engine.is_editor_hint():
 		return;
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_0:
+		if event.keycode == KEY_ESCAPE:
 			get_tree().quit();
 		if event.keycode == KEY_D:
 			debug_mode = !debug_mode;
