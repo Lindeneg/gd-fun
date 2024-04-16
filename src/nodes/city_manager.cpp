@@ -17,23 +17,16 @@ const char *godot::CL::CityManager::SCityClicked{"city_clicked"};
 
 godot::CL::CityManager::CityManager()
     : TilePlaceable(PLACEABLE_CITY),
-      tile_manager_(nullptr),
       cities_({}),
       city_clicked_cb_(Callable(this, "handle_city_clicked_")) {}
 
 godot::CL::CityManager::~CityManager() {}
 
-void godot::CL::CityManager::_ready() {
-    //    auto *tile_manager = get_node_or_null(NodePath("../TileManager"));
-    //    if (tile_manager != nullptr) {
-    //        tile_manager_ = static_cast<TileManager *>(tile_manager);
-    //    }
-}
-
 void godot::CL::CityManager::handle_city_clicked_(StringName city_name) {
     emit_signal(SCityClicked, city_name);
 }
 
+// TODO: rewrite this mess please
 void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
                                                Node2D *parent = nullptr) {
     auto size{nodes.size()};
@@ -81,17 +74,17 @@ void godot::CL::CityManager::unlock_all_buttons() {
     }
 }
 
-void godot::CL::CityManager::lock_buttons(TypedArray<StringName> ignore) {
+void godot::CL::CityManager::lock_buttons_except(
+    TypedArray<StringName> except) {
     for (auto city_el : cities_) {
-        if (ignore.has(city_el.first)) continue;
-        city_el.second->set_button_enabled(false);
+        city_el.second->set_button_enabled(except.has(city_el.first));
     }
 }
 
-void godot::CL::CityManager::unlock_buttons(TypedArray<StringName> ignore) {
+void godot::CL::CityManager::unlock_buttons_except(
+    TypedArray<StringName> except) {
     for (auto city_el : cities_) {
-        if (ignore.has(city_el.first)) continue;
-        city_el.second->set_button_enabled(true);
+        city_el.second->set_button_enabled(!except.has(city_el.first));
     }
 }
 
@@ -103,62 +96,66 @@ godot::CL::City *godot::CL::CityManager::get_city(StringName name) const {
     return city->second;
 }
 
-godot::Array godot::CL::CityManager::get_cities_within_distance(
-    City *from, int distance) const {
-    //    auto onshore_from{from->get_entry_tile(TILE_ENTRY_ONSHORE)};
-    //    auto offshore_from{from->get_entry_tile(TILE_ENTRY_OFFSHORE)};
+godot::Array godot::CL::CityManager::get_cities_within_distance(City *from,
+                                                                int distance) {
+    auto onshore_from{from->get_entry_tile(TILE_ENTRY_ONSHORE)};
+    auto offshore_from{from->get_entry_tile(TILE_ENTRY_OFFSHORE)};
     Array result{};
-    //    for (auto city_el : cities_) {
-    //        if (city_el.first == from->get_name()) {
-    //            printf("skipping: %s\n",
-    //            Utils::convert_gd_string(city_el.first)); continue;
-    //        }
-    //        auto to{city_el.second};
-    //        Dictionary city_result{};
-    //        city_result["name"] = city_el.second;
-    //        city_result["has_entries"] = false;
-    //        city_result["onshores"] = Array();
-    //        city_result["offshores"] = Array();
-    //        if (onshore_from["found"]) {
-    //            auto onshore_to{to->get_entry_tile(TILE_ENTRY_ONSHORE)};
-    //            if (onshore_to["found"]) {
-    //                auto path{tile_manager_->construct_path(
-    //                    static_cast<Vector2i>(onshore_from["coords"]),
-    //                    static_cast<Vector2i>(onshore_to["coords"]),
-    //                    TILE_SURFACE_GROUND)};
-    //                if (path.size() > 0) {
-    //                    printf(
-    //                        "onshore distance from %s to %s is %d "
-    //                        "(%d,%d)|(%d,%d))\n",
-    //                        Utils::convert_gd_string(from),
-    //                        Utils::convert_gd_string(city_el.first),
-    //                        path.size(),
-    //                        static_cast<Vector2i>(onshore_from["coords"]).x,
-    //                        static_cast<Vector2i>(onshore_from["coords"]).y,
-    //                        static_cast<Vector2i>(onshore_to["coords"]).x,
-    //                        static_cast<Vector2i>(onshore_to["coords"]).y);
-    //                }
-    //            }
-    //        }
-    //        if (city_result["has_entries"]) {
-    //            result.push_back(city_result);
-    //        }
-    //    }
+    for (auto city_el : cities_) {
+        if (city_el.first == from->get_name()) {
+            continue;
+        }
+        auto to{city_el.second};
+        Dictionary city_result{};
+        city_result["name"] = city_el.second->get_name();
+        auto onshores{
+            find_entry_path_(distance, onshore_from, to, TILE_ENTRY_ONSHORE)};
+        auto offshores{
+            find_entry_path_(distance, offshore_from, to, TILE_ENTRY_OFFSHORE)};
+        if (onshores.size() > 0 || offshores.size() > 0) {
+            city_result["onshores"] = onshores;
+            city_result["offshores"] = offshores;
+            result.push_back(city_result);
+        }
+    }
     return result;
+}
+
+godot::Array godot::CL::CityManager::find_entry_path_(
+    const int max_distance, const Dictionary from, const Entryable *to_entry,
+    const TileEntryType entry_type) {
+    if (from["found"]) {
+        auto to{to_entry->get_entry_tile(entry_type)};
+        if (to["found"]) {
+            auto surface{TILE_SURFACE_GROUND};
+            if (entry_type == TILE_ENTRY_OFFSHORE) {
+                surface = TILE_SURFACE_WATER;
+            }
+            auto path{tile_manager_->construct_path(
+                static_cast<Vector2i>(from["coords"]),
+                static_cast<Vector2i>(to["coords"]), surface)};
+            auto path_size{path.size()};
+            if (path_size > 0 && path_size <= max_distance) {
+                return path;
+            }
+        }
+    }
+    return Array();
 }
 
 void godot::CL::CityManager::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_city", "name"), &CityManager::get_city);
-//    ClassDB::bind_method(
-//        D_METHOD("get_cities_within_distance", "from", "distance"),
-//        &CityManager::get_cities_within_distance);
+    ClassDB::bind_method(
+        D_METHOD("get_cities_within_distance", "from", "distance"),
+        &CityManager::get_cities_within_distance);
     ClassDB::bind_method(D_METHOD("handle_city_clicked_", "city_name"),
                          &CityManager::handle_city_clicked_);
 
-    ClassDB::bind_method(D_METHOD("lock_buttons", "ignore"),
-                         &CityManager::lock_buttons);
-    ClassDB::bind_method(D_METHOD("unlock_buttons", "ignore"),
-                         &CityManager::unlock_buttons);
+    ClassDB::bind_method(D_METHOD("lock_buttons_except", "except"),
+                         &CityManager::lock_buttons_except);
+    ClassDB::bind_method(D_METHOD("unlock_buttons_except", "except"),
+                         &CityManager::unlock_buttons_except);
+
     ClassDB::bind_method(D_METHOD("lock_all_buttons"),
                          &CityManager::lock_all_buttons);
     ClassDB::bind_method(D_METHOD("unlock_all_buttons"),

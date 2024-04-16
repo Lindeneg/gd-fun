@@ -74,7 +74,10 @@ func _get_visual_tile_width() -> int:
 
 func _on_btn_state_changed(enabled: bool) -> void:
 	btn.disabled = !enabled;
-	btn_layer = 1;
+	if enabled:
+		btn.mouse_default_cursor_shape = CURSOR_POINTING_HAND;
+	else:
+		btn.mouse_default_cursor_shape = CURSOR_FORBIDDEN;
 
 func _on_name_btn_button_down() -> void:
 	city.emit_signal("btn_clicked", city.name);

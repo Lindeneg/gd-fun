@@ -59,18 +59,18 @@ void godot::CL::Entryable::e_assign_required_components_() {
 godot::Dictionary godot::CL::Entryable::get_entry_tile(
     const TileEntryType type) const {
     Dictionary result{};
-    //    result["coords"] = Vector2i();
-    //    result["found"] = false;
-    //    if (type == TILE_ENTRY_ONSHORE && onshore_entries_.size() > 0) {
-    //        result["coords"] = onshore_entries_[0];
-    //        result["found"] = true;
-    //        return result;
-    //    }
-    //    if (type == TILE_ENTRY_OFFSHORE && offshore_entries_.size() > 0) {
-    //        result["coords"] = offshore_entries_[0];
-    //        result["found"] = true;
-    //        return result;
-    //    }
+    result["coords"] = Vector2i();
+    result["found"] = false;
+    if (type == TILE_ENTRY_ONSHORE && onshore_entries_.size() > 0) {
+        result["coords"] = onshore_entries_[0];
+        result["found"] = true;
+        return result;
+    }
+    if (type == TILE_ENTRY_OFFSHORE && offshore_entries_.size() > 0) {
+        result["coords"] = offshore_entries_[0];
+        result["found"] = true;
+        return result;
+    }
     return result;
 }
 
@@ -80,8 +80,8 @@ void godot::CL::Entryable::_bind_methods() {
                          &Entryable::get_onshore_entries);
     ClassDB::bind_method(D_METHOD("get_offshore_entries"),
                          &Entryable::get_offshore_entries);
-    //    ClassDB::bind_method(D_METHOD("get_entry_tile", "t"),
-    //                         &Entryable::get_entry_tile);
+    ClassDB::bind_method(D_METHOD("get_entry_tile", "t"),
+                         &Entryable::get_entry_tile);
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(TILE_ENTRY_ONSHORE);

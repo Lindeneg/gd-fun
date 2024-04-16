@@ -19,7 +19,7 @@ func _input(event: InputEvent) -> void:
 	if Engine.is_editor_hint() or !_open:
 		return
 	if !_focused and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		close_menu();
+		close_menu_unlocked();
 
 func is_open() -> bool:
 	return _open;
@@ -32,6 +32,9 @@ func opened_city_name() -> StringName:
 
 func open_menu(city: City) -> void:
 	if _open:
+		return;
+	if gui.is_creating_route:
+		gui.set_create_route_to(city);
 		return;
 	visible = true;
 	_open = true;
@@ -49,7 +52,15 @@ func open_menu(city: City) -> void:
 		gui.create_demand_item(industry.in, menu_demand);
 		gui.create_industry_item(industry, menu_industry);
 
-func close_menu() -> void:
+func close_menu_unlocked() -> void:
+	if !_open:
+		return;
+	close_menu_locked();
+	gui.city_manager.unlock_all_buttons();
+	gui.camera_manager.unlock_cam();
+
+
+func close_menu_locked() -> void:
 	if !_open:
 		return;
 	visible = false;
@@ -57,14 +68,12 @@ func close_menu() -> void:
 	_city = null;
 	city_label.text = "";
 	gui.remove_nodes_children([menu_supply, menu_demand, menu_industry]);
-	gui.city_manager.unlock_all_buttons();
-	gui.camera_manager.unlock_cam();
 
 func _on_build_route_btn_button_down() -> void:
 	if !_open:
 		return;
 	emit_signal("open_create_route_ui", _city);
-	close_menu();
+	close_menu_locked();
 
 func _on_mouse_entered() -> void:
 	_focused = true;
