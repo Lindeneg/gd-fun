@@ -17,10 +17,18 @@ const char *godot::CL::CityManager::SCityClicked{"city_clicked"};
 
 godot::CL::CityManager::CityManager()
     : TilePlaceable(PLACEABLE_CITY),
+      tile_manager_(nullptr),
       cities_({}),
       city_clicked_cb_(Callable(this, "handle_city_clicked_")) {}
 
 godot::CL::CityManager::~CityManager() {}
+
+void godot::CL::CityManager::_ready() {
+    //    auto *tile_manager = get_node_or_null(NodePath("../TileManager"));
+    //    if (tile_manager != nullptr) {
+    //        tile_manager_ = static_cast<TileManager *>(tile_manager);
+    //    }
+}
 
 void godot::CL::CityManager::handle_city_clicked_(StringName city_name) {
     emit_signal(SCityClicked, city_name);
@@ -95,8 +103,55 @@ godot::CL::City *godot::CL::CityManager::get_city(StringName name) const {
     return city->second;
 }
 
+godot::Array godot::CL::CityManager::get_cities_within_distance(
+    City *from, int distance) const {
+    //    auto onshore_from{from->get_entry_tile(TILE_ENTRY_ONSHORE)};
+    //    auto offshore_from{from->get_entry_tile(TILE_ENTRY_OFFSHORE)};
+    Array result{};
+    //    for (auto city_el : cities_) {
+    //        if (city_el.first == from->get_name()) {
+    //            printf("skipping: %s\n",
+    //            Utils::convert_gd_string(city_el.first)); continue;
+    //        }
+    //        auto to{city_el.second};
+    //        Dictionary city_result{};
+    //        city_result["name"] = city_el.second;
+    //        city_result["has_entries"] = false;
+    //        city_result["onshores"] = Array();
+    //        city_result["offshores"] = Array();
+    //        if (onshore_from["found"]) {
+    //            auto onshore_to{to->get_entry_tile(TILE_ENTRY_ONSHORE)};
+    //            if (onshore_to["found"]) {
+    //                auto path{tile_manager_->construct_path(
+    //                    static_cast<Vector2i>(onshore_from["coords"]),
+    //                    static_cast<Vector2i>(onshore_to["coords"]),
+    //                    TILE_SURFACE_GROUND)};
+    //                if (path.size() > 0) {
+    //                    printf(
+    //                        "onshore distance from %s to %s is %d "
+    //                        "(%d,%d)|(%d,%d))\n",
+    //                        Utils::convert_gd_string(from),
+    //                        Utils::convert_gd_string(city_el.first),
+    //                        path.size(),
+    //                        static_cast<Vector2i>(onshore_from["coords"]).x,
+    //                        static_cast<Vector2i>(onshore_from["coords"]).y,
+    //                        static_cast<Vector2i>(onshore_to["coords"]).x,
+    //                        static_cast<Vector2i>(onshore_to["coords"]).y);
+    //                }
+    //            }
+    //        }
+    //        if (city_result["has_entries"]) {
+    //            result.push_back(city_result);
+    //        }
+    //    }
+    return result;
+}
+
 void godot::CL::CityManager::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_city", "name"), &CityManager::get_city);
+//    ClassDB::bind_method(
+//        D_METHOD("get_cities_within_distance", "from", "distance"),
+//        &CityManager::get_cities_within_distance);
     ClassDB::bind_method(D_METHOD("handle_city_clicked_", "city_name"),
                          &CityManager::handle_city_clicked_);
 

@@ -27,6 +27,7 @@ class Entryable : public Area2D {
     Entryable();
     ~Entryable();
 
+    Dictionary get_entry_tile(const TileEntryType type) const;
     void add_entry_point(const Vector2i coords, const TileEntryType type);
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }

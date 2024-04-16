@@ -73,7 +73,8 @@ func _get_visual_tile_width() -> int:
 	return demands + industries;
 
 func _on_btn_state_changed(enabled: bool) -> void:
-	btn.visible = enabled;
+	btn.disabled = !enabled;
+	btn_layer = 1;
 
 func _on_name_btn_button_down() -> void:
 	city.emit_signal("btn_clicked", city.name);

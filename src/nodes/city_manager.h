@@ -21,6 +21,7 @@ class CityManager : public TilePlaceable {
     GDCLASS(CityManager, TilePlaceable)
 
    private:
+    TileManager *tile_manager_;
     std::map<StringName, City *> cities_;
 
     Callable city_clicked_cb_;
@@ -38,11 +39,14 @@ class CityManager : public TilePlaceable {
 
     const static char *SCityClicked;
 
+    void _ready() override;
+
     void lock_all_buttons();
     void unlock_all_buttons();
     void lock_buttons(TypedArray<StringName> ignore);
     void unlock_buttons(TypedArray<StringName> ignore);
     City *get_city(StringName name) const;
+    Array get_cities_within_distance(City *from, int distance) const;
 };
 }  // namespace godot::CL
 

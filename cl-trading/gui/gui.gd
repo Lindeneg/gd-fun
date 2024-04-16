@@ -7,7 +7,12 @@ const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 @export var route_manager: RouteManager;
 @export var resources: Resources;
 
-@onready var city_menu: CityMenu = $CityMenu;
+@onready var city_menu: CityMenu = $GUIContainer/CityMenu;
+@onready var container: CanvasLayer = $GUIContainer;
+
+func _ready() -> void:
+	visible = true;
+	container.visible = true;
 
 func _on_city_manager_city_clicked(city_name: StringName) -> void:
 	if !city_manager:
@@ -67,3 +72,4 @@ func remove_node_children(node: Node) -> void:
 	var children = node.get_children();
 	for child in children:
 		node.remove_child(child);
+		child.free();

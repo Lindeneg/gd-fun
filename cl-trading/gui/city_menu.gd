@@ -2,7 +2,7 @@ class_name CityMenu extends Control
 
 signal open_create_route_ui(from: City);
 
-@onready var gui: GUI = $"..";
+@onready var gui: GUI = $"../..";
 @onready var city_label: RichTextLabel = $CityMenuRect/CityMenuContainer/CityHeader/CityLabel;
 @onready var menu_supply: GridContainer = $CityMenuRect/CityMenuContainer/SupplyContainer/CitySupply;
 @onready var menu_demand: GridContainer = $CityMenuRect/CityMenuContainer/DemandContainer/CityDemand;

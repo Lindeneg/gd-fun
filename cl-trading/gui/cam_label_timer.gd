@@ -1,6 +1,6 @@
 extends Container
 
-@onready var gui: GUI = $"../..";
+@onready var gui: GUI = $"../../..";
 @onready var cam_label: Label = $CamLabel;
 @onready var cam_timer: Timer = $CamLabel/CamLabelTimer;
 
