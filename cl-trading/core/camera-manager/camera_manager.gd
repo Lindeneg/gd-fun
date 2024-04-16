@@ -2,7 +2,7 @@
 CameraManger is reponsible for handling camera
 updates via mouse-movement and displaying related UI.
 """
-extends Camera2D
+class_name CameraManager extends Camera2D
 
 signal cam_speed_changed(new_speed: float);
 

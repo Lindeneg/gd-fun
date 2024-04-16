@@ -6,7 +6,7 @@ in a hypothetical release of the game, this code will not be shipped, so
 we can afford to be a bit lazy without having too many concerns.
 """
 @tool
-extends Node2D
+class_name DebugManager extends Node2D
 
 @export var debug_mode: bool = false:
 	get:
@@ -53,6 +53,7 @@ extends Node2D
 const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA];
 var tile_size: int = 0;
 var tile_array = [];
+var focused_path = [];
 
 var camera_manager: Camera2D;
 var tile_manager: TileManager;
@@ -89,6 +90,8 @@ func _draw() -> void:
 		return;
 	if show_tiles and tile_array and tile_array.size() > 0:
 		draw_tile_manager_grid();
+	if focused_path and focused_path.size() > 0:
+		draw_route_path(focused_path);
 
 # SIGNAL CALLBACKS
 
@@ -139,3 +142,17 @@ func draw_tile_coord_string(vec: Vector2, s: String):
 			8,
 			Color.BLACK,
 		);
+
+func draw_route_path(path: Array):
+	var path_size = path.size();
+	for i in range(path_size):
+		var current = path[i];
+		if (i < path_size - 1):
+			var next = path[i+1]
+			var color = Color.CORNSILK if i == 0 else Color.BLACK;
+			draw_line(
+				tile_manager.map_to_local(current),
+				tile_manager.map_to_local(next),
+				color,
+				2
+			);

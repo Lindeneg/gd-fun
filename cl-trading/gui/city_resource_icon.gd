@@ -10,6 +10,7 @@ func create_demand(icon: Object) -> void:
 	update_texture(icon);
 	var label = get_child(0);
 	remove_child(label);
+	label.free();
 
 func update_texture(icon: Object) -> void:
 	texture = icon;

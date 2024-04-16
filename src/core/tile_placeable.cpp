@@ -17,6 +17,7 @@ void godot::CL::TilePlaceable::_enter_tree() { setup_tile_manager_(); }
 
 void godot::CL::TilePlaceable::_exit_tree() {
     Utils::disconnect(tile_manager_, "ready", tile_manager_ready_cb_);
+    tile_manager_ = nullptr;
 }
 
 void godot::CL::TilePlaceable::setup_tile_manager_() {

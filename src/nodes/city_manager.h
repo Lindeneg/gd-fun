@@ -26,6 +26,9 @@ class CityManager : public TilePlaceable {
     Callable city_clicked_cb_;
 
     void handle_city_clicked_(StringName city_name);
+    Array find_entry_path_(const int max_distance, const Dictionary from,
+                           const Entryable *to_entry,
+                           const TileEntryType entry_type);
 
    protected:
     static void _bind_methods();
@@ -40,9 +43,10 @@ class CityManager : public TilePlaceable {
 
     void lock_all_buttons();
     void unlock_all_buttons();
-    void lock_buttons(TypedArray<StringName> ignore);
-    void unlock_buttons(TypedArray<StringName> ignore);
+    void lock_buttons_except(TypedArray<StringName> except);
+    void unlock_buttons_except(TypedArray<StringName> except);
     City *get_city(StringName name) const;
+    Array get_cities_within_distance(City *from, int distance);
 };
 }  // namespace godot::CL
 

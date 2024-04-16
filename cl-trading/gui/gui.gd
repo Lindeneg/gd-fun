@@ -2,12 +2,22 @@ class_name GUI extends Control
 
 const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 
-@export var camera_manager: Camera2D;
+@export var camera_manager: CameraManager;
 @export var city_manager: CityManager;
+@export var tile_manager: TileManager;
 @export var route_manager: RouteManager;
+@export var debug_manager: DebugManager;
 @export var resources: Resources;
 
-@onready var city_menu: CityMenu = $CityMenu;
+@onready var city_menu: CityMenu = $GUIContainer/CityMenu;
+@onready var create_route: CreateRoute = $GUIContainer/CreateRoute;
+@onready var container: CanvasLayer = $GUIContainer;
+
+var is_creating_route: bool = false;
+
+func _ready() -> void:
+	visible = true;
+	container.visible = true;
 
 func _on_city_manager_city_clicked(city_name: StringName) -> void:
 	if !city_manager:
@@ -17,6 +27,10 @@ func _on_city_manager_city_clicked(city_name: StringName) -> void:
 func remove_nodes_children(nodes: Array) -> void:
 	for node in nodes:
 		remove_node_children(node);
+
+func set_create_route_to(entry: Entryable) -> void:
+	if is_creating_route:
+		create_route.set_to(entry);
 
 func create_supply_item(resource_kind: int, amount: int, node: Node) -> void:
 	var supply_item = VBoxContainer.new();
@@ -67,3 +81,4 @@ func remove_node_children(node: Node) -> void:
 	var children = node.get_children();
 	for child in children:
 		node.remove_child(child);
+		child.free();
