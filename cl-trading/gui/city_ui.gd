@@ -80,4 +80,5 @@ func _on_btn_state_changed(enabled: bool) -> void:
 		btn.mouse_default_cursor_shape = CURSOR_FORBIDDEN;
 
 func _on_name_btn_button_down() -> void:
+	print("CLICK CITY UI")
 	city.emit_signal("btn_clicked", city.name);

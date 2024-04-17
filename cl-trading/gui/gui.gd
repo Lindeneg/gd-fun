@@ -22,11 +22,6 @@ func _ready() -> void:
 	visible = true;
 	container.visible = true;
 
-func _on_city_manager_city_clicked(city_name: StringName) -> void:
-	if !city_manager:
-		return;
-	city_menu.open_menu(city_manager.get_city(city_name));
-
 func remove_nodes_children(nodes: Array) -> void:
 	for node in nodes:
 		remove_node_children(node);
@@ -88,3 +83,9 @@ func remove_node_children(node: Node) -> void:
 
 func _on_create_route_create_route(ctx: Dictionary) -> void:
 	emit_signal("create_route", ctx);
+
+func _on_city_manager_city_clicked(entry_name: StringName) -> void:
+	print("CLICK GUI")
+	if !city_manager:
+		return;
+	city_menu.open_menu(city_manager.get_city(entry_name));

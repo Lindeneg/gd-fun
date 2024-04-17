@@ -4,7 +4,6 @@
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/variant/callable.hpp>
-#include <map>
 
 #include "../core/tile_placeable.h"
 #include "./resource.h"
@@ -15,22 +14,20 @@ class Node2D;
 
 namespace godot::CL {
 
-class ResourceManager : public TilePlaceable {
-    GDCLASS(ResourceManager, TilePlaceable)
-
-   private:
-    std::map<StringName, CL::ResourceTile *> resources_;
+class ResourceManager : public TilePlaceable<ResourceTile> {
+    GDCLASS(ResourceManager, TilePlaceable<ResourceTile>)
 
    protected:
     static void _bind_methods();
 
-    //void iterate_children_(TypedArray<Node> nodes, Node2D *parent) override;
+    // void handle_entry_clicked_(StringName entry_name) override;
 
    public:
     ResourceManager();
     ~ResourceManager();
 
-    ResourceTile *get_resource(StringName name) const;
+    void _enter_tree() override;
+    void _exit_tree() override;
 };
 }  // namespace godot::CL
 

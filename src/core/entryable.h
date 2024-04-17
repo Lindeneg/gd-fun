@@ -19,6 +19,8 @@ class Entryable : public Area2D {
     Array offshore_entries_;
 
    protected:
+    bool button_enabled_;
+
     static void _bind_methods();
 
     void r_assign_required_components_();
@@ -28,6 +30,9 @@ class Entryable : public Area2D {
     Entryable();
     ~Entryable();
 
+    const static char *SButtonClicked;
+    const static char *SButtonStateChanged;
+
     inline Vector2i calculate_size_in_tiles() { return Vector2i(0, 0); }
 
     Dictionary get_entry_tile(const TileEntryType type) const;
@@ -35,6 +40,11 @@ class Entryable : public Area2D {
     inline Vector2i get_tile_size() const { return tile_size_; }
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }
+    inline bool get_button_enabled() const { return button_enabled_; }
+    inline void set_button_enabled(const bool e) {
+        button_enabled_ = e;
+        emit_signal(SButtonStateChanged, e);
+    }
 };
 }  // namespace godot::CL
 

@@ -29,7 +29,6 @@ class City : public Entryable {
 
    private:
     CitySize size_;
-    bool button_enabled_;
     TypedArray<CityResource> supplies_;
     TypedArray<CityResource> demands_;
     TypedArray<Industry> industries_;
@@ -45,18 +44,10 @@ class City : public Entryable {
     const static char *SDemandsChanged;
     const static char *SIndustriesChanged;
 
-    const static char *SButtonClicked;
-    const static char *SButtonStateChanged;
-
     void _ready() override;
 
     inline CitySize get_size() const { return size_; }
     inline void set_size(const CitySize s) { size_ = s; }
-    inline bool get_button_enabled() const { return button_enabled_; }
-    inline void set_button_enabled(const bool e) {
-        button_enabled_ = e;
-        emit_signal(SButtonStateChanged, e);
-    }
     inline TypedArray<CityResource> get_supplies() const { return supplies_; }
     inline void set_supplies(TypedArray<CityResource> s) {
         supplies_ = s;
