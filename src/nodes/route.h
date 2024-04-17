@@ -30,6 +30,7 @@ class Route : public Node {
    private:
     bool initial_start_;
     RouteKind kind_;
+    StringName player_;
     // packed array of current route
     TypedArray<Vector2> current_route_;
     // intended tile surface
@@ -79,6 +80,7 @@ class Route : public Node {
     void stop();
     void destroy();
 
+    inline StringName get_player() const { return player_; }
     inline int get_distance() const { return distance_; }
     inline int get_gold_cost() const { return gold_cost_; }
     inline TypedArray<Vector2> get_current_route() const {
@@ -94,6 +96,7 @@ class Route : public Node {
     inline void set_current_route(const TypedArray<Vector2> path) {
         current_route_ = path;
     }
+    inline void set_player(const StringName p) { player_ = p; }
     inline void set_start(const StringName name) { start_ = name; }
     inline void set_end(const StringName name) { end_ = name; }
     inline void set_type(const TileSurface t) { type_ = t; }

@@ -16,34 +16,34 @@ godot::CL::ResourceManager::ResourceManager()
 
 godot::CL::ResourceManager::~ResourceManager() {}
 
-void godot::CL::ResourceManager::iterate_children_(TypedArray<Node> nodes,
-                                                   Node2D *parent = nullptr) {
-    auto size{nodes.size()};
-    for (auto i = 0; i < size; i++) {
-        auto *node{cast_to<Node2D>(nodes[i])};
-        if (node == nullptr) {
-            continue;
-        }
-        auto grand_children = node->get_children();
-        if (grand_children.size() == 0 && parent != nullptr) {
-            if (typeid(*node) == typeid(Sprite2D)) {
-                handle_sprite_tile_manager_notification_(
-                    static_cast<Sprite2D *>(node), parent);
-            } else if (typeid(*node) == typeid(Marker2D)) {
-                auto *resource{static_cast<ResourceTile *>(parent)};
-                Vector2 marker_position = node->get_position();
-                Vector2i coords{tile_manager_->local_to_map(
-                    parent->to_global(marker_position))};
-                auto resource_entry_type =
-                    static_cast<TileEntryType>(node->get_visibility_layer());
-                resource->add_entry_point(coords, resource_entry_type);
-                resources_[resource->get_name()] = resource;
-            }
-        } else {
-            iterate_children_(grand_children, node);
-        }
-    }
-}
+//void godot::CL::ResourceManager::iterate_children_(TypedArray<Node> nodes,
+//                                                   Node2D *parent = nullptr) {
+//    auto size{nodes.size()};
+//    for (auto i = 0; i < size; i++) {
+//        auto *node{cast_to<Node2D>(nodes[i])};
+//        if (node == nullptr) {
+//            continue;
+//        }
+//        auto grand_children = node->get_children();
+//        if (grand_children.size() == 0 && parent != nullptr) {
+//            if (typeid(*node) == typeid(Sprite2D)) {
+//                handle_sprite_tile_manager_notification_(
+//                    static_cast<Sprite2D *>(node), parent);
+//            } else if (typeid(*node) == typeid(Marker2D)) {
+//                auto *resource{static_cast<ResourceTile *>(parent)};
+//                Vector2 marker_position = node->get_position();
+//                Vector2i coords{tile_manager_->local_to_map(
+//                    parent->to_global(marker_position))};
+//                auto resource_entry_type =
+//                    static_cast<TileEntryType>(node->get_visibility_layer());
+//                resource->add_entry_point(coords, resource_entry_type);
+//                resources_[resource->get_name()] = resource;
+//            }
+//        } else {
+//            iterate_children_(grand_children, node);
+//        }
+//    }
+//}
 
 godot::CL::ResourceTile *godot::CL::ResourceManager::get_resource(
     StringName name) const {

@@ -7,6 +7,8 @@
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/variant/callable.hpp>
 
+#include "./entryable.h"
+
 namespace godot::CL {
 class TileManager;
 
@@ -25,9 +27,9 @@ class TilePlaceable : public Node {
 
     void setup_tile_manager_();
     void handle_sprite_tile_manager_notification_(Sprite2D *sprite,
-                                                  Node2D *parent);
+                                                      Node2D *parent);
 
-    virtual void iterate_children_(TypedArray<Node> nodes, Node2D *parent){};
+    virtual void iterate_children_(TypedArray<Entryable> nodes){};
 
    public:
     TilePlaceable();

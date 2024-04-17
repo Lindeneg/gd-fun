@@ -62,15 +62,10 @@ func stop_create() -> void:
 	gui.city_manager.unlock_all_buttons();
 	gui.camera_manager.unlock_cam();
 
-func _get_vehicle_scene_test(surface: int) -> PackedScene:
-	if surface == Utils.TILE_SURFACE_GROUND:
-		return gui.route_manager._vehicles.get("vehicle_horse").scene;
-	return gui.route_manager._vehicles.get("vehicle_ship").scene;
-
 func _on_city_menu_open_create_route_ui(from: City) -> void:
 	gui.is_creating_route = true;
 	_from = from;
-	_destinations = gui.city_manager.get_cities_within_distance(from, 100);
+	_destinations = gui.city_manager.get_cities_within_distance(from, gui.player.range);
 	var names = [];
 	for dest in _destinations:
 		names.push_back(dest.name);
@@ -88,11 +83,14 @@ func _on_route_cancel_btn_button_down() -> void:
 
 func _on_route_confirm_btn_button_down() -> void:
 	var dict = {};
+	dict["player"] = gui.player.name;
 	dict["from"] = _from.name;
 	dict["to"] = _to.name;
 	dict["path"] = _chosen_path;
 	dict["type"] = Route.ROUTE_CITY_CITY;
 	dict["surface"] = route_surface_opts.get_item_id(route_surface_opts.selected);
-	dict["vehicle"] = _get_vehicle_scene_test(dict["surface"]);
+	dict["vehicle"] = "vehicle_horse" if dict["surface"] == Utils.TILE_SURFACE_GROUND else "vehicle_ship";
+	gui.player.get_connections().push_back(_to.name);
+	print("CREATING ROUTE: ", dict);
 	stop_create();
 	emit_signal("create_route", dict);

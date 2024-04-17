@@ -10,6 +10,7 @@ const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 @export var route_manager: RouteManager;
 @export var debug_manager: DebugManager;
 @export var resources: Resources;
+@export var player: Player;
 
 @onready var city_menu: CityMenu = $GUIContainer/CityMenu;
 @onready var create_route_ui: CreateRoute = $GUIContainer/CreateRoute;

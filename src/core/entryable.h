@@ -13,6 +13,7 @@ enum TileEntryType { TILE_ENTRY_ONSHORE = 1, TILE_ENTRY_OFFSHORE = 2 };
 class Entryable : public Area2D {
     GDCLASS(Entryable, Area2D)
    private:
+    Vector2i tile_size_;
     CollisionShape2D *col_shape_;
     Array onshore_entries_;
     Array offshore_entries_;
@@ -27,8 +28,11 @@ class Entryable : public Area2D {
     Entryable();
     ~Entryable();
 
+    inline Vector2i calculate_size_in_tiles() { return Vector2i(0, 0); }
+
     Dictionary get_entry_tile(const TileEntryType type) const;
     void add_entry_point(const Vector2i coords, const TileEntryType type);
+    inline Vector2i get_tile_size() const { return tile_size_; }
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }
 };

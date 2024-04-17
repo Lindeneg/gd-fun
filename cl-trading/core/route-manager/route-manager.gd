@@ -26,12 +26,13 @@ func instanciate_vehicle(vehicle_scene: PackedScene) -> TradingVehicle:
 	return vehicle_scene.instantiate();
 
 func _on_gui_create_route(ctx: Dictionary) -> void:
-	var vehicle = instanciate_vehicle(ctx["vehicle"]);
+	var vehicle = instanciate_vehicle(_vehicles[ctx["vehicle"]].scene);
 	if !vehicle:
 		return;
 	var route: Route = Route.new();
 	add_child(route);
 
+	route.set_player(ctx["player"]);
 	route.set_type(ctx["surface"]);
 	route.set_kind(ctx["type"]);
 	route.set_start(ctx["from"]);

@@ -30,11 +30,12 @@ class CityManager : public TilePlaceable {
     Array find_entry_path_(const int max_distance, const Dictionary from,
                            const Entryable *to_entry,
                            const TileEntryType entry_type);
+    void handle_entryable_node_(Entryable *root, Node *node, Node2D *parent);
 
    protected:
     static void _bind_methods();
 
-    void iterate_children_(TypedArray<Node> nodes, Node2D *parent) override;
+    void iterate_children_(TypedArray<Entryable> nodes) override;
 
    public:
     CityManager();

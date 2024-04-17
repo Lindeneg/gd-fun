@@ -12,7 +12,8 @@
 #include "../core/utils.h"
 
 godot::CL::Entryable::Entryable()
-    : col_shape_(nullptr),
+    : tile_size_(Vector2i(0, 0)),
+      col_shape_(nullptr),
       onshore_entries_(Array()),
       offshore_entries_(Array()) {}
 

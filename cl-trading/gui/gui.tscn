@@ -169,6 +169,7 @@ layout_mode = 2
 columns = 5
 
 [node name="CreateRoute" type="Control" parent="GUIContainer"]
+visible = false
 custom_minimum_size = Vector2(500, 500)
 layout_mode = 3
 anchors_preset = 8

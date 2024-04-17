@@ -34,10 +34,10 @@ void godot::CL::TilePlaceable::setup_tile_manager_() {
 void godot::CL::TilePlaceable::handle_sprite_tile_manager_notification_(
     Sprite2D *sprite, Node2D *parent) {
     // convert position to tile grid coordinates
-    Vector2i coords{
+    Vector2i tile_pos{
         tile_manager_->local_to_map(parent->to_global(sprite->get_position()))};
     // the first tile is taken by default
-    tile_manager_->add_occupant(coords, kind_);
+    tile_manager_->add_occupant(tile_pos, kind_);
     // now we need to figure out if we have more tiles to occupy
     int32_t tile_size{tile_manager_->get_tileset()->get_tile_size().x};
     Rect2 rect = sprite->get_region_rect();
@@ -45,10 +45,12 @@ void godot::CL::TilePlaceable::handle_sprite_tile_manager_notification_(
     auto y_limit = int((rect.size.y / tile_size) - 1);
     // update any offset tiles from origin
     for (auto x_offset = 0; x_offset < x_limit; x_offset++) {
-        tile_manager_->add_occupant(coords + Vector2i(x_offset + 1, 0), kind_);
+        tile_manager_->add_occupant(tile_pos + Vector2i(x_offset + 1, 0),
+                                    kind_);
     }
     for (auto y_offset = 0; y_offset < y_limit; y_offset++) {
-        tile_manager_->add_occupant(coords + Vector2i(0, y_offset + 1), kind_);
+        tile_manager_->add_occupant(tile_pos + Vector2i(0, y_offset + 1),
+                                    kind_);
     }
 }
 
@@ -59,9 +61,7 @@ void godot::CL::TilePlaceable::notify_tile_manager() {
     if (Utils::is_in_editor()) {
         tile_manager_->reset_occupants_kind(kind_);
     }
-    auto children = get_children();
-    iterate_children_(children, nullptr);
-    tile_manager_->set_rebuild_debug_graph(true);
+    iterate_children_(get_children());
 }
 
 void godot::CL::TilePlaceable::_bind_methods() {

@@ -24,7 +24,7 @@ class ResourceManager : public TilePlaceable {
    protected:
     static void _bind_methods();
 
-    void iterate_children_(TypedArray<Node> nodes, Node2D *parent) override;
+    //void iterate_children_(TypedArray<Node> nodes, Node2D *parent) override;
 
    public:
     ResourceManager();

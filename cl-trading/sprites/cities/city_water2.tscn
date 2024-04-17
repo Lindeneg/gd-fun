@@ -49,4 +49,3 @@ shape = SubResource("CircleShape2D_2wy11")
 [node name="CityUI" parent="." instance=ExtResource("3_d3w6q")]
 offset_top = 0.0
 y_container_offset = -16.0
-y_btn_offset = 32.0

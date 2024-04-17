@@ -11,8 +11,8 @@ signal cam_speed_changed(new_speed: float);
 @export var max_move_speed: float = 10;
 @export var min_move_speed: float = 0.0;
 @export var move_cutoff: float = 200;
+@export var tile_manager: TileManager;
 
-@onready var tile_manager: TileManager = $"../TileManager";
 @onready var gui: Control = $GUI;
 
 var cam_locked: bool = false;

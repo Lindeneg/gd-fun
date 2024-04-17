@@ -10,6 +10,8 @@
 godot::CL::Route::Route()
     : initial_start_(true),
       kind_(ROUTE_CITY_CITY),
+      player_(""),
+      current_route_(TypedArray<Vector2>()),
       type_(TILE_SURFACE_NONE),
       // timeout for time bewteen destination
       // reached and resuming of route
@@ -33,6 +35,8 @@ void godot::CL::Route::destroy() {
 
     vehicle_ = nullptr;
     cooldown_timer_ = nullptr;
+    player_ = "";
+    current_route_.clear();
     distance_ = 0;
     gold_cost_ = 0;
     type_ = TILE_SURFACE_NONE;
@@ -164,6 +168,8 @@ void godot::CL::Route::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_start", "name"), &Route::set_start);
     ClassDB::bind_method(D_METHOD("get_end"), &Route::get_end);
     ClassDB::bind_method(D_METHOD("set_end", "name"), &Route::set_end);
+    ClassDB::bind_method(D_METHOD("get_player"), &Route::get_player);
+    ClassDB::bind_method(D_METHOD("set_player", "p"), &Route::set_player);
 
     ClassDB::bind_method(D_METHOD("get_type"), &Route::get_type);
     ClassDB::bind_method(D_METHOD("set_type", "t"), &Route::set_type);

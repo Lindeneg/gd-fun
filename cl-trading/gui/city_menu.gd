@@ -7,8 +7,21 @@ signal open_create_route_ui(from: City);
 @onready var menu_supply: GridContainer = $CityMenuRect/CityMenuContainer/SupplyContainer/CitySupply;
 @onready var menu_demand: GridContainer = $CityMenuRect/CityMenuContainer/DemandContainer/CityDemand;
 @onready var menu_industry: GridContainer = $CityMenuRect/CityMenuContainer/IndustriesContainer/CityIndustry;
+@onready var route_btn: Button = $CityMenuRect/CityMenuContainer/CityHeader/BuildButtons/BuildRouteBtn;
+@onready var industry_btn: Button = $CityMenuRect/CityMenuContainer/CityHeader/BuildButtons/BuildIndustryBtn;
 
 var _city: City = null;
+
+func _update_btn_state(city_name: StringName) -> void:
+	var has_connection = gui.player.get_connections().has(city_name);
+	route_btn.disabled = !has_connection;
+	industry_btn.disabled = !has_connection;
+	if has_connection:
+		route_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;
+		industry_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;
+	else:
+		route_btn.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN;
+		industry_btn.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN;
 
 func open_menu(city: City) -> void:
 	if visible:
@@ -21,6 +34,8 @@ func open_menu(city: City) -> void:
 	city_label.text = _city.name;
 	gui.city_manager.lock_all_buttons();
 	gui.camera_manager.lock_cam();
+
+	_update_btn_state(city.name);
 
 	for supply in _city.supplies:
 		gui.create_supply_item(supply.resource_kind, supply.amount, menu_supply);

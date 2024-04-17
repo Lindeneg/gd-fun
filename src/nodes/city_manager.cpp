@@ -26,38 +26,38 @@ void godot::CL::CityManager::handle_city_clicked_(StringName city_name) {
     emit_signal(SCityClicked, city_name);
 }
 
-// TODO: rewrite this mess please
-void godot::CL::CityManager::iterate_children_(TypedArray<Node> nodes,
-                                               Node2D *parent = nullptr) {
-    auto size{nodes.size()};
-    for (auto i = 0; i < size; i++) {
-        auto *node{cast_to<Node2D>(nodes[i])};
-        if (node == nullptr) {
-            continue;
+void godot::CL::CityManager::iterate_children_(TypedArray<Entryable> nodes) {
+    for (auto i = 0; i < nodes.size(); i++) {
+        auto root{cast_to<City>(nodes[i])};
+        handle_entryable_node_(root, root, nullptr);
+        auto city_name = root->get_name();
+        if (cities_.find(city_name) == cities_.end()) {
+            cities_[city_name] = root;
+            Utils::connect(root, City::SButtonClicked, city_clicked_cb_);
         }
-        auto grand_children = node->get_children();
-        if (grand_children.size() == 0 && parent != nullptr) {
-            if (typeid(*node) == typeid(Sprite2D)) {
-                handle_sprite_tile_manager_notification_(
-                    static_cast<Sprite2D *>(node), parent);
-            } else if (typeid(*node) == typeid(Marker2D)) {
-                auto *city{static_cast<City *>(parent)};
-                Vector2 marker_position = node->get_position();
-                Vector2i coords{tile_manager_->local_to_map(
-                    parent->to_global(marker_position))};
-                // TODO(5) Use an actual property:
-                auto city_entry_type =
-                    static_cast<TileEntryType>(node->get_visibility_layer());
-                city->add_entry_point(coords, city_entry_type);
-                auto city_name = city->get_name();
-                if (cities_.find(city_name) == cities_.end()) {
-                    cities_[city_name] = city;
-                    Utils::connect(city, City::SButtonClicked,
-                                   city_clicked_cb_);
-                }
-            }
-        } else {
-            iterate_children_(grand_children, node);
+    }
+}
+
+void godot::CL::CityManager::handle_entryable_node_(Entryable *root, Node *node,
+                                                    Node2D *parent = nullptr) {
+    auto children{node->get_children()};
+    if (children.size() == 0 && parent != nullptr) {
+        if (typeid(*node) == typeid(Sprite2D)) {
+            handle_sprite_tile_manager_notification_(
+                static_cast<Sprite2D *>(node), parent);
+        } else if (typeid(*node) == typeid(Marker2D)) {
+            auto marker{static_cast<Marker2D *>(node)};
+            Vector2 marker_position = marker->get_position();
+            Vector2i coords{tile_manager_->local_to_map(
+                parent->to_global(marker_position))};
+            auto city_entry_type =
+                static_cast<TileEntryType>(marker->get_visibility_layer());
+            root->add_entry_point(coords, city_entry_type);
+        }
+    } else {
+        for (int i = 0; i < children.size(); i++) {
+            handle_entryable_node_(root, cast_to<Node>(children[i]),
+                                   cast_to<Node2D>(node));
         }
     }
 }
