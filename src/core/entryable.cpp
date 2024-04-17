@@ -11,6 +11,9 @@
 
 #include "../core/utils.h"
 
+const char *godot::CL::Entryable::SButtonClicked{"btn_clicked"};
+const char *godot::CL::Entryable::SButtonStateChanged{"btn_state_changed"};
+
 godot::CL::Entryable::Entryable()
     : tile_size_(Vector2i(0, 0)),
       col_shape_(nullptr),
@@ -83,6 +86,10 @@ void godot::CL::Entryable::_bind_methods() {
                          &Entryable::get_offshore_entries);
     ClassDB::bind_method(D_METHOD("get_entry_tile", "t"),
                          &Entryable::get_entry_tile);
+    ClassDB::bind_method(D_METHOD("get_button_enabled"),
+                         &Entryable::get_button_enabled);
+    ClassDB::bind_method(D_METHOD("set_button_enabled", "e"),
+                         &Entryable::set_button_enabled);
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(TILE_ENTRY_ONSHORE);

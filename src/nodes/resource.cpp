@@ -64,4 +64,12 @@ void godot::CL::ResourceTile::_bind_methods() {
     ClassDB::add_signal(
         "ResourceTile",
         MethodInfo(SAmountChanged, PropertyInfo(Variant::INT, "amount")));
+
+    ClassDB::add_signal("ResourceTile",
+                        MethodInfo(SButtonStateChanged,
+                                   PropertyInfo(Variant::BOOL, "enabled")));
+    ClassDB::add_signal(
+        "ResourceTile",
+        MethodInfo(SButtonClicked,
+                   PropertyInfo(Variant::STRING_NAME, "resource_name")));
 }

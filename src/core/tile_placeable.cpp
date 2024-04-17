@@ -1,5 +1,7 @@
 #include "tile_placeable.h"
 
+#include <godot_cpp/classes/marker2d.hpp>
+
 #include "../nodes/tile_manager.h"
 #include "./utils.h"
 
@@ -18,6 +20,62 @@ void godot::CL::TilePlaceable::_enter_tree() { setup_tile_manager_(); }
 void godot::CL::TilePlaceable::_exit_tree() {
     Utils::disconnect(tile_manager_, "ready", tile_manager_ready_cb_);
     tile_manager_ = nullptr;
+}
+
+void godot::CL::TilePlaceable::handle_entryable_node_(
+    Entryable *root, Node *node, Node2D *parent = nullptr) {
+    auto children{node->get_children()};
+    if (children.size() == 0 && parent != nullptr) {
+        if (typeid(*node) == typeid(Sprite2D)) {
+            handle_sprite_tile_manager_notification_(
+                static_cast<Sprite2D *>(node), parent);
+        } else if (typeid(*node) == typeid(Marker2D)) {
+            auto marker{static_cast<Marker2D *>(node)};
+            Vector2 marker_position = marker->get_position();
+            Vector2i coords{tile_manager_->local_to_map(
+                parent->to_global(marker_position))};
+            auto city_entry_type =
+                static_cast<TileEntryType>(marker->get_visibility_layer());
+            root->add_entry_point(coords, city_entry_type);
+        }
+    } else {
+        for (int i = 0; i < children.size(); i++) {
+            handle_entryable_node_(root, cast_to<Node>(children[i]),
+                                   cast_to<Node2D>(node));
+        }
+    }
+}
+
+godot::Array godot::CL::TilePlaceable::find_entry_path_(
+    const int max_distance, const Dictionary from, const Entryable *to_entry,
+    const TileEntryType entry_type) {
+    if (from["found"]) {
+        auto to{to_entry->get_entry_tile(entry_type)};
+        if (to["found"]) {
+            auto surface{TILE_SURFACE_GROUND};
+            if (entry_type == TILE_ENTRY_OFFSHORE) {
+                surface = TILE_SURFACE_WATER;
+            }
+            auto path{tile_manager_->construct_path(
+                static_cast<Vector2i>(from["coords"]),
+                static_cast<Vector2i>(to["coords"]), surface)};
+            auto path_size{path.size()};
+            if (path_size > 0 && path_size <= max_distance) {
+                return get_local_path_(path);
+            }
+        }
+    }
+    return Array();
+}
+
+godot::TypedArray<godot::Vector2> godot::CL::TilePlaceable::get_local_path_(
+    PackedVector2Array path) {
+    TypedArray<Vector2> result{};
+    auto size = path.size();
+    for (int i = 0; i < size; i++) {
+        result.append(tile_manager_->map_to_local(path[i]));
+    }
+    return result;
 }
 
 void godot::CL::TilePlaceable::setup_tile_manager_() {

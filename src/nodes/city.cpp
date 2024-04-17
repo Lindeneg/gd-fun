@@ -10,13 +10,10 @@
 const char *godot::CL::City::SSuppliesChanged{"supplies_changed"};
 const char *godot::CL::City::SDemandsChanged{"demands_changed"};
 const char *godot::CL::City::SIndustriesChanged{"industries_changed"};
-const char *godot::CL::City::SButtonClicked{"btn_clicked"};
-const char *godot::CL::City::SButtonStateChanged{"btn_state_changed"};
 
 godot::CL::City::City()
     : Entryable(),
       size_(CITY_SIZE_VILLAGE),
-      button_enabled_(true),
       supplies_(TypedArray<CityResource>{}),
       demands_(TypedArray<CityResource>{}),
       industries_(TypedArray<Industry>{}) {}
@@ -40,10 +37,6 @@ void godot::CL::City::_bind_methods() {
     // BIND METHODS
     ClassDB::bind_method(D_METHOD("get_size"), &City::get_size);
     ClassDB::bind_method(D_METHOD("set_size", "s"), &City::set_size);
-    ClassDB::bind_method(D_METHOD("get_button_enabled"),
-                         &City::get_button_enabled);
-    ClassDB::bind_method(D_METHOD("set_button_enabled", "e"),
-                         &City::set_button_enabled);
     ClassDB::bind_method(D_METHOD("get_supplies"), &City::get_supplies);
     ClassDB::bind_method(D_METHOD("set_supplies", "s"), &City::set_supplies);
     ClassDB::bind_method(D_METHOD("get_demands"), &City::get_demands);

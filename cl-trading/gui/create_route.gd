@@ -91,6 +91,6 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["surface"] = route_surface_opts.get_item_id(route_surface_opts.selected);
 	dict["vehicle"] = "vehicle_horse" if dict["surface"] == Utils.TILE_SURFACE_GROUND else "vehicle_ship";
 	gui.player.get_connections().push_back(_to.name);
-	print("CREATING ROUTE: ", dict);
+	#print("CREATING ROUTE: ", dict);
 	stop_create();
 	emit_signal("create_route", dict);

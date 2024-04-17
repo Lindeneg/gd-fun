@@ -26,6 +26,8 @@ class ResourceTile : public Entryable {
 
     const static char *SAmountChanged;
 
+    void _ready() override;
+
     inline ResourceKind get_resource_kind() const { return resource_kind_; }
     inline int get_capacity_amount() const { return capacity_amount_; }
     inline int get_current_amount() const { return current_amount_; }
@@ -36,8 +38,6 @@ class ResourceTile : public Entryable {
         current_amount_ = c;
         emit_signal(SAmountChanged, current_amount_);
     }
-
-    void _ready() override;
 };
 }  // namespace godot::CL
 
