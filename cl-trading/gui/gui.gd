@@ -1,5 +1,7 @@
 class_name GUI extends Control
 
+signal create_route(ctx: Dictionary);
+
 const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 
 @export var camera_manager: CameraManager;
@@ -10,7 +12,7 @@ const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 @export var resources: Resources;
 
 @onready var city_menu: CityMenu = $GUIContainer/CityMenu;
-@onready var create_route: CreateRoute = $GUIContainer/CreateRoute;
+@onready var create_route_ui: CreateRoute = $GUIContainer/CreateRoute;
 @onready var container: CanvasLayer = $GUIContainer;
 
 var is_creating_route: bool = false;
@@ -30,7 +32,7 @@ func remove_nodes_children(nodes: Array) -> void:
 
 func set_create_route_to(entry: Entryable) -> void:
 	if is_creating_route:
-		create_route.set_to(entry);
+		create_route_ui.set_to(entry);
 
 func create_supply_item(resource_kind: int, amount: int, node: Node) -> void:
 	var supply_item = VBoxContainer.new();
@@ -82,3 +84,6 @@ func remove_node_children(node: Node) -> void:
 	for child in children:
 		node.remove_child(child);
 		child.free();
+
+func _on_create_route_create_route(ctx: Dictionary) -> void:
+	emit_signal("create_route", ctx);

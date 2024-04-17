@@ -5,18 +5,12 @@
 #include <godot_cpp/core/error_macros.hpp>
 
 #include "../core/utils.h"
-#include "./city_manager.h"
-#include "./resource_manager.h"
-#include "./tile_manager.h"
 #include "./trading_vehicle.h"
 
 godot::CL::Route::Route()
     : initial_start_(true),
       kind_(ROUTE_CITY_CITY),
       type_(TILE_SURFACE_NONE),
-      tile_manager_(nullptr),
-      city_manager_(nullptr),
-      resource_manager_(nullptr),
       // timeout for time bewteen destination
       // reached and resuming of route
       timeout_cb_(Callable(this, "handle_timeout_")),
@@ -39,9 +33,6 @@ void godot::CL::Route::destroy() {
 
     vehicle_ = nullptr;
     cooldown_timer_ = nullptr;
-    tile_manager_ = nullptr;
-    city_manager_ = nullptr;
-    resource_manager_ = nullptr;
     distance_ = 0;
     gold_cost_ = 0;
     type_ = TILE_SURFACE_NONE;
@@ -68,52 +59,14 @@ void godot::CL::Route::handle_destination_reached_(const Vector2 dest) {
     cooldown_timer_->start();
 }
 
-godot::Vector2 godot::CL::Route::get_entry_tile_(StringName name) const {
-    Entryable *entry = nullptr;
-    if (kind_ == ROUTE_CITY_CITY || name == start_) {
-        entry = city_manager_->get_city(name);
-        ERR_FAIL_NULL_V_MSG(
-            entry, Vector2(),
-            vformat("get_entry: city %s is null on %s", name, get_name()));
-    } else if (kind_ == ROUTE_CITY_RESOURCE && name == end_) {
-        entry = resource_manager_->get_resource(name);
-        ERR_FAIL_NULL_V_MSG(
-            entry, Vector2(),
-            vformat("get_entry: resource %s is null on %s", name, get_name()));
-    }
-    auto entries{type_ == TILE_SURFACE_GROUND ? entry->get_onshore_entries()
-                                              : entry->get_offshore_entries()};
-    ERR_FAIL_COND_V_MSG(
-        entries.size() == 0, Vector2(),
-        vformat("get_entry: %s has no entries on %s", name, get_name()));
-    // TODO perhaps pick the closet point
-    return entries[0];
-}
-
-godot::TypedArray<godot::Vector2> godot::CL::Route::get_local_path_() {
-    TypedArray<Vector2> result{};
-    auto size = current_route_.size();
-    for (int i = 0; i < size; i++) {
-        result.append(tile_manager_->map_to_local(current_route_[i]));
-    }
-    return result;
-}
-
 bool godot::CL::Route::start() {
+    ERR_FAIL_COND_V_MSG(current_route_.size() == 0, false,
+                        "start: no route set");
     ERR_FAIL_NULL_V_MSG(vehicle_, false,
                         vformat("start: vehicle is null on %s", get_name()));
-    ERR_FAIL_COND_V_MSG(
-        !has_required_managers_(), false,
-        vformat("start: required managers missing on %s", get_name()));
     if (initial_start_) {
-        current_route_ = tile_manager_->construct_path(
-            get_entry_tile_(start_), get_entry_tile_(end_), type_);
-        auto local_path = get_local_path_();
-        ERR_FAIL_COND_V_MSG(
-            local_path.size() == 0, false,
-            vformat("start: could not calculate path on %s", get_name()));
-        vehicle_->set_map_path(local_path);
-        vehicle_->set_position(local_path[0]);
+        vehicle_->set_map_path(current_route_);
+        vehicle_->set_position(current_route_[0]);
         initial_start_ = false;
     }
     vehicle_->start_navigating();
@@ -142,9 +95,6 @@ void godot::CL::Route::set_vehicle(TradingVehicle *vehicle) {
     vehicle_->set_owner(this);
     Utils::connect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
 }
-
-void godot::CL::Route::change_route_plan() {}
-void godot::CL::Route::change_trading_vehicle() {}
 
 void godot::CL::Route::setup_vehicle_from_tree_() {
     ERR_FAIL_COND_MSG(vehicle_ != nullptr,
@@ -178,36 +128,12 @@ void godot::CL::Route::setup_timer_from_tree_or_create_() {
                    Callable(this, "handle_timeout_"));
 }
 
-bool godot::CL::Route::has_required_managers_() const {
-    return tile_manager_ != nullptr && city_manager_ != nullptr &&
-           resource_manager_ != nullptr;
-}
-
 void godot::CL::Route::_ready() {
     if (Utils::is_in_editor()) {
         return;
     }
     setup_timer_from_tree_or_create_();
     setup_vehicle_from_tree_();
-}
-
-void godot::CL::Route::_enter_tree() {
-    if (Utils::is_in_editor()) {
-        return;
-    }
-    auto *tile_manager = get_node_or_null(NodePath("../../TileManager"));
-    auto *city_manager = get_node_or_null(NodePath("../../CityManager"));
-    auto *resource_manager =
-        get_node_or_null(NodePath("../../ResourceManager"));
-    if (tile_manager != nullptr) {
-        tile_manager_ = static_cast<TileManager *>(tile_manager);
-    }
-    if (city_manager != nullptr) {
-        city_manager_ = static_cast<CityManager *>(city_manager);
-    }
-    if (resource_manager != nullptr) {
-        resource_manager_ = static_cast<ResourceManager *>(resource_manager);
-    }
 }
 
 void godot::CL::Route::_exit_tree() {
@@ -225,6 +151,8 @@ void godot::CL::Route::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_current_route"),
                          &Route::get_current_route);
+    ClassDB::bind_method(D_METHOD("set_current_route", "path"),
+                         &Route::set_current_route);
 
     ClassDB::bind_method(D_METHOD("start"), &Route::start);
     ClassDB::bind_method(D_METHOD("stop"), &Route::stop);

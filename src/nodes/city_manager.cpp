@@ -136,11 +136,21 @@ godot::Array godot::CL::CityManager::find_entry_path_(
                 static_cast<Vector2i>(to["coords"]), surface)};
             auto path_size{path.size()};
             if (path_size > 0 && path_size <= max_distance) {
-                return path;
+                return get_local_path_(path);
             }
         }
     }
     return Array();
+}
+
+godot::TypedArray<godot::Vector2> godot::CL::CityManager::get_local_path_(
+    PackedVector2Array path) {
+    TypedArray<Vector2> result{};
+    auto size = path.size();
+    for (int i = 0; i < size; i++) {
+        result.append(tile_manager_->map_to_local(path[i]));
+    }
+    return result;
 }
 
 void godot::CL::CityManager::_bind_methods() {

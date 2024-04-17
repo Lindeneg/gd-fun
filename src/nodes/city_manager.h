@@ -26,6 +26,7 @@ class CityManager : public TilePlaceable {
     Callable city_clicked_cb_;
 
     void handle_city_clicked_(StringName city_name);
+    TypedArray<Vector2> get_local_path_(PackedVector2Array path);
     Array find_entry_path_(const int max_distance, const Dictionary from,
                            const Entryable *to_entry,
                            const TileEntryType entry_type);

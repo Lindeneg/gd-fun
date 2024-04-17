@@ -8,12 +8,9 @@
 #include <godot_cpp/variant/typed_array.hpp>
 
 #include "../core/utils.h"
-#include "./tile_manager.h"
 
 namespace godot::CL {
 
-class CityManager;
-class ResourceManager;
 class TradingVehicle;
 
 enum RouteState { ROUTE_INACTIVE, ROUTE_ACTIVE };
@@ -34,13 +31,9 @@ class Route : public Node {
     bool initial_start_;
     RouteKind kind_;
     // packed array of current route
-    PackedVector2Array current_route_;
+    TypedArray<Vector2> current_route_;
     // intended tile surface
     TileSurface type_;
-    // pointers to needed managers
-    TileManager *tile_manager_;
-    CityManager *city_manager_;
-    ResourceManager *resource_manager_;
     // signal Callables
     Callable timeout_cb_;
     Callable dest_reached_cb_;
@@ -63,12 +56,6 @@ class Route : public Node {
     // callback to handle vehicle
     // destination reached signal
     void handle_destination_reached_(const Vector2 dest);
-    // converts from tile coords to local coords
-    TypedArray<Vector2> get_local_path_();
-    // finds an entry respecting surface
-    Vector2 get_entry_tile_(StringName name) const;
-    // checks if tile and city managers are assinged
-    bool has_required_managers_() const;
     // checks if timer already in tree,
     // if so, assigns it to cooldown_timer_
     // else creates a new instance that is
@@ -86,18 +73,15 @@ class Route : public Node {
     ~Route();
 
     void _ready() override;
-    void _enter_tree() override;
     void _exit_tree() override;
 
     bool start();
     void stop();
     void destroy();
-    void change_trading_vehicle();
-    void change_route_plan();
 
     inline int get_distance() const { return distance_; }
     inline int get_gold_cost() const { return gold_cost_; }
-    inline PackedVector2Array get_current_route() const {
+    inline TypedArray<Vector2> get_current_route() const {
         return current_route_;
     }
     inline RouteState get_route_state() const { return state_; }
@@ -107,6 +91,9 @@ class Route : public Node {
     inline TileSurface get_type() const { return type_; }
     inline RouteKind get_kind() const { return kind_; }
 
+    inline void set_current_route(const TypedArray<Vector2> path) {
+        current_route_ = path;
+    }
     inline void set_start(const StringName name) { start_ = name; }
     inline void set_end(const StringName name) { end_ = name; }
     inline void set_type(const TileSurface t) { type_ = t; }

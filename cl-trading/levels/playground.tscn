@@ -137,3 +137,4 @@ show_tile_coords = true
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
 [connection signal="city_clicked" from="CityManager" to="CameraManager/GUI" method="_on_city_manager_city_clicked"]
+[connection signal="create_route" from="CameraManager/GUI" to="RouteManager" method="_on_gui_create_route"]

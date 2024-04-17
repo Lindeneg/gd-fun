@@ -1,4 +1,4 @@
-class_name CityMenu extends Control
+class_name CityMenu extends Menu
 
 signal open_create_route_ui(from: City);
 
@@ -8,36 +8,15 @@ signal open_create_route_ui(from: City);
 @onready var menu_demand: GridContainer = $CityMenuRect/CityMenuContainer/DemandContainer/CityDemand;
 @onready var menu_industry: GridContainer = $CityMenuRect/CityMenuContainer/IndustriesContainer/CityIndustry;
 
-var _open: bool = false;
-var _focused: bool = false;
 var _city: City = null;
 
-func _ready() -> void:
-	visible = false;
-
-func _input(event: InputEvent) -> void:
-	if Engine.is_editor_hint() or !_open:
-		return
-	if !_focused and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		close_menu_unlocked();
-
-func is_open() -> bool:
-	return _open;
-
-func opened_city() -> City:
-	return _city;
-
-func opened_city_name() -> StringName:
-	return _city.name;
-
 func open_menu(city: City) -> void:
-	if _open:
+	if visible:
 		return;
 	if gui.is_creating_route:
 		gui.set_create_route_to(city);
 		return;
 	visible = true;
-	_open = true;
 	_city = city;
 	city_label.text = _city.name;
 	gui.city_manager.lock_all_buttons();
@@ -53,30 +32,26 @@ func open_menu(city: City) -> void:
 		gui.create_industry_item(industry, menu_industry);
 
 func close_menu_unlocked() -> void:
-	if !_open:
+	if !visible:
 		return;
 	close_menu_locked();
 	gui.city_manager.unlock_all_buttons();
 	gui.camera_manager.unlock_cam();
 
-
 func close_menu_locked() -> void:
-	if !_open:
+	if !visible:
 		return;
 	visible = false;
-	_open = false;
 	_city = null;
 	city_label.text = "";
 	gui.remove_nodes_children([menu_supply, menu_demand, menu_industry]);
 
 func _on_build_route_btn_button_down() -> void:
-	if !_open:
+	if !visible:
 		return;
-	emit_signal("open_create_route_ui", _city);
+	var tmp = _city;
 	close_menu_locked();
+	emit_signal("open_create_route_ui", tmp);
 
-func _on_mouse_entered() -> void:
-	_focused = true;
-
-func _on_mouse_exited() -> void:
-	_focused = false;
+func _on_close_menu() -> void:
+	close_menu_unlocked();
