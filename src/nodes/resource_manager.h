@@ -4,7 +4,6 @@
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/variant/callable.hpp>
-#include <map>
 
 #include "../core/tile_placeable.h"
 #include "./resource.h"
@@ -19,7 +18,6 @@ class ResourceManager : public TilePlaceable {
     GDCLASS(ResourceManager, TilePlaceable)
 
    private:
-    std::map<StringName, CL::ResourceTile *> resources_;
     Callable resource_clicked_cb_;
 
     void handle_resource_clicked_(StringName resource_name);
@@ -35,12 +33,11 @@ class ResourceManager : public TilePlaceable {
 
     const static char *SResourceClicked;
 
-    void lock_all_buttons();
-    void unlock_all_buttons();
-    void lock_buttons_except(TypedArray<StringName> except);
-    void unlock_buttons_except(TypedArray<StringName> except);
     ResourceTile *get_resource(StringName name) const;
-    Array get_resources_within_distance(Entryable *from, int distance);
+    inline Dictionary get_resources() const { return entries_; }
+    inline Array get_resources_within_distance(Entryable *from, int distance) {
+        return get_within_distance_(from, distance);
+    }
 };
 }  // namespace godot::CL
 

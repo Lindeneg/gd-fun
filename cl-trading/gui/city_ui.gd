@@ -9,9 +9,6 @@ enum ResourceType {
 const BASE_ITEM_SIZE: float = 23.3;
 const BASE_UI_HEIGHT: int = 50;
 
-@export var y_container_offset: float = 0.0;
-@export var y_btn_offset: float = 32;
-
 @onready var supply = $SupplyContainer;
 @onready var demand = $DemandContainer;
 @onready var btn_layer = $BtnLayer;
@@ -20,29 +17,24 @@ const BASE_UI_HEIGHT: int = 50;
 var city_resource_icon = preload("res://gui/city_resource_icon.tscn");
 
 var city: City;
-var gui: GUI;
+var player: Player;
+var resources: Resources;
 
 func _ready() -> void:
-	# set required members
-	#PlayerManager/PlayerLars/CameraManager/GUI
-	var nullable_city = get_node_or_null("..");
-	var nullable_gui = get_node_or_null("../../../PlayerManager/PlayerLars/CameraManager/GUI");
-	if !nullable_gui or !nullable_city:
+	if !city or !player or !resources:
 		btn_layer.visible = false;
 		return;
-	city = nullable_city;
 	city.connect("btn_state_changed", _on_btn_state_changed);
-	gui = nullable_gui;
 	btn_layer.visible = true;
 	# adjust container size
 	if !Engine.is_editor_hint():
 		z_index = 1;
-	position.y = -(BASE_UI_HEIGHT + y_container_offset);
+	position.y = -(BASE_UI_HEIGHT + city.y_container_offset);
 	size.x = BASE_ITEM_SIZE * _get_visual_tile_width();
 	size.y = BASE_UI_HEIGHT;
-	btn_layer.transform = Transform2D(0, Vector2(city.global_position.x, city.global_position.y + (y_btn_offset - y_container_offset)));
+	btn_layer.transform = Transform2D(0, Vector2(city.global_position.x, city.global_position.y + (city.y_btn_offset - city.y_container_offset)));
 	btn.text = city.name;
-	if gui.player.start_city == city.name || gui.player.get_connections().has(city.name):
+	if player.start_city == city.name || player.get_connections().has(city.name):
 		btn.text = "%s*" % city.name;
 	else:
 		btn.text = city.name;
@@ -60,10 +52,11 @@ func _create_supply_demand(resource_kind: int, amount: int, type: ResourceType) 
 		printerr("failed to instanciate icon for resource %d" % resource_kind);
 		return;
 	var city_resource = city_resource_icon.instantiate() as CityResourceIcon;
-	var icon = gui.resources.get_resource_icon(resource_kind);
+	var icon = resources.get_resource_icon(resource_kind);
 	if !icon:
 		printerr("failed to find icon for resource %d" % resource_kind);
 		return;
+	city_resource.name = resources.get_resource(resource_kind).name;
 	if type == ResourceType.SUPPLY:
 		city_resource.create_supply(icon, amount);
 		supply.add_child(city_resource);

@@ -10,6 +10,7 @@ godot::CL::TilePlaceable::TilePlaceable()
 
 godot::CL::TilePlaceable::TilePlaceable(godot::CL::TilePlaceableKind kind)
     : kind_(kind),
+      entries_({}),
       tile_manager_(nullptr),
       tile_manager_ready_cb_(Callable(this, "notify_tile_manager")) {}
 
@@ -89,6 +90,33 @@ void godot::CL::TilePlaceable::setup_tile_manager_() {
     }
 }
 
+godot::Array godot::CL::TilePlaceable::get_within_distance_(Entryable *from,
+                                                            int distance) {
+    Dictionary onshore_from{from->get_entry_tile(TILE_ENTRY_ONSHORE)};
+    Dictionary offshore_from{from->get_entry_tile(TILE_ENTRY_OFFSHORE)};
+    Array result{};
+    Array keys{entries_.keys()};
+    for (int i = 0; i < keys.size(); i++) {
+        StringName key{keys[i]};
+        if (key == from->get_name()) {
+            continue;
+        }
+        Entryable *to{cast_to<Entryable>(entries_[key])};
+        Dictionary entry_result{};
+        entry_result["name"] = key;
+        auto onshores{
+            find_entry_path_(distance, onshore_from, to, TILE_ENTRY_ONSHORE)};
+        auto offshores{
+            find_entry_path_(distance, offshore_from, to, TILE_ENTRY_OFFSHORE)};
+        if (onshores.size() > 0 || offshores.size() > 0) {
+            entry_result["onshores"] = onshores;
+            entry_result["offshores"] = offshores;
+            result.append(entry_result);
+        }
+    }
+    return result;
+}
+
 void godot::CL::TilePlaceable::handle_sprite_tile_manager_notification_(
     Sprite2D *sprite, Node2D *parent) {
     // convert position to tile grid coordinates
@@ -112,6 +140,44 @@ void godot::CL::TilePlaceable::handle_sprite_tile_manager_notification_(
     }
 }
 
+void godot::CL::TilePlaceable::lock_all_buttons() {
+    Array keys{entries_.keys()};
+    for (int i = 0; i < keys.size(); i++) {
+        StringName key{keys[i]};
+        Entryable *to{cast_to<Entryable>(entries_[key])};
+        to->set_button_enabled(false);
+    }
+}
+
+void godot::CL::TilePlaceable::unlock_all_buttons() {
+    Array keys{entries_.keys()};
+    for (int i = 0; i < keys.size(); i++) {
+        StringName key{keys[i]};
+        Entryable *to{cast_to<Entryable>(entries_[key])};
+        to->set_button_enabled(true);
+    }
+}
+
+void godot::CL::TilePlaceable::lock_buttons_except(
+    TypedArray<StringName> except) {
+    Array keys{entries_.keys()};
+    for (int i = 0; i < keys.size(); i++) {
+        StringName key{keys[i]};
+        Entryable *to{cast_to<Entryable>(entries_[key])};
+        to->set_button_enabled(except.has(key));
+    }
+}
+
+void godot::CL::TilePlaceable::unlock_buttons_except(
+    TypedArray<StringName> except) {
+    Array keys{entries_.keys()};
+    for (int i = 0; i < keys.size(); i++) {
+        StringName key{keys[i]};
+        Entryable *to{cast_to<Entryable>(entries_[key])};
+        to->set_button_enabled(!except.has(key));
+    }
+}
+
 void godot::CL::TilePlaceable::notify_tile_manager() {
     if (tile_manager_ == nullptr) {
         return;
@@ -123,6 +189,15 @@ void godot::CL::TilePlaceable::notify_tile_manager() {
 }
 
 void godot::CL::TilePlaceable::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("lock_buttons_except", "except"),
+                         &TilePlaceable::lock_buttons_except);
+    ClassDB::bind_method(D_METHOD("unlock_buttons_except", "except"),
+                         &TilePlaceable::unlock_buttons_except);
+
+    ClassDB::bind_method(D_METHOD("lock_all_buttons"),
+                         &TilePlaceable::lock_all_buttons);
+    ClassDB::bind_method(D_METHOD("unlock_all_buttons"),
+                         &TilePlaceable::unlock_all_buttons);
     ClassDB::bind_method(D_METHOD("notify_tile_manager"),
                          &TilePlaceable::notify_tile_manager);
 }

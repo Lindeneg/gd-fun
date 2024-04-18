@@ -16,7 +16,9 @@ godot::CL::City::City()
       size_(CITY_SIZE_VILLAGE),
       supplies_(TypedArray<CityResource>{}),
       demands_(TypedArray<CityResource>{}),
-      industries_(TypedArray<Industry>{}) {}
+      industries_(TypedArray<Industry>{}),
+      y_container_offset_(0.0f),
+      y_button_offset_(0.0f) {}
 
 godot::CL::City::~City() {}
 
@@ -44,12 +46,25 @@ void godot::CL::City::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_industries"), &City::get_industries);
     ClassDB::bind_method(D_METHOD("set_industries", "d"),
                          &City::set_industries);
+    ClassDB::bind_method(D_METHOD("get_y_container_offset"),
+                         &City::get_y_container_offset);
+    ClassDB::bind_method(D_METHOD("set_y_container_offset", "o"),
+                         &City::set_y_container_offset);
+    ClassDB::bind_method(D_METHOD("get_y_btn_offset"), &City::get_y_btn_offset);
+    ClassDB::bind_method(D_METHOD("set_y_btn_offset", "o"),
+                         &City::set_y_btn_offset);
 
     ClassDB::add_property(
         "City",
         PropertyInfo(Variant::INT, "size", PROPERTY_HINT_ENUM,
                      "Village,Town,Urban,Regiopolis,Metropolis"),
         "set_size", "get_size");
+
+    ClassDB::add_property("City",
+                          PropertyInfo(Variant::FLOAT, "y_container_offset"),
+                          "set_y_container_offset", "get_y_container_offset");
+    ClassDB::add_property("City", PropertyInfo(Variant::FLOAT, "y_btn_offset"),
+                          "set_y_btn_offset", "get_y_btn_offset");
 
     ClassDB::add_property(
         "City",

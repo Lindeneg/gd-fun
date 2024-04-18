@@ -32,6 +32,8 @@ class City : public Entryable {
     TypedArray<CityResource> supplies_;
     TypedArray<CityResource> demands_;
     TypedArray<Industry> industries_;
+    float y_container_offset_;
+    float y_button_offset_;
 
    protected:
     static void _bind_methods();
@@ -47,6 +49,8 @@ class City : public Entryable {
     void _ready() override;
 
     inline CitySize get_size() const { return size_; }
+    inline float get_y_container_offset() const { return y_container_offset_; }
+    inline float get_y_btn_offset() const { return y_button_offset_; }
     inline void set_size(const CitySize s) { size_ = s; }
     inline TypedArray<CityResource> get_supplies() const { return supplies_; }
     inline void set_supplies(TypedArray<CityResource> s) {
@@ -63,6 +67,10 @@ class City : public Entryable {
         demands_ = d;
         emit_signal(SDemandsChanged, d);
     }
+    inline void set_y_container_offset(const float o) {
+        y_container_offset_ = o;
+    }
+    inline void set_y_btn_offset(const float o) { y_button_offset_ = o; }
 };
 }  // namespace godot::CL
 

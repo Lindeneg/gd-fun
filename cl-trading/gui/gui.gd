@@ -1,8 +1,12 @@
+@tool
 class_name GUI extends Control
 
 signal create_route(ctx: Dictionary);
 
 const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
+
+const _city_ui_scene = preload("res://gui/city_ui.tscn");
+const _resource_ui_scene = preload("res://gui/resource_ui.tscn");
 
 @export var camera_manager: CameraManager;
 @export var city_manager: CityManager;
@@ -16,13 +20,36 @@ const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 @onready var city_menu: CityMenu = $GUIContainer/CityMenu;
 @onready var create_route_ui: CreateRoute = $GUIContainer/CreateRoute;
 @onready var container: CanvasLayer = $GUIContainer;
-
 var is_creating_route: bool = false;
 
 func _ready() -> void:
 	visible = true;
 	container.visible = true;
-	resource_manager.lock_all_buttons();
+	_setup_uis();
+	if !Engine.is_editor_hint():
+		resource_manager.lock_all_buttons();
+
+func _setup_uis() -> void:
+	var cities = city_manager.get_cities();
+	for key in cities.keys():
+		var city_ui = _city_ui_scene.instantiate();
+		var city: City = cities[key];
+		city_ui.player = player;
+		city_ui.resources = resources;
+		city_ui.city = city;
+		city.add_child(city_ui);
+
+	var managed_resources = resource_manager.get_resources();
+	for key in managed_resources.keys():
+		var resource_ui = _resource_ui_scene.instantiate();
+		var resource: ResourceTile = managed_resources[key];
+		resource_ui.custom_minimum_size = Vector2(25, 25);
+		resource_ui.anchors_preset = PRESET_BOTTOM_LEFT;
+		resource_ui.player = player;
+		resource_ui.resources = resources;
+		resource_ui.resource = resource;
+		resource.add_child(resource_ui);
+
 
 func remove_nodes_children(nodes: Array) -> void:
 	for node in nodes:

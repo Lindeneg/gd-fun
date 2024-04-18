@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5lmqbt18cayx"]
+
+[ext_resource type="Script" path="res://gui/resource_ui.gd" id="1_nwof0"]
+
+[node name="ResourceUI" type="ColorRect"]
+z_index = 1
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.184314, 0.184314, 0.184314, 0.454902)
+script = ExtResource("1_nwof0")
+
+[node name="BtnLayer" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="NameBtn" type="Button" parent="BtnLayer"]
+offset_right = 8.0
+offset_bottom = 31.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+
+[connection signal="button_down" from="BtnLayer/NameBtn" to="." method="_on_name_btn_button_down"]

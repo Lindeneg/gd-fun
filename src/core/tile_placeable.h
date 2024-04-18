@@ -6,7 +6,7 @@
 #include <godot_cpp/classes/sprite2d.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/variant/callable.hpp>
-#include <map>
+#include <godot_cpp/variant/dictionary.hpp>
 
 #include "./entryable.h"
 
@@ -23,37 +23,13 @@ class TilePlaceable : public Node {
    protected:
     static void _bind_methods();
 
+    Dictionary entries_;
     TileManager *tile_manager_;
     Callable tile_manager_ready_cb_;
 
     void setup_tile_manager_();
 
-    template <typename TNode>
-    inline Array get_within_distance_(std::map<StringName, TNode *> entries,
-                                      Entryable *from, int distance) {
-        auto onshore_from{from->get_entry_tile(TILE_ENTRY_ONSHORE)};
-        auto offshore_from{from->get_entry_tile(TILE_ENTRY_OFFSHORE)};
-        Array result{};
-        for (auto el : entries) {
-            if (el.first == from->get_name()) {
-                continue;
-            }
-            auto to{el.second};
-            Dictionary entry_result{};
-            entry_result["name"] = el.second->get_name();
-            auto onshores{find_entry_path_(distance, onshore_from, to,
-                                           TILE_ENTRY_ONSHORE)};
-            auto offshores{find_entry_path_(distance, offshore_from, to,
-                                            TILE_ENTRY_OFFSHORE)};
-            if (onshores.size() > 0 || offshores.size() > 0) {
-                entry_result["onshores"] = onshores;
-                entry_result["offshores"] = offshores;
-                result.push_back(entry_result);
-            }
-        }
-        return result;
-    }
-
+    Array get_within_distance_(Entryable *from, int distance);
     void handle_sprite_tile_manager_notification_(Sprite2D *sprite,
                                                   Node2D *parent);
     void handle_entryable_node_(Entryable *root, Node *node, Node2D *parent);
@@ -72,6 +48,10 @@ class TilePlaceable : public Node {
     void _enter_tree() override;
     void _exit_tree() override;
 
+    void lock_all_buttons();
+    void unlock_all_buttons();
+    void lock_buttons_except(TypedArray<StringName> except);
+    void unlock_buttons_except(TypedArray<StringName> except);
     void notify_tile_manager();
 };
 }  // namespace godot::CL
