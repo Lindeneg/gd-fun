@@ -8,6 +8,7 @@ const _down_arrow_texture = preload("res://assets/Icons/down-arrow.png");
 @export var city_manager: CityManager;
 @export var tile_manager: TileManager;
 @export var route_manager: RouteManager;
+@export var resource_manager: ResourceManager;
 @export var debug_manager: DebugManager;
 @export var resources: Resources;
 @export var player: Player;
@@ -21,11 +22,7 @@ var is_creating_route: bool = false;
 func _ready() -> void:
 	visible = true;
 	container.visible = true;
-
-func _on_city_manager_city_clicked(city_name: StringName) -> void:
-	if !city_manager:
-		return;
-	city_menu.open_menu(city_manager.get_city(city_name));
+	resource_manager.lock_all_buttons();
 
 func remove_nodes_children(nodes: Array) -> void:
 	for node in nodes:
@@ -88,3 +85,12 @@ func remove_node_children(node: Node) -> void:
 
 func _on_create_route_create_route(ctx: Dictionary) -> void:
 	emit_signal("create_route", ctx);
+
+func _on_resource_manager_resource_clicked(resource_name: StringName) -> void:
+	if is_creating_route:
+		create_route_ui.set_to(resource_manager.get_resource(resource_name));
+
+func _on_city_manager_city_clicked(city_name: StringName) -> void:
+	if !city_manager:
+		return;
+	city_menu.open_menu(city_manager.get_city(city_name));

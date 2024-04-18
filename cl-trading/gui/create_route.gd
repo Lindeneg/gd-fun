@@ -46,6 +46,7 @@ func open_menu() -> void:
 		route_surface_opts.set_item_disabled(1, true);
 
 	gui.city_manager.lock_all_buttons();
+	gui.resource_manager.lock_all_buttons();
 	gui.camera_manager.lock_cam();
 
 func set_chosen_path(index: int) -> void:
@@ -60,16 +61,19 @@ func stop_create() -> void:
 	_destinations = [];
 	_chosen_path = [];
 	gui.city_manager.unlock_all_buttons();
+	gui.resource_manager.lock_all_buttons();
 	gui.camera_manager.unlock_cam();
 
 func _on_city_menu_open_create_route_ui(from: City) -> void:
 	gui.is_creating_route = true;
 	_from = from;
 	_destinations = gui.city_manager.get_cities_within_distance(from, gui.player.range);
+	_destinations.append_array(gui.resource_manager.get_resources_within_distance(from, gui.player.range));
 	var names = [];
 	for dest in _destinations:
 		names.push_back(dest.name);
 	gui.city_manager.lock_buttons_except(names);
+	gui.resource_manager.lock_buttons_except(names);
 	gui.camera_manager.unlock_cam();
 
 func _on_close_menu() -> void:

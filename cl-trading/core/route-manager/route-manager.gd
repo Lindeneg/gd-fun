@@ -40,7 +40,6 @@ func _on_gui_create_route(ctx: Dictionary) -> void:
 	route.set_current_route(ctx["path"]);
 	route.set_vehicle(vehicle);
 
-	var did_start = route.start();
-	if !did_start:
+	if !route.start():
 		remove_child(route);
 		route.free();

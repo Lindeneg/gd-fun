@@ -88,9 +88,9 @@ layer_3/tile_data = PackedInt32Array(1507361, 17, 1, 1507362, 65553, 1, 1572897,
 
 [node name="ResourceManager" type="ResourceManager" parent="."]
 
-[node name="Grain" parent="ResourceManager" instance=ExtResource("4_t4uab")]
+[node name="GrainFarm1" parent="ResourceManager" instance=ExtResource("4_t4uab")]
 capacity_amount = 15
-start_amount = 12
+start_amount = 8
 position = Vector2(480, 176)
 
 [node name="CityManager" type="CityManager" parent="."]
@@ -130,11 +130,12 @@ max_move_speed = 5.0
 move_cutoff = 250.0
 tile_manager = NodePath("../../../TileManager")
 
-[node name="GUI" parent="PlayerManager/PlayerLars/CameraManager" node_paths=PackedStringArray("camera_manager", "city_manager", "tile_manager", "route_manager", "debug_manager", "resources", "player") instance=ExtResource("8_wqw8b")]
+[node name="GUI" parent="PlayerManager/PlayerLars/CameraManager" node_paths=PackedStringArray("camera_manager", "city_manager", "tile_manager", "route_manager", "resource_manager", "debug_manager", "resources", "player") instance=ExtResource("8_wqw8b")]
 camera_manager = NodePath("..")
 city_manager = NodePath("../../../../CityManager")
 tile_manager = NodePath("../../../../TileManager")
 route_manager = NodePath("../../../../RouteManager")
+resource_manager = NodePath("../../../../ResourceManager")
 debug_manager = NodePath("../../../../DebugManager")
 resources = NodePath("../../../../BaseResources")
 player = NodePath("../..")
@@ -145,5 +146,6 @@ show_tiles = true
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
+[connection signal="resource_clicked" from="ResourceManager" to="PlayerManager/PlayerLars/CameraManager/GUI" method="_on_resource_manager_resource_clicked"]
 [connection signal="city_clicked" from="CityManager" to="PlayerManager/PlayerLars/CameraManager/GUI" method="_on_city_manager_city_clicked"]
 [connection signal="create_route" from="PlayerManager/PlayerLars/CameraManager/GUI" to="RouteManager" method="_on_gui_create_route"]

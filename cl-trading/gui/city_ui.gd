@@ -20,25 +20,32 @@ const BASE_UI_HEIGHT: int = 50;
 var city_resource_icon = preload("res://gui/city_resource_icon.tscn");
 
 var city: City;
-var resources: Resources;
+var gui: GUI;
 
 func _ready() -> void:
 	# set required members
+	#PlayerManager/PlayerLars/CameraManager/GUI
 	var nullable_city = get_node_or_null("..");
-	var nullable_resources = get_node_or_null("../../../BaseResources");
-	if !nullable_resources or !nullable_city:
+	var nullable_gui = get_node_or_null("../../../PlayerManager/PlayerLars/CameraManager/GUI");
+	if !nullable_gui or !nullable_city:
 		btn_layer.visible = false;
 		return;
 	city = nullable_city;
 	city.connect("btn_state_changed", _on_btn_state_changed);
-	resources = nullable_resources;
+	gui = nullable_gui;
 	btn_layer.visible = true;
 	# adjust container size
+	if !Engine.is_editor_hint():
+		z_index = 1;
 	position.y = -(BASE_UI_HEIGHT + y_container_offset);
 	size.x = BASE_ITEM_SIZE * _get_visual_tile_width();
 	size.y = BASE_UI_HEIGHT;
 	btn_layer.transform = Transform2D(0, Vector2(city.global_position.x, city.global_position.y + (y_btn_offset - y_container_offset)));
 	btn.text = city.name;
+	if gui.player.start_city == city.name || gui.player.get_connections().has(city.name):
+		btn.text = "%s*" % city.name;
+	else:
+		btn.text = city.name;
 	# display city resources
 	for cs in city.supplies:
 		_create_supply_demand(cs.resource_kind, cs.amount, ResourceType.SUPPLY);
@@ -53,7 +60,7 @@ func _create_supply_demand(resource_kind: int, amount: int, type: ResourceType) 
 		printerr("failed to instanciate icon for resource %d" % resource_kind);
 		return;
 	var city_resource = city_resource_icon.instantiate() as CityResourceIcon;
-	var icon = resources.get_resource_icon(resource_kind);
+	var icon = gui.resources.get_resource_icon(resource_kind);
 	if !icon:
 		printerr("failed to find icon for resource %d" % resource_kind);
 		return;
