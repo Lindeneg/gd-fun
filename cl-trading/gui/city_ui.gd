@@ -49,9 +49,11 @@ func _ready() -> void:
 		_create_supply_demand(industry.in, 0, ResourceType.DEMAND);
 
 func _exit_tree() -> void:
-	city.disconnect("btn_state_changed", _on_btn_state_changed);
-	player.disconnect("connection_added", _on_player_connection_added);
-	player.disconnect("connection_removed", _on_player_connection_removed);
+	if city:
+		city.disconnect("btn_state_changed", _on_btn_state_changed);
+	if player:
+		player.disconnect("connection_added", _on_player_connection_added);
+		player.disconnect("connection_removed", _on_player_connection_removed);
 
 func _create_supply_demand(resource_kind: int, amount: int, type: ResourceType) -> void:
 	if !city_resource_icon.can_instantiate():
