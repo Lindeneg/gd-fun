@@ -37,7 +37,6 @@ script = ExtResource("1_d1v18")
 
 [node name="GUIContainer" type="CanvasLayer" parent="."]
 layer = 2
-visible = false
 
 [node name="TopRight" type="Control" parent="GUIContainer"]
 visible = false

@@ -25,6 +25,8 @@ func _ready() -> void:
 		btn_layer.visible = false;
 		return;
 	city.connect("btn_state_changed", _on_btn_state_changed);
+	player.connect("connection_added", _on_player_connection_added);
+	player.connect("connection_removed", _on_player_connection_removed);
 	btn_layer.visible = true;
 	# adjust container size
 	if !Engine.is_editor_hint():
@@ -33,8 +35,7 @@ func _ready() -> void:
 	size.x = BASE_ITEM_SIZE * _get_visual_tile_width();
 	size.y = BASE_UI_HEIGHT;
 	btn_layer.transform = Transform2D(0, Vector2(city.global_position.x, city.global_position.y + (city.y_btn_offset - city.y_container_offset)));
-	btn.text = city.name;
-	if player.start_city == city.name || player.get_connections().has(city.name):
+	if player.start_city == city.name || player.has_connection(city.name):
 		btn.text = "%s*" % city.name;
 	else:
 		btn.text = city.name;
@@ -46,6 +47,11 @@ func _ready() -> void:
 	for industry in city.industries:
 		_create_supply_demand(industry.out, industry.amount, ResourceType.SUPPLY);
 		_create_supply_demand(industry.in, 0, ResourceType.DEMAND);
+
+func _exit_tree() -> void:
+	city.disconnect("btn_state_changed", _on_btn_state_changed);
+	player.disconnect("connection_added", _on_player_connection_added);
+	player.disconnect("connection_removed", _on_player_connection_removed);
 
 func _create_supply_demand(resource_kind: int, amount: int, type: ResourceType) -> void:
 	if !city_resource_icon.can_instantiate():
@@ -81,3 +87,11 @@ func _on_btn_state_changed(enabled: bool) -> void:
 
 func _on_name_btn_button_down() -> void:
 	city.emit_signal("btn_clicked", city.name);
+
+func _on_player_connection_added(n: StringName) -> void:
+	if n == city.name:
+		btn.text = "%s*" % city.name;
+
+func _on_player_connection_removed(n: StringName) -> void:
+	if n == city.name:
+		btn.text = "%s" % city.name;

@@ -39,7 +39,22 @@ class Player : public Node {
     inline int get_range() const { return range_; }
     inline bool get_is_active() const { return is_active_; }
 
+    inline bool has_connection(const StringName n) {
+        return connections_.has(n);
+    }
     inline void set_connections(const Array c) { connections_ = c; }
+    inline void add_connection(const StringName n) {
+        if (!connections_.has(n)) {
+            connections_.append(n);
+            emit_signal("connection_added", n);
+        }
+    }
+    inline void remove_connection(const StringName n) {
+        if (connections_.has(n)) {
+            connections_.erase(n);
+            emit_signal("connection_removed", n);
+        }
+    }
     inline void set_start_city(const StringName s) { start_city_ = s; }
     inline void set_player_level(const PlayerLevel l) { level_ = l; }
     inline void set_gold(const int g) { gold_ = g; }

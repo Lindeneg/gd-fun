@@ -13,7 +13,7 @@ signal open_create_route_ui(from: City);
 var _city: City = null;
 
 func _update_btn_state(city_name: StringName) -> void:
-	if gui.player.get_connections().has(city_name):
+	if gui.player.has_connection(city_name):
 		route_btn.disabled = false;
 		industry_btn.disabled = false;
 		route_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;

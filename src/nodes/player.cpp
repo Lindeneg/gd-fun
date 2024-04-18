@@ -13,6 +13,12 @@ void godot::CL::Player::_ready() { connections_.push_back(start_city_); }
 
 void godot::CL::Player::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_connections"), &Player::get_connections);
+    ClassDB::bind_method(D_METHOD("has_connection", "n"),
+                         &Player::has_connection);
+    ClassDB::bind_method(D_METHOD("add_connection", "n"),
+                         &Player::add_connection);
+    ClassDB::bind_method(D_METHOD("remove_connection", "n"),
+                         &Player::remove_connection);
     ClassDB::bind_method(D_METHOD("set_connections", "c"),
                          &Player::set_connections);
     ClassDB::bind_method(D_METHOD("get_start_city"), &Player::get_start_city);
@@ -48,4 +54,11 @@ void godot::CL::Player::_bind_methods() {
     BIND_ENUM_CONSTANT(PLAYER_LEVEL_INTERMEDIATE);
     BIND_ENUM_CONSTANT(PLAYER_LEVEL_ADVANCED);
     BIND_ENUM_CONSTANT(PLAYER_LEVEL_MASTER);
+
+    ClassDB::add_signal("Player",
+                        MethodInfo("connection_added",
+                                   PropertyInfo(Variant::STRING_NAME, "name")));
+    ClassDB::add_signal("Player",
+                        MethodInfo("connection_removed",
+                                   PropertyInfo(Variant::STRING_NAME, "name")));
 }

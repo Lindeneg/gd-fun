@@ -30,6 +30,8 @@ func _ready() -> void:
 		resource_manager.lock_all_buttons();
 
 func _setup_uis() -> void:
+	if !city_manager or !resource_manager:
+		return;
 	var cities = city_manager.get_cities();
 	for key in cities.keys():
 		var city_ui = _city_ui_scene.instantiate();
