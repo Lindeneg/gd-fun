@@ -12,6 +12,9 @@ class_name DebugManager extends Node2D
 	get:
 		return debug_mode;
 	set(value):
+		if value and !Engine.is_editor_hint() and !has_build_graph:
+			tile_manager.set_rebuild_debug_graph(true);
+			has_build_graph = true;
 		debug_mode = value;
 		queue_redraw();
 
@@ -54,6 +57,7 @@ const TILE_COLORS: Array = [Color.BLACK, Color.BLUE, Color.GREEN, Color.RED, Col
 var tile_size: int = 0;
 var tile_array = [];
 var focused_path = [];
+var has_build_graph = false;
 
 var camera_manager: Camera2D;
 var tile_manager: TileManager;
@@ -83,7 +87,9 @@ func _ready() -> void:
 	route_manager = get_node_or_null("../RouteManager");
 	resource_manager = get_node_or_null("../ResourceManager");
 
-	debug_mode = false;
+	if debug_mode:
+		tile_manager.set_rebuild_debug_graph(true);
+		has_build_graph = true;
 
 func _draw() -> void:
 	if not debug_mode:

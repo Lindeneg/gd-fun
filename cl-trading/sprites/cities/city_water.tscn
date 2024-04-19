@@ -8,6 +8,7 @@ resource_local_to_scene = true
 radius = 168.0
 
 [node name="CityWater" type="City"]
+y_btn_offset = 48.0
 z_index = 5
 y_sort_enabled = true
 collision_layer = 2

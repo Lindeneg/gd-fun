@@ -99,7 +99,7 @@ position = Vector2(480, 176)
 supplies = Array[CityResource]([SubResource("CityResource_q40ce"), SubResource("CityResource_4l0v7")])
 demands = Array[CityResource]([SubResource("CityResource_8ykkg"), SubResource("CityResource_bquv1")])
 industries = Array[Industry]([SubResource("Industry_1hx1g")])
-position = Vector2(864, 304)
+position = Vector2(816, 304)
 
 [node name="Coltrane" parent="CityManager" instance=ExtResource("5_2dkme")]
 supplies = Array[CityResource]([SubResource("CityResource_e36wm"), SubResource("CityResource_7kf6t")])
@@ -121,7 +121,7 @@ position = Vector2(1216, 1056)
 script = ExtResource("8_k7mje")
 
 [node name="PlayerLars" type="Player" parent="PlayerManager"]
-start_city = &"Coltrane"
+start_city = &"Garland"
 
 [node name="CameraManager" parent="PlayerManager/PlayerLars" node_paths=PackedStringArray("tile_manager") instance=ExtResource("1_rr1md")]
 z_index = 4000

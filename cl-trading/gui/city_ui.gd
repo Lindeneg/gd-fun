@@ -24,12 +24,11 @@ func _ready() -> void:
 	if !city or !player or !resources:
 		btn_layer.visible = false;
 		return;
-	city.connect("btn_state_changed", _on_btn_state_changed);
-	player.connect("connection_added", _on_player_connection_added);
-	player.connect("connection_removed", _on_player_connection_removed);
 	btn_layer.visible = true;
-	# adjust container size
 	if !Engine.is_editor_hint():
+		city.connect("btn_state_changed", _on_btn_state_changed);
+		player.connect("connection_added", _on_player_connection_added);
+		player.connect("connection_removed", _on_player_connection_removed);
 		z_index = 1;
 	position.y = -(BASE_UI_HEIGHT + city.y_container_offset);
 	size.x = BASE_ITEM_SIZE * _get_visual_tile_width();
@@ -49,9 +48,8 @@ func _ready() -> void:
 		_create_supply_demand(industry.in, 0, ResourceType.DEMAND);
 
 func _exit_tree() -> void:
-	if city:
+	if !Engine.is_editor_hint():
 		city.disconnect("btn_state_changed", _on_btn_state_changed);
-	if player:
 		player.disconnect("connection_added", _on_player_connection_added);
 		player.disconnect("connection_removed", _on_player_connection_removed);
 
