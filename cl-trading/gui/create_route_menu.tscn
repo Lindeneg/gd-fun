@@ -91,6 +91,7 @@ horizontal_alignment = 1
 
 [node name="VehicleContainer" type="VBoxContainer" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="VehicleTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer"]
 layout_mode = 2
@@ -102,6 +103,57 @@ vertical_alignment = 1
 layout_mode = 2
 mouse_filter = 1
 
+[node name="VehicleCtx" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 25
+theme_override_constants/v_separation = 5
+columns = 5
+
+[node name="SurfaceLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Surface"
+
+[node name="SpeedLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Speed"
+
+[node name="CostLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Cost"
+
+[node name="UpkeepLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Upkeep"
+
+[node name="SpaceLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Space"
+
+[node name="SurfaceValue" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+text = "Water"
+
+[node name="SpeedValue" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+text = "15"
+
+[node name="CostValue" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+text = "100"
+
+[node name="UpkeepValue" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+text = "15"
+
+[node name="SpaceValue" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx"]
+layout_mode = 2
+text = "15"
+
 [node name="RouteCargoTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2
 text = "Route Cargo"
@@ -111,6 +163,7 @@ vertical_alignment = 1
 [node name="RouteActions" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2
 theme_override_constants/separation = 25
+alignment = 1
 
 [node name="RouteConfirmBtn" type="Button" parent="CreateRouteRect/CreateRouteContainer/RouteActions"]
 custom_minimum_size = Vector2(80, 20)

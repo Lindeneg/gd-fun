@@ -20,6 +20,7 @@ func _init() -> void:
 			"tier": vehicle.tier,
 			"surface": vehicle.vehicle_surface,
 			"speed": vehicle.speed,
+			"cargo_space": vehicle.cargo_space,
 			"cost": vehicle.cost,
 			"upkeep": vehicle.upkeep
 		}

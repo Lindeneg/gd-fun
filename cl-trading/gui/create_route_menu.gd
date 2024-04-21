@@ -6,6 +6,11 @@ signal create_route(ctx: Dictionary);
 @onready var to_label: Label = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection/ToLabel;
 @onready var route_distance_label: Label = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteDistanceLabel;
 @onready var route_surface_opts: OptionButton = $CreateRouteRect/CreateRouteContainer/VehicleContainer/RouteSurfaceOptions;
+@onready var surface_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SurfaceValue;
+@onready var speed_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SpeedValue;
+@onready var cost_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/CostValue;
+@onready var upkeep_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/UpkeepValue;
+@onready var space_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SpaceValue;
 
 @export var gui: GUI;
 
@@ -83,9 +88,14 @@ func _set_path_from_idx(idx: int) -> void:
 
 func _set_path_from_id(vehicle_id: int) -> void:
 	var vehicle = vehicles[vehicle_id];
-	_chosen_path = _to["onshores"] if vehicle.surface == Utils.TILE_SURFACE_GROUND else _to["offshores"]
-	route_distance_label.text = "%dkm" % _chosen_path.size();
-	# TODO update selected vehicle ui
+	var is_ground = vehicle.surface == Utils.TILE_SURFACE_GROUND;
+	_chosen_path = _to["onshores"] if is_ground else _to["offshores"]
+	route_distance_label.text = "Distance: %d" % _chosen_path.size();
+	surface_value.text = "Ground" if is_ground else "Water";
+	speed_value.text = "%d" % vehicle.speed;
+	cost_value.text = "%d" % vehicle.cost;
+	upkeep_value.text = "%d" % vehicle.upkeep;
+	space_value.text = "%d" % vehicle.cargo_space;
 
 func _on_city_menu_open_create_route_ui(from: City) -> void:
 	gui.is_creating_route = true;
