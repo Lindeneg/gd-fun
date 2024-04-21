@@ -32,6 +32,9 @@ godot::CL::TradingVehicle::TradingVehicle()
       tile_surface_(TILE_SURFACE_GROUND),
       tier_(VEHICLE_TIER_COMMON),
       speed_(0.0),
+      cost_(0),
+      upkeep_(0),
+      cargo_space_(0),
       destination_threshold_(0.0),
       state_(VEHICLE_IDLE),
       navigation_target_(Vector2()),
@@ -238,6 +241,15 @@ void godot::CL::TradingVehicle::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_tier"), &TradingVehicle::get_tier);
     ClassDB::bind_method(D_METHOD("set_tier", "t"), &TradingVehicle::set_tier);
+    ClassDB::bind_method(D_METHOD("get_cost"), &TradingVehicle::get_cost);
+    ClassDB::bind_method(D_METHOD("set_cost", "c"), &TradingVehicle::set_cost);
+    ClassDB::bind_method(D_METHOD("get_upkeep"), &TradingVehicle::get_upkeep);
+    ClassDB::bind_method(D_METHOD("set_upkeep", "u"),
+                         &TradingVehicle::set_upkeep);
+    ClassDB::bind_method(D_METHOD("get_cargo_space"),
+                         &TradingVehicle::get_cargo_space);
+    ClassDB::bind_method(D_METHOD("set_cargo_space", "c"),
+                         &TradingVehicle::set_cargo_space);
 
     ClassDB::bind_method(D_METHOD("get_destination_threshold"),
                          &TradingVehicle::get_destination_threshold);
@@ -253,6 +265,15 @@ void godot::CL::TradingVehicle::_bind_methods() {
                           PropertyInfo(Variant::INT, "tier", PROPERTY_HINT_ENUM,
                                        "Budget,Common,Premium"),
                           "set_tier", "get_tier");
+
+    ClassDB::add_property("TradingVehicle", PropertyInfo(Variant::INT, "cost"),
+                          "set_cost", "get_cost");
+    ClassDB::add_property("TradingVehicle",
+                          PropertyInfo(Variant::INT, "upkeep"), "set_upkeep",
+                          "get_upkeep");
+    ClassDB::add_property("TradingVehicle",
+                          PropertyInfo(Variant::INT, "cargo_space"),
+                          "set_cargo_space", "get_cargo_space");
 
     ClassDB::add_property_group("TradingVehicle", "Navigation", "");
     ClassDB::add_property(

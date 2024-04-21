@@ -1,29 +1,14 @@
-[gd_scene load_steps=10 format=3 uid="uid://bh4owj8k1r3y0"]
+[gd_scene load_steps=7 format=3 uid="uid://bh4owj8k1r3y0"]
 
 [ext_resource type="Script" path="res://gui/gui.gd" id="1_d1v18"]
 [ext_resource type="Script" path="res://gui/cam_label_timer.gd" id="1_uu4hx"]
-[ext_resource type="Script" path="res://gui/city_menu.gd" id="2_rex7j"]
-[ext_resource type="Script" path="res://gui/create_route.gd" id="4_irgej"]
-[ext_resource type="Texture2D" uid="uid://clnehws11k21h" path="res://assets/Icons/connection.png" id="5_5sr60"]
+[ext_resource type="PackedScene" uid="uid://da0oc27bh80ic" path="res://gui/city_menu.tscn" id="3_yniq2"]
+[ext_resource type="PackedScene" uid="uid://c83ingpvbre02" path="res://gui/create_route_menu.tscn" id="4_5jou7"]
 
 [sub_resource type="Theme" id="Theme_wa76b"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wywbp"]
 bg_color = Color(0.552941, 0.611765, 0.639216, 0.219608)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ifyfw"]
-bg_color = Color(0, 0.419608, 0.227451, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iwo44"]
-bg_color = Color(0.580392, 0.0352941, 0.121569, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
 
 [node name="GUI" type="Control"]
 custom_minimum_size = Vector2(1920, 1080)
@@ -64,226 +49,14 @@ text = "Cam Speed: X.X"
 wait_time = 0.5
 one_shot = true
 
-[node name="CityMenu" type="Control" parent="GUIContainer"]
+[node name="CityMenu" parent="GUIContainer" node_paths=PackedStringArray("gui") instance=ExtResource("3_yniq2")]
 visible = false
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -250.0
-offset_right = 250.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("2_rex7j")
+gui = NodePath("../..")
 
-[node name="CityMenuRect" type="ColorRect" parent="GUIContainer/CityMenu"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-color = Color(0.180392, 0.180392, 0.180392, 1)
-
-[node name="CityMenuContainer" type="VBoxContainer" parent="GUIContainer/CityMenu/CityMenuRect"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -109.5
-offset_right = 109.5
-offset_bottom = 70.0
-grow_horizontal = 2
-theme_override_constants/separation = 25
-
-[node name="CityHeader" type="VSplitContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer"]
-layout_mode = 2
-dragger_visibility = 1
-
-[node name="CityLabel" type="RichTextLabel" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/CityHeader"]
-clip_contents = false
-layout_mode = 2
-size_flags_horizontal = 4
-mouse_filter = 1
-text = "Test"
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-
-[node name="BuildButtons" type="BoxContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/CityHeader"]
-layout_mode = 2
-alignment = 1
-
-[node name="BuildRouteBtn" type="Button" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/CityHeader/BuildButtons"]
-layout_mode = 2
-mouse_filter = 1
-mouse_default_cursor_shape = 2
-text = "Build Route"
-
-[node name="BuildIndustryBtn" type="Button" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/CityHeader/BuildButtons"]
-layout_mode = 2
-mouse_filter = 1
-mouse_default_cursor_shape = 2
-text = "Build Industry"
-
-[node name="SupplyContainer" type="VBoxContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer"]
-layout_mode = 2
-
-[node name="SupplyHeader" type="Label" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/SupplyContainer"]
-layout_mode = 2
-text = "SUPPLY"
-horizontal_alignment = 1
-
-[node name="CitySupply" type="GridContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/SupplyContainer"]
-layout_mode = 2
-columns = 5
-
-[node name="DemandContainer" type="VBoxContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer"]
-layout_mode = 2
-
-[node name="DemandHeader" type="Label" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/DemandContainer"]
-layout_mode = 2
-text = "DEMAND"
-horizontal_alignment = 1
-
-[node name="CityDemand" type="GridContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/DemandContainer"]
-layout_mode = 2
-columns = 5
-
-[node name="IndustriesContainer" type="VBoxContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer"]
-layout_mode = 2
-
-[node name="IndustriesHeader" type="Label" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/IndustriesContainer"]
-layout_mode = 2
-text = "INDUSTRIES"
-horizontal_alignment = 1
-
-[node name="CityIndustry" type="GridContainer" parent="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/IndustriesContainer"]
-layout_mode = 2
-columns = 5
-
-[node name="CreateRoute" type="Control" parent="GUIContainer"]
+[node name="CreateRouteMenu" parent="GUIContainer" node_paths=PackedStringArray("gui") instance=ExtResource("4_5jou7")]
 visible = false
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -250.0
-offset_right = 250.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("4_irgej")
-
-[node name="CreateRouteRect" type="ColorRect" parent="GUIContainer/CreateRoute"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-color = Color(0.180392, 0.180392, 0.180392, 1)
-
-[node name="CreateRouteContainer" type="VBoxContainer" parent="GUIContainer/CreateRoute/CreateRouteRect"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 40.0
-grow_horizontal = 2
-theme_override_constants/separation = 15
-
-[node name="RouteTitle" type="Label" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer"]
-layout_mode = 2
-text = "Create Route"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="RouteConnectionContainer" type="VBoxContainer" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer"]
-layout_mode = 2
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="RouteConnection" type="HBoxContainer" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteConnectionContainer"]
-layout_mode = 2
-theme_override_constants/separation = 25
-alignment = 1
-
-[node name="FromLabel" type="Label" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection"]
-layout_mode = 2
-text = "TEST"
-
-[node name="ConnectionTexture" type="TextureRect" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection"]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("5_5sr60")
-
-[node name="ToLabel" type="Label" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection"]
-layout_mode = 2
-text = "TEST2"
-
-[node name="RouteDistanceLabel" type="Label" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteConnectionContainer"]
-layout_mode = 2
-text = "122km"
-horizontal_alignment = 1
-
-[node name="RouteSurfaceOptions" type="OptionButton" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer"]
-layout_mode = 2
-mouse_filter = 1
-item_count = 2
-selected = 0
-popup/item_0/text = "Ground"
-popup/item_0/id = 1
-popup/item_1/text = "Water"
-popup/item_1/id = 2
-
-[node name="RouteCargoTitle" type="Label" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer"]
-layout_mode = 2
-text = "Route Cargo"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="RouteActions" type="HBoxContainer" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer"]
-layout_mode = 2
-theme_override_constants/separation = 25
-
-[node name="RouteConfirmBtn" type="Button" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteActions"]
-custom_minimum_size = Vector2(80, 20)
-layout_mode = 2
-mouse_filter = 1
-mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_ifyfw")
-text = "Confirm"
-
-[node name="RouteCancelBtn" type="Button" parent="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteActions"]
-custom_minimum_size = Vector2(80, 20)
-layout_mode = 2
-mouse_filter = 1
-mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_iwo44")
-text = "Cancel"
+gui = NodePath("../..")
 
 [connection signal="timeout" from="GUIContainer/TopRight/CamLabelTimer/CamLabel/CamLabelTimer" to="GUIContainer/TopRight/CamLabelTimer" method="_on_cam_label_timer_timeout"]
-[connection signal="close_menu" from="GUIContainer/CityMenu" to="GUIContainer/CityMenu" method="_on_close_menu"]
-[connection signal="open_create_route_ui" from="GUIContainer/CityMenu" to="GUIContainer/CreateRoute" method="_on_city_menu_open_create_route_ui"]
-[connection signal="button_down" from="GUIContainer/CityMenu/CityMenuRect/CityMenuContainer/CityHeader/BuildButtons/BuildRouteBtn" to="GUIContainer/CityMenu" method="_on_build_route_btn_button_down"]
-[connection signal="close_menu" from="GUIContainer/CreateRoute" to="GUIContainer/CreateRoute" method="_on_close_menu"]
-[connection signal="create_route" from="GUIContainer/CreateRoute" to="." method="_on_create_route_create_route"]
-[connection signal="item_selected" from="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteSurfaceOptions" to="GUIContainer/CreateRoute" method="_on_route_surface_options_item_selected"]
-[connection signal="button_down" from="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteActions/RouteConfirmBtn" to="GUIContainer/CreateRoute" method="_on_route_confirm_btn_button_down"]
-[connection signal="button_down" from="GUIContainer/CreateRoute/CreateRouteRect/CreateRouteContainer/RouteActions/RouteCancelBtn" to="GUIContainer/CreateRoute" method="_on_route_cancel_btn_button_down"]
+[connection signal="open_create_route_ui" from="GUIContainer/CityMenu" to="GUIContainer/CreateRouteMenu" method="_on_city_menu_open_create_route_ui"]
+[connection signal="create_route" from="GUIContainer/CreateRouteMenu" to="." method="_on_create_route_menu_create_route"]

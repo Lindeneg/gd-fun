@@ -18,7 +18,7 @@ const _resource_ui_scene = preload("res://gui/resource_ui.tscn");
 @export var player: Player;
 
 @onready var city_menu: CityMenu = $GUIContainer/CityMenu;
-@onready var create_route_ui: CreateRoute = $GUIContainer/CreateRoute;
+@onready var create_route_ui: CreateRoute = $GUIContainer/CreateRouteMenu;
 @onready var container: CanvasLayer = $GUIContainer;
 var is_creating_route: bool = false;
 
@@ -112,9 +112,6 @@ func remove_node_children(node: Node) -> void:
 		node.remove_child(child);
 		child.free();
 
-func _on_create_route_create_route(ctx: Dictionary) -> void:
-	emit_signal("create_route", ctx);
-
 func _on_resource_manager_resource_clicked(resource_name: StringName) -> void:
 	if is_creating_route:
 		create_route_ui.set_to(resource_manager.get_resource(resource_name));
@@ -123,3 +120,7 @@ func _on_city_manager_city_clicked(city_name: StringName) -> void:
 	if !city_manager:
 		return;
 	city_menu.open_menu(city_manager.get_city(city_name));
+
+
+func _on_create_route_menu_create_route(ctx: Dictionary) -> void:
+		emit_signal("create_route", ctx);

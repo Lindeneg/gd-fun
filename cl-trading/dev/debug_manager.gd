@@ -12,7 +12,7 @@ class_name DebugManager extends Node2D
 	get:
 		return debug_mode;
 	set(value):
-		if value and !Engine.is_editor_hint() and !has_build_graph:
+		if value and !Engine.is_editor_hint() and !has_build_graph and tile_manager:
 			tile_manager.set_rebuild_debug_graph(true);
 			has_build_graph = true;
 		debug_mode = value;

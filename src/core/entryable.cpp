@@ -14,8 +14,11 @@
 const char *godot::CL::Entryable::SButtonClicked{"btn_clicked"};
 const char *godot::CL::Entryable::SButtonStateChanged{"btn_state_changed"};
 
-godot::CL::Entryable::Entryable()
-    : tile_size_(Vector2i(0, 0)),
+godot::CL::Entryable::Entryable() : Entryable(ENTRYABLE_CITY) {}
+
+godot::CL::Entryable::Entryable(EntryableKind kind)
+    : entryable_kind_(kind),
+      tile_size_(Vector2i(0, 0)),
       col_shape_(nullptr),
       onshore_entries_(Array()),
       offshore_entries_(Array()) {}
@@ -80,6 +83,7 @@ godot::Dictionary godot::CL::Entryable::get_entry_tile(
 
 void godot::CL::Entryable::_bind_methods() {
     // BIND METHODS
+    ClassDB::bind_method(D_METHOD("get_kind"), &Entryable::get_kind);
     ClassDB::bind_method(D_METHOD("get_onshore_entries"),
                          &Entryable::get_onshore_entries);
     ClassDB::bind_method(D_METHOD("get_offshore_entries"),
@@ -94,4 +98,7 @@ void godot::CL::Entryable::_bind_methods() {
     // BIND ENUMS
     BIND_ENUM_CONSTANT(TILE_ENTRY_ONSHORE);
     BIND_ENUM_CONSTANT(TILE_ENTRY_OFFSHORE);
+
+    BIND_ENUM_CONSTANT(ENTRYABLE_CITY);
+    BIND_ENUM_CONSTANT(ENTRYABLE_RESOURCE);
 }

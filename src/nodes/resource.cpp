@@ -10,7 +10,7 @@
 const char *godot::CL::ResourceTile::SAmountChanged{"amount_changed"};
 
 godot::CL::ResourceTile::ResourceTile()
-    : Entryable(),
+    : Entryable(ENTRYABLE_RESOURCE),
       resource_kind_(RESOURCE_PASSENGER),
       capacity_amount_(0),
       current_amount_(0) {}

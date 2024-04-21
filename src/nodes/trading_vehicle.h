@@ -4,12 +4,14 @@
 #include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/core/memory.hpp>
+#include <godot_cpp/templates/vector.hpp>
 
 #include "../core/utils.h"
 
 namespace godot {
 class AnimatedSprite2D;
 class CollisionShape2D;
+class PackedScene;
 }  // namespace godot
 
 namespace godot::CL {
@@ -50,9 +52,6 @@ class TradingVehicle : public Area2D {
    private:
     static const char *AnimationNames[];
     static const int32_t AnimationSize;
-    // TODO (1) int cargo_space_;
-    // TODO (1) int maintenance_cost_;
-    // TODO (1) Node* cargo_container_;
 
     // are we going from
     // cityX->cityY or cityY->cityX
@@ -65,6 +64,9 @@ class TradingVehicle : public Area2D {
     VehicleTier tier_;
     // speed multiplier
     double speed_;
+    int cost_;
+    int upkeep_;
+    int cargo_space_;
     // stops movement if distance
     // to nav target is within threshold
     double destination_threshold_;
@@ -117,6 +119,9 @@ class TradingVehicle : public Area2D {
         return destination_threshold_;
     }
     inline double get_speed() const { return speed_; }
+    inline int get_cost() const { return cost_; }
+    inline int get_upkeep() const { return upkeep_; }
+    inline int get_cargo_space() const { return cargo_space_; }
     inline VehicleState get_state() const { return state_; }
     inline VehicleMoveDir get_move_dir() const { return move_dir_; }
     inline VehicleTier get_tier() const { return tier_; }
@@ -136,6 +141,9 @@ class TradingVehicle : public Area2D {
     }
     inline void set_tier(const VehicleTier t) { tier_ = t; }
     inline void set_speed(const double s) { speed_ = s; }
+    inline void set_cost(const int c) { cost_ = c; }
+    inline void set_upkeep(const int u) { upkeep_ = u; }
+    inline void set_cargo_space(const int c) { cargo_space_ = c; }
     inline void set_tile_surface(const TileSurface s) { tile_surface_ = s; }
 };
 }  // namespace godot::CL

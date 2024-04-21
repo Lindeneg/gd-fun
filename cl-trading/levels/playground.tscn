@@ -121,7 +121,7 @@ position = Vector2(1216, 1056)
 script = ExtResource("8_k7mje")
 
 [node name="PlayerLars" type="Player" parent="PlayerManager"]
-start_city = &"Garland"
+start_city = &"Coltrane"
 
 [node name="CameraManager" parent="PlayerManager/PlayerLars" node_paths=PackedStringArray("tile_manager") instance=ExtResource("1_rr1md")]
 z_index = 4000
@@ -142,7 +142,6 @@ player = NodePath("../..")
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 z_index = 4096
-show_tiles = true
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]

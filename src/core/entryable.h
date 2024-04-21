@@ -8,11 +8,13 @@
 
 namespace godot::CL {
 
+enum EntryableKind { ENTRYABLE_CITY, ENTRYABLE_RESOURCE };
 enum TileEntryType { TILE_ENTRY_ONSHORE = 1, TILE_ENTRY_OFFSHORE = 2 };
 
 class Entryable : public Area2D {
     GDCLASS(Entryable, Area2D)
    private:
+    EntryableKind entryable_kind_;
     Vector2i tile_size_;
     CollisionShape2D *col_shape_;
     Array onshore_entries_;
@@ -28,6 +30,7 @@ class Entryable : public Area2D {
 
    public:
     Entryable();
+    Entryable(EntryableKind kind);
     ~Entryable();
 
     const static char *SButtonClicked;
@@ -40,6 +43,7 @@ class Entryable : public Area2D {
     inline Vector2i get_tile_size() const { return tile_size_; }
     inline Array get_onshore_entries() const { return onshore_entries_; }
     inline Array get_offshore_entries() const { return offshore_entries_; }
+    inline EntryableKind get_kind() const { return entryable_kind_; }
 
     inline bool get_button_enabled() const { return button_enabled_; }
     inline void set_button_enabled(const bool e) {
@@ -50,5 +54,6 @@ class Entryable : public Area2D {
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::TileEntryType);
+VARIANT_ENUM_CAST(godot::CL::EntryableKind);
 
 #endif  // CL_TRADING_ENTRYABLE_H_

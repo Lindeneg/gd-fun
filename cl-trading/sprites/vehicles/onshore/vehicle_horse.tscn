@@ -142,8 +142,10 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7s74f"]
 resource_local_to_scene = true
 
-[node name="VehicleHorse" type="TradingVehicle"]
-tier = 65793
+[node name="Horse" type="TradingVehicle"]
+cost = 100
+upkeep = 4
+cargo_space = 4
 speed = 50.0
 destination_threshold = 1.0
 z_index = 7

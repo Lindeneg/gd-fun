@@ -14,13 +14,6 @@ class PackedVector2Array;
 
 namespace godot::CL {
 
-// DEPRECATED - do not use!!!
-// enum TileMat {
-//    TILE_MAT_NONE,
-//    TILE_MAT_GROUND,
-//    TILE_MAT_WATER,
-//    TILE_MAT_OBSTACLE
-//};
 
 // tile layers
 enum TileLayer {

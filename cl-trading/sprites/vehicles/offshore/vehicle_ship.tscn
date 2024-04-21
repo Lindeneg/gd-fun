@@ -57,9 +57,12 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2ma0s"]
 resource_local_to_scene = true
 
-[node name="VehicleShip" type="TradingVehicle"]
+[node name="Ship" type="TradingVehicle"]
 vehicle_surface = 2
-tier = 2
+tier = 0
+cost = 50
+upkeep = 2
+cargo_space = 5
 speed = 25.0
 destination_threshold = 2.0
 z_index = 5

@@ -2,13 +2,15 @@ class_name CityMenu extends Menu
 
 signal open_create_route_ui(from: City);
 
-@onready var gui: GUI = $"../..";
 @onready var city_label: RichTextLabel = $CityMenuRect/CityMenuContainer/CityHeader/CityLabel;
 @onready var menu_supply: GridContainer = $CityMenuRect/CityMenuContainer/SupplyContainer/CitySupply;
 @onready var menu_demand: GridContainer = $CityMenuRect/CityMenuContainer/DemandContainer/CityDemand;
 @onready var menu_industry: GridContainer = $CityMenuRect/CityMenuContainer/IndustriesContainer/CityIndustry;
 @onready var route_btn: Button = $CityMenuRect/CityMenuContainer/CityHeader/BuildButtons/BuildRouteBtn;
 @onready var industry_btn: Button = $CityMenuRect/CityMenuContainer/CityHeader/BuildButtons/BuildIndustryBtn;
+@onready var industry_header: Label = $CityMenuRect/CityMenuContainer/IndustriesContainer/IndustriesHeader;
+
+@export var gui: GUI;
 
 var _city: City = null;
 
@@ -42,10 +44,14 @@ func open_menu(city: City) -> void:
 		gui.create_supply_item(supply.resource_kind, supply.amount, menu_supply);
 	for demand in _city.demands:
 		gui.create_demand_item(demand.resource_kind, menu_demand);
-	for industry in _city.industries:
-		gui.create_supply_item(industry.out, industry.amount, menu_supply);
-		gui.create_demand_item(industry.in, menu_demand);
-		gui.create_industry_item(industry, menu_industry);
+	if _city.industries.size() > 0:
+		industry_header.visible = true;
+		for industry in _city.industries:
+			gui.create_supply_item(industry.out, industry.amount, menu_supply);
+			gui.create_demand_item(industry.in, menu_demand);
+			gui.create_industry_item(industry, menu_industry);
+	else:
+		industry_header.visible = false;
 
 func close_menu_unlocked() -> void:
 	if !visible:

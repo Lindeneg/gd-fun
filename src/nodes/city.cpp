@@ -12,7 +12,7 @@ const char *godot::CL::City::SDemandsChanged{"demands_changed"};
 const char *godot::CL::City::SIndustriesChanged{"industries_changed"};
 
 godot::CL::City::City()
-    : Entryable(),
+    : Entryable(ENTRYABLE_CITY),
       size_(CITY_SIZE_VILLAGE),
       supplies_(TypedArray<CityResource>{}),
       demands_(TypedArray<CityResource>{}),
