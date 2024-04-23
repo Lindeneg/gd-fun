@@ -7,6 +7,7 @@
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 
+#include "../core/entryable.h"
 #include "../core/utils.h"
 
 namespace godot::CL {
@@ -14,7 +15,6 @@ namespace godot::CL {
 class TradingVehicle;
 
 enum RouteState { ROUTE_INACTIVE, ROUTE_ACTIVE };
-enum RouteKind { ROUTE_CITY_CITY, ROUTE_CITY_RESOURCE };
 
 /* Route connects two Cities via TradingVehicle to trade ressources.
  *
@@ -29,7 +29,7 @@ class Route : public Node {
 
    private:
     bool initial_start_;
-    RouteKind kind_;
+    EntryableKind kind_;
     StringName player_;
     // packed array of current route
     TypedArray<Vector2> current_route_;
@@ -91,7 +91,7 @@ class Route : public Node {
     inline StringName get_start() const { return start_; }
     inline StringName get_end() const { return end_; }
     inline TileSurface get_type() const { return type_; }
-    inline RouteKind get_kind() const { return kind_; }
+    inline EntryableKind get_kind() const { return kind_; }
 
     inline void set_current_route(const TypedArray<Vector2> path) {
         current_route_ = path;
@@ -100,13 +100,12 @@ class Route : public Node {
     inline void set_start(const StringName name) { start_ = name; }
     inline void set_end(const StringName name) { end_ = name; }
     inline void set_type(const TileSurface t) { type_ = t; }
-    inline void set_kind(const int k) { kind_ = static_cast<RouteKind>(k); }
+    inline void set_kind(const int k) { kind_ = static_cast<EntryableKind>(k); }
 
     void set_vehicle(TradingVehicle *vehicle);
 };
 }  // namespace godot::CL
 
 VARIANT_ENUM_CAST(godot::CL::RouteState);
-VARIANT_ENUM_CAST(godot::CL::RouteKind);
 
 #endif  // CL_TRADING_ROUTE_H_

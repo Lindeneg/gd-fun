@@ -98,6 +98,7 @@ layout_mode = 2
 text = "Vehicle"
 horizontal_alignment = 1
 vertical_alignment = 1
+uppercase = true
 
 [node name="RouteSurfaceOptions" type="OptionButton" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer"]
 layout_mode = 2
@@ -154,11 +155,17 @@ text = "15"
 layout_mode = 2
 text = "15"
 
-[node name="RouteCargoTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer"]
+[node name="CargoContainer" type="VBoxContainer" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2
-text = "Route Cargo"
+
+[node name="RouteCargoTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
+layout_mode = 2
+text = "CARGO"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ResourceContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
+layout_mode = 2
 
 [node name="RouteActions" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2

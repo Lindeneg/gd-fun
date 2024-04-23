@@ -272,6 +272,7 @@ void godot::CL::TradingVehicle::_bind_methods() {
                           PropertyInfo(Variant::INT, "upkeep"), "set_upkeep",
                           "get_upkeep");
     ClassDB::add_property("TradingVehicle",
+
                           PropertyInfo(Variant::INT, "cargo_space"),
                           "set_cargo_space", "get_cargo_space");
 

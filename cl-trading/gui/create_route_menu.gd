@@ -11,6 +11,7 @@ signal create_route(ctx: Dictionary);
 @onready var cost_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/CostValue;
 @onready var upkeep_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/UpkeepValue;
 @onready var space_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SpaceValue;
+@onready var resource_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/ResourceContainer;
 
 @export var gui: GUI;
 
@@ -67,6 +68,15 @@ func open_menu() -> void:
 	elif offshore_idx > -1:
 		route_surface_opts.select(offshore_idx);
 		_set_path_from_idx(offshore_idx);
+
+
+	gui.remove_node_children(resource_container);
+	if _entryable_kind == Entryable.ENTRYABLE_CITY:
+		gui.create_supply_item(0, 1, resource_container);
+		pass
+	else:
+		# TODO set city-resource cargo UI
+		pass
 
 	gui.city_manager.lock_all_buttons();
 	gui.resource_manager.lock_all_buttons();
@@ -125,7 +135,7 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["from"] = _from.name;
 	dict["to"] = _to.name;
 	dict["path"] = _chosen_path;
-	dict["type"] = Route.ROUTE_CITY_CITY;
+	dict["type"] = _entryable_kind;
 	dict["surface"] = vehicle.surface;
 	dict["vehicle"] = vehicle.scene;
 	stop_create();

@@ -9,7 +9,7 @@
 
 godot::CL::Route::Route()
     : initial_start_(true),
-      kind_(ROUTE_CITY_CITY),
+      kind_(ENTRYABLE_CITY),
       player_(""),
       current_route_(TypedArray<Vector2>()),
       type_(TILE_SURFACE_NONE),
@@ -180,7 +180,4 @@ void godot::CL::Route::_bind_methods() {
     // BIND ENUMS
     BIND_ENUM_CONSTANT(ROUTE_INACTIVE);
     BIND_ENUM_CONSTANT(ROUTE_ACTIVE);
-
-    BIND_ENUM_CONSTANT(ROUTE_CITY_CITY);
-    BIND_ENUM_CONSTANT(ROUTE_CITY_RESOURCE);
 }
