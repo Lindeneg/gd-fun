@@ -9,29 +9,27 @@ signal create_route(ctx: Dictionary);
 @onready var cost_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/CostValue;
 @onready var upkeep_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/UpkeepValue;
 @onready var space_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SpaceValue;
+@onready var cargo_container: VBoxContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer;
 @onready var supply_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources/SupplyContainer;
 @onready var demand_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources/DemandContainer;
 @onready var route_connection: RouteConnection = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection;
-@onready var cargo_container: RouteConnection = $CreateRouteRect/CreateRouteContainer/CargoContainer/CargoConnection;
 @onready var chosen_cargo_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CurrentCargo;
 @onready var cargo_title: Label = $CreateRouteRect/CreateRouteContainer/CargoTitle;
 @export var gui: GUI;
 
-var route_connection_scene = preload("res://gui/route_connection.tscn");
-
 var _from: City = null;
 var _to: Dictionary = {};
-var _direction = cargo_container.ArrowDirection.Right;
+var _direction = TradingVehicle.VEHICLE_MOVE_DIR_AB;
 var _entryable_kind = Entryable.ENTRYABLE_CITY;
 var _destinations: Array = [];
 var _chosen_path: Array = [];
 var _chosen_cargo: Dictionary = {
-	cargo_container.ArrowDirection.Right: {
+	TradingVehicle.VEHICLE_MOVE_DIR_AB: {
 		"total_space": 0,
 		"used_space": 0,
 		"cargo": []
 	},
-	cargo_container.ArrowDirection.Left: {
+	TradingVehicle.VEHICLE_MOVE_DIR_BA: {
 		"total_space": 0,
 		"used_space": 0,
 		"cargo": []
@@ -66,14 +64,18 @@ func open_menu() -> void:
 
 	route_connection.from_label.text = _from.name;
 	route_connection.to_label.text = _to.name;
-	_direction = cargo_container.ArrowDirection.Right;
+	_direction = TradingVehicle.VEHICLE_MOVE_DIR_AB;
 
 	preselect_vehicle();
 	if _entryable_kind == Entryable.ENTRYABLE_CITY:
+		cargo_container.visible = true;
+		cargo_title.visible = true;
+		chosen_cargo_container.visible = true;
 		update_city_city_cargo_view();
 	else:
-		# show city->resource UI
-		pass
+		cargo_container.visible = false;
+		cargo_title.visible = false;
+		chosen_cargo_container.visible = false;
 
 	gui.city_manager.lock_all_buttons();
 	gui.resource_manager.lock_all_buttons();
@@ -130,15 +132,14 @@ func update_city_city_cargo_view() -> void:
 
 	update_current_cargo_view();
 
-	cargo_container.direction = _direction;
 	var a = _from;
 	var b = _to;
-	if _direction == cargo_container.ArrowDirection.Left:
+	if _direction == TradingVehicle.VEHICLE_MOVE_DIR_BA:
 		a = _to;
 		b = _from;
 
-	cargo_container.from_label.text = a.name + " SUPPLY";
-	cargo_container.to_label.text = b.name + " DEMAND";
+	#cargo_container.from_label.text = a.name + " SUPPLY";
+	#cargo_container.to_label.text = b.name + " DEMAND";
 	var from_city: City = a if is_instance_of(a, City) else gui.city_manager.get_city(a.name);
 	var to_city: City = b if is_instance_of(b, City) else gui.city_manager.get_city(b.name);
 	for s in from_city.supplies:
@@ -194,12 +195,12 @@ func _set_path_from_id(vehicle_id: int) -> void:
 	space_value.text = "%d" % vehicle.cargo_space;
 
 	var total_space = vehicle.cargo_space;
-	_chosen_cargo[cargo_container.ArrowDirection.Right]["total_space"] = total_space;
-	_chosen_cargo[cargo_container.ArrowDirection.Right]["used_space"] = 0;
-	_chosen_cargo[cargo_container.ArrowDirection.Right]["cargo"] = [];
-	_chosen_cargo[cargo_container.ArrowDirection.Left]["total_space"] = total_space;
-	_chosen_cargo[cargo_container.ArrowDirection.Left]["used_space"] = 0;
-	_chosen_cargo[cargo_container.ArrowDirection.Left]["cargo"] = [];
+	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB]["total_space"] = total_space;
+	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB]["used_space"] = 0;
+	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB]["cargo"] = [];
+	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA]["total_space"] = total_space;
+	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA]["used_space"] = 0;
+	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA]["cargo"] = [];
 	update_cargo_title();
 	update_current_cargo_view();
 
@@ -236,3 +237,13 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["vehicle"] = vehicle.scene;
 	stop_create();
 	emit_signal("create_route", dict);
+
+
+func _on_switch_btn_button_down() -> void:
+	if _direction == TradingVehicle.VEHICLE_MOVE_DIR_AB:
+		_direction = TradingVehicle.VEHICLE_MOVE_DIR_BA;
+	else:
+		_direction = TradingVehicle.VEHICLE_MOVE_DIR_AB;
+	update_city_city_cargo_view();
+	update_cargo_title();
+	update_current_cargo_view();
