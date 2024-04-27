@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://c83ingpvbre02"]
 
 [ext_resource type="Script" path="res://gui/create_route_menu.gd" id="1_yswjq"]
-[ext_resource type="Texture2D" uid="uid://clnehws11k21h" path="res://assets/Icons/connection.png" id="2_2ur75"]
+[ext_resource type="PackedScene" uid="uid://cvxod7qku6d18" path="res://gui/route_connection.tscn" id="2_77pvt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ifyfw"]
 bg_color = Color(0, 0.419608, 0.227451, 1)
@@ -66,23 +66,8 @@ layout_mode = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="RouteConnection" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer/RouteConnectionContainer"]
+[node name="RouteConnection" parent="CreateRouteRect/CreateRouteContainer/RouteConnectionContainer" instance=ExtResource("2_77pvt")]
 layout_mode = 2
-theme_override_constants/separation = 25
-alignment = 1
-
-[node name="FromLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection"]
-layout_mode = 2
-text = "TEST"
-
-[node name="ConnectionTexture" type="TextureRect" parent="CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection"]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("2_2ur75")
-
-[node name="ToLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection"]
-layout_mode = 2
-text = "TEST2"
 
 [node name="RouteDistanceLabel" type="Label" parent="CreateRouteRect/CreateRouteContainer/RouteConnectionContainer"]
 layout_mode = 2
@@ -95,7 +80,7 @@ theme_override_constants/separation = 10
 
 [node name="VehicleTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer/VehicleContainer"]
 layout_mode = 2
-text = "Vehicle"
+text = "SET Vehicle"
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
@@ -157,15 +142,42 @@ text = "15"
 
 [node name="CargoContainer" type="VBoxContainer" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2
+alignment = 1
 
-[node name="RouteCargoTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
+[node name="RouteTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
 layout_mode = 2
-text = "CARGO"
+text = "SET CARGO"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ResourceContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
+[node name="CargoConnection" parent="CreateRouteRect/CreateRouteContainer/CargoContainer" instance=ExtResource("2_77pvt")]
 layout_mode = 2
+direction = 0
+
+[node name="RouteResources" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="SupplyContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+columns = 4
+
+[node name="DemandContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+columns = 4
+
+[node name="CargoTitle" type="Label" parent="CreateRouteRect/CreateRouteContainer"]
+layout_mode = 2
+text = "CURRENT CARGO"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CurrentCargo" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer"]
+layout_mode = 2
+columns = 10
 
 [node name="RouteActions" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer"]
 layout_mode = 2
@@ -178,7 +190,7 @@ layout_mode = 2
 mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_ifyfw")
-text = "Confirm"
+text = "Build"
 
 [node name="RouteCancelBtn" type="Button" parent="CreateRouteRect/CreateRouteContainer/RouteActions"]
 custom_minimum_size = Vector2(80, 20)

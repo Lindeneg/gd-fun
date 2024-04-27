@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvxod7qku6d18"]
+
+[ext_resource type="Texture2D" uid="uid://clnehws11k21h" path="res://assets/Icons/connection.png" id="1_i5l16"]
+[ext_resource type="Script" path="res://gui/route_connection.gd" id="1_pyyb6"]
+
+[node name="RouteConnection" type="HBoxContainer"]
+theme_override_constants/separation = 25
+alignment = 1
+script = ExtResource("1_pyyb6")
+
+[node name="FromLabel" type="Label" parent="."]
+layout_mode = 2
+text = "FOO"
+
+[node name="ConnectionTexture" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("1_i5l16")
+
+[node name="ToLabel" type="Label" parent="."]
+layout_mode = 2
+text = "BAR"

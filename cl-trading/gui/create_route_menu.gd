@@ -2,8 +2,6 @@ class_name CreateRoute extends Menu
 
 signal create_route(ctx: Dictionary);
 
-@onready var from_label: Label = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection/FromLabel;
-@onready var to_label: Label = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection/ToLabel;
 @onready var route_distance_label: Label = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteDistanceLabel;
 @onready var route_surface_opts: OptionButton = $CreateRouteRect/CreateRouteContainer/VehicleContainer/RouteSurfaceOptions;
 @onready var surface_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SurfaceValue;
@@ -11,9 +9,14 @@ signal create_route(ctx: Dictionary);
 @onready var cost_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/CostValue;
 @onready var upkeep_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/UpkeepValue;
 @onready var space_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SpaceValue;
-@onready var resource_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/ResourceContainer;
-
+@onready var supply_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources/SupplyContainer;
+@onready var demand_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources/DemandContainer;
+@onready var route_connection: RouteConnection = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection;
+@onready var cargo_connection: RouteConnection = $CreateRouteRect/CreateRouteContainer/CargoContainer/CargoConnection;
+@onready var current_cargo: GridContainer = $CreateRouteRect/CreateRouteContainer/CurrentCargo;
 @export var gui: GUI;
+
+var route_connection_scene = preload("res://gui/route_connection.tscn");
 
 var _from: City = null;
 var _to: Dictionary = {};
@@ -27,6 +30,9 @@ func _ready() -> void:
 	vehicles = gui.route_manager.vehicles;
 	for i in range(vehicles.size()):
 		route_surface_opts.add_item(vehicles[i].name, i);
+
+func selected_vehicle():
+	return vehicles[route_surface_opts.get_item_id(route_surface_opts.selected)];
 
 func set_to(to: Entryable) -> void:
 	var destination = null;
@@ -44,8 +50,8 @@ func open_menu() -> void:
 		return;
 	visible = true;
 
-	from_label.text = _from.name;
-	to_label.text = _to.name;
+	route_connection.from_label.text = _from.name;
+	route_connection.to_label.text = _to.name;
 
 	var has_onshore = _to["onshores"].size() > 0;
 	var has_offshore = _to["offshores"].size() > 0;
@@ -69,14 +75,28 @@ func open_menu() -> void:
 		route_surface_opts.select(offshore_idx);
 		_set_path_from_idx(offshore_idx);
 
-
-	gui.remove_node_children(resource_container);
+	cargo_connection.direction = cargo_connection.ArrowDirection.Right;
+	cargo_connection.from_label.text = _from.name + " SUPPLY";
+	cargo_connection.to_label.text = _to.name + " DEMAND";
+	gui.remove_node_children(supply_container);
+	gui.remove_node_children(demand_container);
 	if _entryable_kind == Entryable.ENTRYABLE_CITY:
-		gui.create_supply_item(0, 1, resource_container);
-		pass
+		var to_city: City = gui.city_manager.get_city(_to.name);
+		for s in _from.supplies:
+			gui.create_route_supply_item(s.resource_kind, supply_container, _on_route_supply_click.bind(s), true);
+		for s in _from.industries:
+			gui.create_route_supply_item(s.out, supply_container, _on_route_supply_click.bind(s), true);
+		for s in to_city.demands:
+			gui.create_demand_item(s.resource_kind, demand_container);
+		for s in to_city.industries:
+			gui.create_demand_item(s.in, demand_container);
 	else:
 		# TODO set city-resource cargo UI
 		pass
+
+	var v = selected_vehicle();
+	for i in range(v.cargo_space):
+		gui.create_route_supply_item(-1, current_cargo, _on_route_cargo_click.bind(i));
 
 	gui.city_manager.lock_all_buttons();
 	gui.resource_manager.lock_all_buttons();
@@ -92,6 +112,12 @@ func stop_create() -> void:
 	gui.city_manager.unlock_all_buttons();
 	gui.resource_manager.lock_all_buttons();
 	gui.camera_manager.unlock_cam();
+
+func _on_route_supply_click(entry):
+	print("SUPPLY CLICKED: ", entry);
+
+func _on_route_cargo_click(index):
+	print("CARGO CLICKED: ", index);
 
 func _set_path_from_idx(idx: int) -> void:
 	return _set_path_from_id(route_surface_opts.get_item_id(idx));
@@ -130,7 +156,7 @@ func _on_route_cancel_btn_button_down() -> void:
 
 func _on_route_confirm_btn_button_down() -> void:
 	var dict = {};
-	var vehicle = vehicles[route_surface_opts.get_item_id(route_surface_opts.selected)];
+	var vehicle = selected_vehicle();
 	dict["player"] = gui.player;
 	dict["from"] = _from.name;
 	dict["to"] = _to.name;

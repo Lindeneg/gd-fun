@@ -72,6 +72,30 @@ func create_supply_item(resource_kind: int, amount: int, node: Node) -> void:
 	supply_item.add_child(supply_texture);
 	node.add_child(supply_item);
 
+func create_route_supply_item(resource_kind: int, node: Node, cb: Callable, with_weight: bool = false) -> void:
+	var supply_item = ReferenceRect.new();
+	var supply_btn = TextureButton.new();
+
+	if resource_kind > -1:
+		var resource = resources.get_resource(resource_kind);
+		supply_btn.texture_normal = resources.get_resource_icon(resource_kind);
+		supply_item.name = resource.name;
+		if with_weight:
+			supply_item.tooltip_text = "WEIGHT: %d" % resource.weight;
+
+	supply_btn.stretch_mode = TextureButton.STRETCH_SCALE;
+	supply_btn.custom_minimum_size = Vector2(32, 32);
+	supply_btn.mouse_filter = Control.MOUSE_FILTER_PASS;
+	supply_btn.connect("button_down", cb);
+
+	supply_item.editor_only = false;
+	supply_item.mouse_filter = Control.MOUSE_FILTER_PASS;
+	supply_item.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;
+	supply_item.custom_minimum_size = Vector2(32, 32);
+	supply_item.border_color = Color.DARK_GREEN;
+	supply_item.add_child(supply_btn);
+	node.add_child(supply_item);
+
 func create_demand_item(resource_kind: int, node: Node) -> void:
 	var demand_item = VBoxContainer.new();
 	var demand_texture = create_texture(resources.get_resource_icon(resource_kind));
