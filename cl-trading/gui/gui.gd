@@ -72,16 +72,17 @@ func create_supply_item(resource_kind: int, amount: int, node: Node) -> void:
 	supply_item.add_child(supply_texture);
 	node.add_child(supply_item);
 
-func create_route_supply_item(resource_kind: int, node: Node, cb: Callable, with_weight: bool = false) -> void:
+func create_route_supply_item(resource_kind: int, node: Node, cb: Callable, color: Color = Color.DARK_GREEN) -> int:
 	var supply_item = ReferenceRect.new();
 	var supply_btn = TextureButton.new();
+	var resource_size = 1;
 
 	if resource_kind > -1:
 		var resource = resources.get_resource(resource_kind);
 		supply_btn.texture_normal = resources.get_resource_icon(resource_kind);
 		supply_item.name = resource.name;
-		if with_weight:
-			supply_item.tooltip_text = "WEIGHT: %d" % resource.weight;
+		supply_item.tooltip_text = "Weight: %d" % resource.weight;
+		resource_size = resource.weight;
 
 	supply_btn.stretch_mode = TextureButton.STRETCH_SCALE;
 	supply_btn.custom_minimum_size = Vector2(32, 32);
@@ -92,9 +93,10 @@ func create_route_supply_item(resource_kind: int, node: Node, cb: Callable, with
 	supply_item.mouse_filter = Control.MOUSE_FILTER_PASS;
 	supply_item.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;
 	supply_item.custom_minimum_size = Vector2(32, 32);
-	supply_item.border_color = Color.DARK_GREEN;
+	supply_item.border_color = color;
 	supply_item.add_child(supply_btn);
 	node.add_child(supply_item);
+	return resource_size;
 
 func create_demand_item(resource_kind: int, node: Node) -> void:
 	var demand_item = VBoxContainer.new();
@@ -134,7 +136,7 @@ func remove_node_children(node: Node) -> void:
 	var children = node.get_children();
 	for child in children:
 		node.remove_child(child);
-		child.free();
+		child.queue_free();
 
 func _on_resource_manager_resource_clicked(resource_name: StringName) -> void:
 	if is_creating_route:
