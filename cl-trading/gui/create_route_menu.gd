@@ -10,11 +10,13 @@ signal create_route(ctx: Dictionary);
 @onready var upkeep_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/UpkeepValue;
 @onready var space_value: Label = $CreateRouteRect/CreateRouteContainer/VehicleContainer/VehicleCtx/SpaceValue;
 @onready var cargo_container: VBoxContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer;
-@onready var supply_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources/SupplyContainer;
-@onready var demand_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources/DemandContainer;
+@onready var supply_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/SupplySelection/SupplyContainer;
+@onready var demand_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/DemandSelection/DemandContainer;
 @onready var route_connection: RouteConnection = $CreateRouteRect/CreateRouteContainer/RouteConnectionContainer/RouteConnection;
 @onready var chosen_cargo_container: GridContainer = $CreateRouteRect/CreateRouteContainer/CurrentCargo;
 @onready var cargo_title: Label = $CreateRouteRect/CreateRouteContainer/CargoTitle;
+@onready var from_label: Label = $CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/SupplySelection/Label;
+@onready var to_label: Label = $CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/DemandSelection/Label;
 @export var gui: GUI;
 
 var _from: City = null;
@@ -138,8 +140,8 @@ func update_city_city_cargo_view() -> void:
 		a = _to;
 		b = _from;
 
-	#cargo_container.from_label.text = a.name + " SUPPLY";
-	#cargo_container.to_label.text = b.name + " DEMAND";
+	from_label.text = a.name + " (supply)";
+	to_label.text = b.name + " (demand)";
 	var from_city: City = a if is_instance_of(a, City) else gui.city_manager.get_city(a.name);
 	var to_city: City = b if is_instance_of(b, City) else gui.city_manager.get_city(b.name);
 	for s in from_city.supplies:
@@ -237,7 +239,6 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["vehicle"] = vehicle.scene;
 	stop_create();
 	emit_signal("create_route", dict);
-
 
 func _on_switch_btn_button_down() -> void:
 	if _direction == TradingVehicle.VEHICLE_MOVE_DIR_AB:

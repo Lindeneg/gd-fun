@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://c83ingpvbre02"]
+[gd_scene load_steps=6 format=3 uid="uid://c83ingpvbre02"]
 
 [ext_resource type="Script" path="res://gui/create_route_menu.gd" id="1_yswjq"]
 [ext_resource type="PackedScene" uid="uid://cvxod7qku6d18" path="res://gui/route_connection.tscn" id="2_77pvt"]
+[ext_resource type="Texture2D" uid="uid://cwnfdvarc5m6j" path="res://assets/Icons/right-arrow.png" id="3_4jhnk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ifyfw"]
 bg_color = Color(0, 0.419608, 0.227451, 1)
@@ -150,21 +151,42 @@ mouse_filter = 1
 mouse_default_cursor_shape = 2
 text = "SWITCH DIRECTION"
 
-[node name="CargoConnection" parent="CreateRouteRect/CreateRouteContainer/CargoContainer" instance=ExtResource("2_77pvt")]
+[node name="SelectionContainer" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
 layout_mode = 2
-direction = 0
-
-[node name="RouteResources" type="HBoxContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer"]
-layout_mode = 2
-theme_override_constants/separation = 50
+theme_override_constants/separation = 15
 alignment = 1
 
-[node name="SupplyContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources"]
+[node name="SupplySelection" type="VBoxContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/SupplySelection"]
+layout_mode = 2
+text = "FOO (supply)
+asdsad"
+horizontal_alignment = 1
+
+[node name="SupplyContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/SupplySelection"]
 layout_mode = 2
 theme_override_constants/h_separation = 5
 columns = 4
 
-[node name="DemandContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/RouteResources"]
+[node name="TextureRect" type="TextureRect" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer"]
+layout_mode = 2
+texture = ExtResource("3_4jhnk")
+expand_mode = 2
+
+[node name="DemandSelection" type="VBoxContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/DemandSelection"]
+layout_mode = 2
+text = "BAR (demand)
+asdsad"
+horizontal_alignment = 1
+
+[node name="DemandContainer" type="GridContainer" parent="CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/DemandSelection"]
 layout_mode = 2
 theme_override_constants/h_separation = 5
 columns = 4
