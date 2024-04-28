@@ -7,8 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://b1p2ffxrmj7xq" path="res://dev/debug_manager.tscn" id="4_olsel"]
 [ext_resource type="PackedScene" uid="uid://3w8ovvrrf6iy" path="res://sprites/resources/grain.tscn" id="4_t4uab"]
 [ext_resource type="PackedScene" uid="uid://bhfi0udcbb1dk" path="res://sprites/cities/city_water2.tscn" id="5_2dkme"]
-[ext_resource type="PackedScene" uid="uid://df4ax3qupqdh7" path="res://core/route-manager/route_manager.tscn" id="5_nbv6i"]
 [ext_resource type="PackedScene" uid="uid://btfn8crdxt066" path="res://sprites/cities/city_water.tscn" id="6_8ipfy"]
+[ext_resource type="Script" path="res://core/route-manager/route-manager.gd" id="7_lwuc8"]
 [ext_resource type="Script" path="res://core/player-manager/player_manager.gd" id="8_k7mje"]
 [ext_resource type="PackedScene" uid="uid://bh4owj8k1r3y0" path="res://gui/gui.tscn" id="8_wqw8b"]
 
@@ -115,7 +115,8 @@ position = Vector2(752, 624)
 [node name="TestCity" parent="CityManager" instance=ExtResource("6_8ipfy")]
 position = Vector2(1216, 1056)
 
-[node name="RouteManager" parent="." instance=ExtResource("5_nbv6i")]
+[node name="RouteManager" type="RouteManager" parent="."]
+script = ExtResource("7_lwuc8")
 
 [node name="PlayerManager" type="Node" parent="."]
 script = ExtResource("8_k7mje")

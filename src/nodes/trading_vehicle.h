@@ -95,7 +95,6 @@ class TradingVehicle : public Area2D {
     void r_assign_required_components_();
     // create sprite frames and set required animation names
     void initialize_sprite_frames_();
-    void switch_move_dir_();
 
    protected:
     static void _bind_methods();
@@ -111,6 +110,7 @@ class TradingVehicle : public Area2D {
 
     void start_navigating();
     void stop_navigating();
+    void switch_move_dir();
 
     inline void clear_map_path() { map_route_.clear(); }
     inline bool is_moving() const { return state_ == VEHICLE_MOVING; }
@@ -139,6 +139,7 @@ class TradingVehicle : public Area2D {
     inline void set_destination_threshold(const double t) {
         destination_threshold_ = t;
     }
+    inline void set_state(const VehicleState s) { state_ = s; }
     inline void set_tier(const VehicleTier t) { tier_ = t; }
     inline void set_speed(const double s) { speed_ = s; }
     inline void set_cost(const int c) { cost_ = c; }

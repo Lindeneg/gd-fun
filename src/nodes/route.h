@@ -9,10 +9,11 @@
 
 #include "../core/entryable.h"
 #include "../core/utils.h"
+#include "./city_resource.h"
+#include "./player.h"
+#include "./trading_vehicle.h"
 
 namespace godot::CL {
-
-class TradingVehicle;
 
 enum RouteState { ROUTE_INACTIVE, ROUTE_ACTIVE };
 
@@ -30,9 +31,10 @@ class Route : public Node {
    private:
     bool initial_start_;
     EntryableKind kind_;
-    StringName player_;
+    Player *player_;
     // packed array of current route
     TypedArray<Vector2> current_route_;
+    Dictionary cargo_;
     // intended tile surface
     TileSurface type_;
     // signal Callables
@@ -56,7 +58,7 @@ class Route : public Node {
     void handle_timeout_();
     // callback to handle vehicle
     // destination reached signal
-    void handle_destination_reached_(const Vector2 dest);
+    void handle_destination_reached_(const int direction);
     // checks if timer already in tree,
     // if so, assigns it to cooldown_timer_
     // else creates a new instance that is
@@ -76,15 +78,34 @@ class Route : public Node {
     void _ready() override;
     void _exit_tree() override;
 
-    bool start();
+    void start();
     void stop();
     void destroy();
 
-    inline StringName get_player() const { return player_; }
+    TypedArray<CityResource> get_current_cargo() const;
+    void add_to_current_cargo(const ResourceKind kind, const int amount);
+    void remove_from_current_cargo(const ResourceKind kind, const int amount);
+
+    inline Dictionary get_cargo() const { return cargo_; }
+    inline void set_cargo(const Dictionary c) { cargo_ = c; }
+
+    inline void set_timeout_duration(const int t) {
+        cooldown_timer_->set_wait_time(t);
+    }
+    inline void start_timer() { cooldown_timer_->start(); }
+    inline void stop_timer() { cooldown_timer_->stop(); }
+
+    inline Player *get_player() const { return player_; }
     inline int get_distance() const { return distance_; }
     inline int get_gold_cost() const { return gold_cost_; }
     inline TypedArray<Vector2> get_current_route() const {
         return current_route_;
+    }
+    inline StringName get_target_entryable() const {
+        if (vehicle_->get_move_dir() == VEHICLE_MOVE_DIR_AB) {
+            return end_;
+        }
+        return start_;
     }
     inline RouteState get_route_state() const { return state_; }
     inline TradingVehicle *get_vehicle() const { return vehicle_; }
@@ -96,7 +117,7 @@ class Route : public Node {
     inline void set_current_route(const TypedArray<Vector2> path) {
         current_route_ = path;
     }
-    inline void set_player(const StringName p) { player_ = p; }
+    inline void set_player(Player *p) { player_ = p; }
     inline void set_start(const StringName name) { start_ = name; }
     inline void set_end(const StringName name) { end_ = name; }
     inline void set_type(const TileSurface t) { type_ = t; }

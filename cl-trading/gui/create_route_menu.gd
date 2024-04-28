@@ -237,6 +237,7 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["type"] = _entryable_kind;
 	dict["surface"] = vehicle.surface;
 	dict["vehicle"] = vehicle.scene;
+	dict["cargo"] = _chosen_cargo;
 	stop_create();
 	emit_signal("create_route", dict);
 

@@ -1,7 +1,7 @@
 """
 RouteManager knows everything about how to create, update and delete Routes.
 """
-class_name RouteManager extends Node
+extends RouteManager
 
 const _vehicle_scenes = [
 	"res://sprites/vehicles/onshore/vehicle_horse.tscn",
@@ -27,22 +27,44 @@ func _init() -> void:
 		vehicles.append(ctx);
 		vehicle.free();
 
+func _increment_cargo_if_exists(cargo: Array, kind: int) -> bool:
+	for c in cargo:
+		if c.resource_kind == kind:
+			c.capacity += 1;
+			return true;
+	return false;
+
+func _update_cargo_dict(cargo: Array, kinds: Array) -> void:
+	for kind in kinds:
+		if (_increment_cargo_if_exists(cargo, kind)):
+			continue;
+		var r = CityResource.new();
+		r.resource_kind = kind;
+		r.capacity = 1;
+		r.amount = 0;
+		cargo.append(r);
+
 func _on_gui_create_route(ctx: Dictionary) -> void:
 	var vehicle = ctx["vehicle"].instantiate() as TradingVehicle;
 	if !vehicle:
 		return;
+
 	var route: Route = Route.new();
-	add_child(route);
-	route.set_player(ctx["player"].name);
+
+	route.set_player(ctx["player"]);
 	route.set_type(ctx["surface"]);
 	route.set_kind(ctx["type"]);
 	route.set_start(ctx["from"]);
 	route.set_end(ctx["to"]);
 	route.set_current_route(ctx["path"]);
 	route.set_vehicle(vehicle);
-	if !route.start():
-		remove_child(route);
-		route.free();
-		return;
-	ctx["player"].add_connection(ctx["to"]);
-	ctx["player"].add_connection(ctx["from"]);
+
+	var cargo = {
+		TradingVehicle.VEHICLE_MOVE_DIR_AB: [],
+		TradingVehicle.VEHICLE_MOVE_DIR_BA: [],
+	};
+	_update_cargo_dict(cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB], ctx["cargo"][TradingVehicle.VEHICLE_MOVE_DIR_AB]["cargo"]);
+	_update_cargo_dict(cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA], ctx["cargo"][TradingVehicle.VEHICLE_MOVE_DIR_BA]["cargo"]);
+	route.set_cargo(cargo);
+
+	add_route(route);

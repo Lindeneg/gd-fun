@@ -5,13 +5,14 @@
 #include <godot_cpp/core/error_macros.hpp>
 
 #include "../core/utils.h"
-#include "./trading_vehicle.h"
+#include "trading_vehicle.h"
 
 godot::CL::Route::Route()
     : initial_start_(true),
       kind_(ENTRYABLE_CITY),
-      player_(""),
+      player_(nullptr),
       current_route_(TypedArray<Vector2>()),
+      cargo_(Dictionary()),
       type_(TILE_SURFACE_NONE),
       // timeout for time bewteen destination
       // reached and resuming of route
@@ -35,7 +36,7 @@ void godot::CL::Route::destroy() {
 
     vehicle_ = nullptr;
     cooldown_timer_ = nullptr;
-    player_ = "";
+    player_ = nullptr;
     current_route_.clear();
     distance_ = 0;
     gold_cost_ = 0;
@@ -49,33 +50,30 @@ void godot::CL::Route::handle_timeout_() {
     if (Utils::is_in_editor()) {
         return;
     }
-    ERR_FAIL_NULL_MSG(vehicle_,
-                      vformat("timeout: vehicle is null on %s", get_name()));
-    vehicle_->start_navigating();
+    emit_signal("timeout", player_->get_name(), get_name());
 }
 
-void godot::CL::Route::handle_destination_reached_(const Vector2 dest) {
+void godot::CL::Route::handle_destination_reached_(const int direction) {
     if (Utils::is_in_editor()) {
         return;
     }
-    ERR_FAIL_NULL_MSG(cooldown_timer_,
-                      vformat("dest_reached: timer is null %s", get_name()));
-    cooldown_timer_->start();
+    emit_signal(TradingVehicle::SDestReached, player_->get_name(), get_name(),
+                direction);
 }
 
-bool godot::CL::Route::start() {
-    ERR_FAIL_COND_V_MSG(current_route_.size() == 0, false,
-                        "start: no route set");
-    ERR_FAIL_NULL_V_MSG(vehicle_, false,
-                        vformat("start: vehicle is null on %s", get_name()));
+void godot::CL::Route::start() {
+    ERR_FAIL_COND_MSG(current_route_.size() == 0, "start: no route set");
+    ERR_FAIL_NULL_MSG(vehicle_,
+                      vformat("start: vehicle is null on %s", get_name()));
     if (initial_start_) {
         vehicle_->set_map_path(current_route_);
         vehicle_->set_position(current_route_[0]);
         initial_start_ = false;
+        handle_destination_reached_(VEHICLE_MOVE_DIR_BA);
+    } else {
+        vehicle_->start_navigating();
+        state_ = ROUTE_ACTIVE;
     }
-    vehicle_->start_navigating();
-    state_ = ROUTE_ACTIVE;
-    return true;
 }
 
 void godot::CL::Route::stop() {
@@ -101,8 +99,9 @@ void godot::CL::Route::set_vehicle(TradingVehicle *vehicle) {
 }
 
 void godot::CL::Route::setup_vehicle_from_tree_() {
-    ERR_FAIL_COND_MSG(vehicle_ != nullptr,
-                      vformat("vehicle is already assigned on %s", get_name()));
+    if (vehicle_ != nullptr) {
+        return;
+    }
     Node *vehicle{find_child("*Vehicle")};
     if (vehicle == nullptr) {
         return;
@@ -126,11 +125,20 @@ void godot::CL::Route::setup_timer_from_tree_or_create_() {
         add_child(cooldown_timer_);
         cooldown_timer_->set_owner(this);
     }
-    // TODO make variable
     cooldown_timer_->set_wait_time(5.0);
     Utils::connect(cooldown_timer_, "timeout",
                    Callable(this, "handle_timeout_"));
 }
+
+godot::TypedArray<godot::CL::CityResource> godot::CL::Route::get_current_cargo()
+    const {
+    return cargo_[vehicle_->get_move_dir()];
+}
+
+void godot::CL::Route::add_to_current_cargo(const ResourceKind kind,
+                                            const int amount) {}
+void godot::CL::Route::remove_from_current_cargo(const ResourceKind kind,
+                                                 const int amount) {}
 
 void godot::CL::Route::_ready() {
     if (Utils::is_in_editor()) {
@@ -176,6 +184,34 @@ void godot::CL::Route::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_kind"), &Route::get_kind);
     ClassDB::bind_method(D_METHOD("set_kind", "k"), &Route::set_kind);
+
+    ClassDB::bind_method(D_METHOD("get_cargo"), &Route::get_cargo);
+    ClassDB::bind_method(D_METHOD("set_cargo", "c"), &Route::set_cargo);
+
+    ClassDB::bind_method(D_METHOD("get_target_entryable"),
+                         &Route::get_target_entryable);
+
+    ClassDB::bind_method(D_METHOD("get_current_cargo"),
+                         &Route::get_current_cargo);
+    ClassDB::bind_method(D_METHOD("add_to_current_cargo", "k", "a"),
+                         &Route::add_to_current_cargo);
+    ClassDB::bind_method(D_METHOD("remove_from_current_cargo", "k", "a"),
+                         &Route::remove_from_current_cargo);
+
+    ClassDB::bind_method(D_METHOD("set_timeout_duration", "i"),
+                         &Route::set_timeout_duration);
+    ClassDB::bind_method(D_METHOD("start_timer"), &Route::start_timer);
+    ClassDB::bind_method(D_METHOD("stop_timer"), &Route::stop_timer);
+
+    ClassDB::add_signal(
+        "Route",
+        MethodInfo("timeout", PropertyInfo(Variant::STRING_NAME, "player_name"),
+                   PropertyInfo(Variant::STRING_NAME, "route_name")));
+    ClassDB::add_signal(
+        "Route", MethodInfo(TradingVehicle::SDestReached,
+                            PropertyInfo(Variant::STRING_NAME, "player_name"),
+                            PropertyInfo(Variant::STRING_NAME, "route_name"),
+                            PropertyInfo(Variant::INT, "direction")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(ROUTE_INACTIVE);
