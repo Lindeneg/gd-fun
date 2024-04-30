@@ -69,11 +69,9 @@ void godot::CL::Route::start() {
         vehicle_->set_map_path(current_route_);
         vehicle_->set_position(current_route_[0]);
         initial_start_ = false;
-        handle_destination_reached_(VEHICLE_MOVE_DIR_BA);
-    } else {
-        vehicle_->start_navigating();
-        state_ = ROUTE_ACTIVE;
     }
+    vehicle_->start_navigating();
+    state_ = ROUTE_ACTIVE;
 }
 
 void godot::CL::Route::stop() {

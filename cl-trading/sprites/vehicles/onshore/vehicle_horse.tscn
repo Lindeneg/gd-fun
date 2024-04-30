@@ -146,8 +146,8 @@ resource_local_to_scene = true
 cost = 100
 upkeep = 4
 cargo_space = 4
-speed = 50.0
-destination_threshold = 1.0
+speed = 80.769
+destination_threshold = 2.722
 z_index = 7
 y_sort_enabled = true
 

@@ -26,7 +26,7 @@ const char *godot::CL::TradingVehicle::AnimationNames
 const char *godot::CL::TradingVehicle::SDestReached{"destination_reached"};
 
 godot::CL::TradingVehicle::TradingVehicle()
-    : move_dir_(VEHICLE_MOVE_DIR_AB),
+    : move_dir_(VEHICLE_MOVE_DIR_BA),
       map_route_(TypedArray<Vector2>()),
       current_map_route_idx_(0),
       tile_surface_(TILE_SURFACE_GROUND),
@@ -121,11 +121,10 @@ void godot::CL::TradingVehicle::handle_movement_(double delta) {
         if (next.is_valid_target) {
             set_navigation_target(next.target);
         } else {
-            auto tmp = move_dir_;
             state_ = VEHICLE_IDLE;
             navigation_target_ = Vector2();
             update_animation_(true);
-            emit_signal(SDestReached, tmp);
+            emit_signal(SDestReached, move_dir_);
         }
         return;
     }
