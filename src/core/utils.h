@@ -1,6 +1,7 @@
 #ifndef CL_TRADING_UTILS_H_
 #define CL_TRADING_UTILS_H_
 
+#include <cstdarg>
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/core/binder_common.hpp>
@@ -8,6 +9,26 @@
 #define NAMEOF(name) #name
 #define MAKE_RESOURCE_TYPE_HINT(m_type) \
     vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, m_type)
+#define GDSTR(s) Utils::convert_gd_string(s)
+#define NEW_LOG(cls)                          \
+    (const cls *t, const char *format, ...) { \
+        va_list args;                         \
+        va_start(args, format);               \
+        printf(#cls);                         \
+        printf(": %s ", GDSTR(t));            \
+        vprintf(format, args);                \
+        va_end(args);                         \
+    }
+#define NEW_E_LOG(cls) \
+    (const cls *t, const char *format, ...) {}
+#define NEW_M_LOG(cls)          \
+    (const char *format, ...) { \
+        va_list args;           \
+        va_start(args, format); \
+        printf("%s: ", #cls);   \
+        vprintf(format, args);  \
+        va_end(args);           \
+    }
 
 namespace godot {
 class String;
