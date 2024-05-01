@@ -17,14 +17,8 @@ namespace godot::CL {
 
 enum RouteState { ROUTE_INACTIVE, ROUTE_ACTIVE };
 
-/* Route connects two Cities via TradingVehicle to trade ressources.
- *
- * TODO (1)
- * A Route is dynamic and the Player is allowed to change important
- * aspect of it (cities and vehicle) at will against a gold cost.
- *
- * TODO (1)
- * Player can also delete Route and recoup some of its gold cost. */
+/* Route connects two Entryable's via TradingVehicle
+ * to on-and-off-load ressources. */
 class Route : public Node {
     GDCLASS(Route, Node)
 
@@ -32,40 +26,23 @@ class Route : public Node {
     bool initial_start_;
     EntryableKind kind_;
     Player *player_;
-    // packed array of current route
     TypedArray<Vector2> current_route_;
     Dictionary cargo_;
-    // intended tile surface
     TileSurface type_;
-    // signal Callables
     Callable timeout_cb_;
     Callable dest_reached_cb_;
-    // from and to entries
     StringName start_;
     StringName end_;
-    // distance betweem them
     int distance_;
-    // current state
+    int current_cargo_idx_;
     RouteState state_;
     Timer *cooldown_timer_;
-    // cost to player
     int gold_cost_;
-    // trading vehicle instance
     TradingVehicle *vehicle_;
 
-    // callback to handle reaction
-    // to Timer.timeout signal
     void handle_timeout_();
-    // callback to handle vehicle
-    // destination reached signal
     void handle_destination_reached_(const int direction);
-    // checks if timer already in tree,
-    // if so, assigns it to cooldown_timer_
-    // else creates a new instance that is
-    // owned by the Route itself
     void setup_timer_from_tree_or_create_();
-    // checks if vehicle is already in tree
-    // and if so, assigns it to vehicle_
     void setup_vehicle_from_tree_();
 
    protected:
@@ -75,6 +52,11 @@ class Route : public Node {
     Route();
     ~Route();
 
+    const static char *SOnloadCargo;
+    const static char *SOnloadCargoFinished;
+    const static char *SOffloadCargo;
+    const static char *SOffloadCargoFinished;
+
     void _ready() override;
     void _exit_tree() override;
 
@@ -82,9 +64,15 @@ class Route : public Node {
     void stop();
     void destroy();
 
+    void switch_dir();
+    void receive_current_resource(int amount);
+    void consume_current_resource(int amount);
+    void go_to_next_cargo();
+
+    void queue_offload_cargo();
+    void queue_onload_cargo();
+
     TypedArray<CityResource> get_current_cargo() const;
-    void add_to_current_cargo(const ResourceKind kind, const int amount);
-    void remove_from_current_cargo(const ResourceKind kind, const int amount);
 
     inline Dictionary get_cargo() const { return cargo_; }
     inline void set_cargo(const Dictionary c) { cargo_ = c; }
@@ -103,6 +91,12 @@ class Route : public Node {
     }
     inline StringName get_target_entryable() const {
         if (vehicle_->get_move_dir() == VEHICLE_MOVE_DIR_AB) {
+            return end_;
+        }
+        return start_;
+    }
+    inline StringName get_target_entryable_inv() const {
+        if (vehicle_->get_move_dir() == VEHICLE_MOVE_DIR_BA) {
             return end_;
         }
         return start_;

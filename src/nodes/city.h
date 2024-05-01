@@ -18,6 +18,11 @@ enum CitySize {
     CITY_SIZE_METRO
 };
 
+struct CityReceiveResult {
+    int accepted_amount;
+    int amount;
+};
+
 /* City has supply, demand and a size.
  * City also only place where
  * Industry can be located.
@@ -50,7 +55,7 @@ class City : public Entryable {
     void _ready() override;
 
     int consume_resource(ResourceKind kind, int amount);
-    int receive_resource(ResourceKind kind, int amount);
+    CityReceiveResult receive_resource(ResourceKind kind, int amount);
 
     inline CitySize get_size() const { return size_; }
     inline float get_y_container_offset() const { return y_container_offset_; }

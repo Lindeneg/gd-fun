@@ -3,9 +3,9 @@
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
+#include "../core/entryable.h"
 #include "../core/utils.h"
 #include "./city_manager.h"
-#include "./resource.h"
 #include "./resource_manager.h"
 #include "./trading_vehicle.h"
 
@@ -16,85 +16,80 @@ void ROUTEMLOG NEW_M_LOG(RouteManager)
 godot::CL::RouteManager::RouteManager()
     : routes_(Dictionary()),
       city_manager_(nullptr),
-      resource_manager_(nullptr) {}
+      resource_manager_(nullptr),
+      offload_cargo_cb_(Callable(this, "handle_offload_cargo_")),
+      onload_cargo_cb_(Callable(this, "handle_onload_cargo_")),
+      onload_finished_cb_(Callable(this, "handle_onload_finished_")),
+      offload_finished_cb_(Callable(this, "handle_offload_finished_")) {}
 
 godot::CL::RouteManager::~RouteManager() {}
 
-void godot::CL::RouteManager::handle_dest_reached_(StringName player_name,
-                                                   StringName route_name,
-                                                   VehicleMoveDir direction) {
+void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
+                                                    StringName route_name,
+                                                    ResourceKind kind) {
     Route *route{get_player_route(player_name, route_name)};
     ERR_FAIL_NULL(route);
-    EntryableKind route_kind{route->get_kind()};
-    if (route_kind == ENTRYABLE_CITY) {
-        handle_route_city_dest_(route);
-    } else if (route_kind == ENTRYABLE_RESOURCE) {
-        handle_route_resource_dest_(route, direction);
+    if (route->get_kind() == ENTRYABLE_CITY) {
+        StringName city_name{route->get_target_entryable()};
+        City *city{city_manager_->get_city(city_name)};
+        ERR_FAIL_NULL(city);
+        auto offloaded{city->receive_resource(kind, 1)};
+        if (offloaded.amount > 0) {
+            route->consume_current_resource(offloaded.amount);
+            if (offloaded.accepted_amount > 0) {
+                // TODO: NOTIFY FINANCE
+            }
+        } else {
+            route->go_to_next_cargo();
+        }
     }
+    route->queue_offload_cargo();
+}
+
+void godot::CL::RouteManager::handle_onload_cargo_(StringName player_name,
+                                                   StringName route_name,
+                                                   ResourceKind kind) {
+    Route *route{get_player_route(player_name, route_name)};
+    ERR_FAIL_NULL(route);
+    if (route->get_kind() == ENTRYABLE_CITY) {
+        StringName city_name{route->get_target_entryable_inv()};
+        City *city{city_manager_->get_city(city_name)};
+        ERR_FAIL_NULL(city);
+        int consumed{city->consume_resource(kind, 1)};
+        if (consumed > 0) {
+            route->receive_current_resource(consumed);
+        } else {
+            route->go_to_next_cargo();
+        }
+    } else {
+        // TODO resource tile onload
+    }
+    route->queue_onload_cargo();
+}
+
+void godot::CL::RouteManager::handle_offload_finished_(StringName player_name,
+                                                       StringName route_name) {
+    Route *route{get_player_route(player_name, route_name)};
+    ERR_FAIL_NULL(route);
+#ifdef CL_TRADING_ROUTE_DEBUG
+    ROUTEMLOG("%s\n", GDSTR(vformat("%s finished offloading cargo",
+                                    route->get_name())));
+#endif
+    route->get_vehicle()->set_state(VEHICLE_ONLOADING);
+    route->switch_dir();
+    route->queue_onload_cargo();
+}
+
+void godot::CL::RouteManager::handle_onload_finished_(StringName player_name,
+                                                      StringName route_name) {
+    Route *route{get_player_route(player_name, route_name)};
+    ERR_FAIL_NULL(route);
+#ifdef CL_TRADING_ROUTE_DEBUG
+    ROUTEMLOG("%s\n",
+              GDSTR(vformat("%s finished onloading cargo", route->get_name())));
+#endif
     route->start();
 }
-
-void godot::CL::RouteManager::handle_route_city_dest_(Route *route) {
-    StringName city_name{route->get_target_entryable()};
-    City *city{city_manager_->get_city(city_name)};
-    ERR_FAIL_NULL(city);
-    auto offload_cargo{route->get_current_cargo()};
-    for (int i = 0; i < offload_cargo.size(); i++) {
-        auto cargo{cast_to<CityResource>(offload_cargo[i])};
-        if (cargo->get_amount() <= 0) {
-            continue;
-        }
-        // TODO notify finance stuff
-        // TODO have a delay before offloading
-        auto kind{cargo->get_resource_kind()};
-        int offloaded{city->receive_resource(kind, cargo->get_amount())};
-#ifdef CL_TRADING_ROUTE_DEBUG
-        ROUTEMLOG("%s\n", GDSTR(vformat("%s offloaded %d of kind %d to city %s",
-                                        route->get_name(), offloaded, kind,
-                                        city_name)));
-#endif
-        cargo->set_amount(0);
-    }
-    route->get_vehicle()->switch_move_dir();
-    auto onload_cargo{route->get_current_cargo()};
-    for (int i = 0; i < onload_cargo.size(); i++) {
-        auto cargo{cast_to<CityResource>(onload_cargo[i])};
-        if (cargo->get_capacity() <= 0) {
-            continue;
-        }
-        // TODO have a delay before onloading
-        auto kind{cargo->get_resource_kind()};
-        int onloaded{city->consume_resource(kind, cargo->get_capacity())};
-#ifdef CL_TRADING_ROUTE_DEBUG
-        if (onloaded > 0) {
-            ROUTEMLOG(
-                "%s\n",
-                GDSTR(vformat("%s onloaded %d of kind %d from city %s",
-                              route->get_name(), onloaded, kind, city_name)));
-        }
-#endif
-        cargo->set_amount(onloaded);
-    }
-}
-void godot::CL::RouteManager::handle_route_resource_dest_(
-    Route *route, VehicleMoveDir direction) {
-//    if (direction == VEHICLE_MOVE_DIR_AB) {
-//        ResourceTile *res{resource_manager_->get_resource(route->get_end())};
-//        ERR_FAIL_NULL(res);
-//        int total_amount{res->get_current_amount()};
-//        if (total_amount <= 0) {
-//            return;
-//        }
-//        auto onload_cargo{route->get_current_cargo()};
-//        // TODO handle resource onload
-//    } else {
-//        // TODO handle resource offload
-//    }
-    route->get_vehicle()->switch_move_dir();
-}
-
-void godot::CL::RouteManager::handle_timeout_(StringName player_name,
-                                              StringName route_name) {}
 
 void godot::CL::RouteManager::_enter_tree() {
     if (Utils::is_in_editor()) return;
@@ -144,12 +139,13 @@ void godot::CL::RouteManager::add_route(Route *route) {
               GDSTR(vformat("created route %s for player %s, total %d",
                             route->get_name(), player_name, routes.size())));
 #endif
+    // TODO disconnect on route removal
     player->add_connection(route->get_start());
     player->add_connection(route->get_end());
-    // TODO disconnect on route removal
-    route->connect(TradingVehicle::SDestReached,
-                   Callable(this, "handle_dest_reached_"));
-    route->connect("timeout", Callable(this, "handle_timeout_"));
+    route->connect(Route::SOnloadCargo, onload_cargo_cb_);
+    route->connect(Route::SOffloadCargo, offload_cargo_cb_);
+    route->connect(Route::SOffloadCargoFinished, offload_finished_cb_);
+    route->connect(Route::SOnloadCargoFinished, onload_finished_cb_);
     route->start();
 }
 
@@ -159,11 +155,6 @@ void godot::CL::RouteManager::remove_route(const Route *route) {}
 
 void godot::CL::RouteManager::_bind_methods() {
     // BIND METHODS
-    ClassDB::bind_method(D_METHOD("handle_dest_reached_", "p", "r", "d"),
-                         &RouteManager::handle_dest_reached_);
-    ClassDB::bind_method(D_METHOD("handle_timeout_", "p", "r"),
-                         &RouteManager::handle_timeout_);
-
     ClassDB::bind_method(D_METHOD("add_route", "r"), &RouteManager::add_route);
     ClassDB::bind_method(D_METHOD("remove_route", "r"),
                          &RouteManager::remove_route);
@@ -173,4 +164,13 @@ void godot::CL::RouteManager::_bind_methods() {
                          &RouteManager::get_player_route);
     ClassDB::bind_method(D_METHOD("get_player_routes", "n"),
                          &RouteManager::get_player_routes);
+
+    ClassDB::bind_method(D_METHOD("handle_offload_cargo_", "p", "r", "k"),
+                         &RouteManager::handle_offload_cargo_);
+    ClassDB::bind_method(D_METHOD("handle_onload_cargo_", "p", "r", "k"),
+                         &RouteManager::handle_onload_cargo_);
+    ClassDB::bind_method(D_METHOD("handle_offload_finished_", "p", "r"),
+                         &RouteManager::handle_offload_finished_);
+    ClassDB::bind_method(D_METHOD("handle_onload_finished_", "p", "r"),
+                         &RouteManager::handle_onload_finished_);
 }

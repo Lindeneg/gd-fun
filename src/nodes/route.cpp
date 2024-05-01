@@ -5,7 +5,16 @@
 #include <godot_cpp/core/error_macros.hpp>
 
 #include "../core/utils.h"
-#include "trading_vehicle.h"
+#include "./trading_vehicle.h"
+
+namespace godot::CL {
+void ROUTELOG NEW_LOG(Route)
+}
+
+const char *godot::CL::Route::SOnloadCargo{"onload-cargo"};
+const char *godot::CL::Route::SOffloadCargo{"offload-cargo"};
+const char *godot::CL::Route::SOnloadCargoFinished{"onload-finished"};
+const char *godot::CL::Route::SOffloadCargoFinished{"offload-finished"};
 
 godot::CL::Route::Route()
     : initial_start_(true),
@@ -14,8 +23,6 @@ godot::CL::Route::Route()
       current_route_(TypedArray<Vector2>()),
       cargo_(Dictionary()),
       type_(TILE_SURFACE_NONE),
-      // timeout for time bewteen destination
-      // reached and resuming of route
       timeout_cb_(Callable(this, "handle_timeout_")),
       dest_reached_cb_(Callable(this, "handle_destination_reached_")),
       start_(""),
@@ -23,6 +30,7 @@ godot::CL::Route::Route()
       state_(ROUTE_INACTIVE),
       cooldown_timer_(nullptr),
       distance_(0),
+      current_cargo_idx_(0),
       gold_cost_(0),
       vehicle_(nullptr) {}
 
@@ -50,15 +58,92 @@ void godot::CL::Route::handle_timeout_() {
     if (Utils::is_in_editor()) {
         return;
     }
-    emit_signal("timeout", player_->get_name(), get_name());
+    auto current_cargo{get_current_cargo()};
+    auto cargo{cast_to<CityResource>(current_cargo[current_cargo_idx_])};
+    if (vehicle_->get_state() == VEHICLE_OFFLOADING) {
+        emit_signal(SOffloadCargo, player_->get_name(), get_name(),
+                    cargo->get_resource_kind());
+    } else if (vehicle_->get_state() == VEHICLE_ONLOADING) {
+        emit_signal(SOnloadCargo, player_->get_name(), get_name(),
+                    cargo->get_resource_kind());
+    }
 }
 
 void godot::CL::Route::handle_destination_reached_(const int direction) {
     if (Utils::is_in_editor()) {
         return;
     }
-    emit_signal(TradingVehicle::SDestReached, player_->get_name(), get_name(),
-                direction);
+#ifdef CL_TRADING_ROUTE_DEBUG
+    ROUTELOG(this, "destination reached with direction %d\n", direction);
+#endif
+    current_cargo_idx_ = 0;
+    vehicle_->set_state(VEHICLE_OFFLOADING);
+    queue_offload_cargo();
+}
+
+void godot::CL::Route::queue_offload_cargo() {
+    ERR_FAIL_COND(vehicle_->get_state() != VEHICLE_OFFLOADING);
+    auto current_cargo{get_current_cargo()};
+    if (current_cargo_idx_ >= current_cargo.size()) {
+        emit_signal(SOffloadCargoFinished, player_->get_name(), get_name());
+        return;
+    }
+    auto cargo{cast_to<CityResource>(current_cargo[current_cargo_idx_])};
+    if (cargo->get_amount() > 0) {
+        cooldown_timer_->start();
+    } else {
+        current_cargo_idx_++;
+        queue_offload_cargo();
+    }
+}
+
+void godot::CL::Route::queue_onload_cargo() {
+    ERR_FAIL_COND(vehicle_->get_state() != VEHICLE_ONLOADING);
+    auto current_cargo{get_current_cargo()};
+    if (current_cargo_idx_ >= current_cargo.size()) {
+        emit_signal(SOnloadCargoFinished, player_->get_name(), get_name());
+        return;
+    }
+    auto cargo{cast_to<CityResource>(current_cargo[current_cargo_idx_])};
+    if (cargo->get_amount() < cargo->get_capacity()) {
+        cooldown_timer_->start();
+    } else {
+        current_cargo_idx_++;
+        queue_onload_cargo();
+    }
+}
+
+void godot::CL::Route::receive_current_resource(int amount) {
+    ERR_FAIL_COND(vehicle_->get_state() != VEHICLE_ONLOADING);
+    auto current_cargo{get_current_cargo()};
+    auto cargo{cast_to<CityResource>(current_cargo[current_cargo_idx_])};
+    int total{cargo->get_amount() + amount};
+    ERR_FAIL_COND(total > cargo->get_capacity());
+    cargo->set_amount(total);
+#ifdef CL_TRADING_ROUTE_DEBUG
+    ROUTELOG(this, "onloaded resource %d for total %d\n",
+             cargo->get_resource_kind(), total);
+#endif
+}
+
+void godot::CL::Route::consume_current_resource(int amount) {
+    ERR_FAIL_COND(vehicle_->get_state() != VEHICLE_OFFLOADING);
+    auto current_cargo{get_current_cargo()};
+    auto cargo{cast_to<CityResource>(current_cargo[current_cargo_idx_])};
+    int total{cargo->get_amount() - amount};
+    ERR_FAIL_COND(total < 0);
+    cargo->set_amount(total);
+#ifdef CL_TRADING_ROUTE_DEBUG
+    ROUTELOG(this, "offloaded resource %d for total %d\n",
+             cargo->get_resource_kind(), total);
+#endif
+}
+
+void godot::CL::Route::go_to_next_cargo() { current_cargo_idx_++; }
+
+void godot::CL::Route::switch_dir() {
+    current_cargo_idx_ = 0;
+    vehicle_->switch_move_dir();
 }
 
 void godot::CL::Route::start() {
@@ -123,7 +208,7 @@ void godot::CL::Route::setup_timer_from_tree_or_create_() {
         add_child(cooldown_timer_);
         cooldown_timer_->set_owner(this);
     }
-    cooldown_timer_->set_wait_time(5.0);
+    cooldown_timer_->set_wait_time(1.5f);
     Utils::connect(cooldown_timer_, "timeout",
                    Callable(this, "handle_timeout_"));
 }
@@ -132,11 +217,6 @@ godot::TypedArray<godot::CL::CityResource> godot::CL::Route::get_current_cargo()
     const {
     return cargo_[vehicle_->get_move_dir()];
 }
-
-void godot::CL::Route::add_to_current_cargo(const ResourceKind kind,
-                                            const int amount) {}
-void godot::CL::Route::remove_from_current_cargo(const ResourceKind kind,
-                                                 const int amount) {}
 
 void godot::CL::Route::_ready() {
     if (Utils::is_in_editor()) {
@@ -191,25 +271,31 @@ void godot::CL::Route::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_current_cargo"),
                          &Route::get_current_cargo);
-    ClassDB::bind_method(D_METHOD("add_to_current_cargo", "k", "a"),
-                         &Route::add_to_current_cargo);
-    ClassDB::bind_method(D_METHOD("remove_from_current_cargo", "k", "a"),
-                         &Route::remove_from_current_cargo);
 
     ClassDB::bind_method(D_METHOD("set_timeout_duration", "i"),
                          &Route::set_timeout_duration);
     ClassDB::bind_method(D_METHOD("start_timer"), &Route::start_timer);
     ClassDB::bind_method(D_METHOD("stop_timer"), &Route::stop_timer);
 
+    // SIGNALS
     ClassDB::add_signal(
-        "Route",
-        MethodInfo("timeout", PropertyInfo(Variant::STRING_NAME, "player_name"),
-                   PropertyInfo(Variant::STRING_NAME, "route_name")));
-    ClassDB::add_signal(
-        "Route", MethodInfo(TradingVehicle::SDestReached,
+        "Route", MethodInfo(SOnloadCargo,
                             PropertyInfo(Variant::STRING_NAME, "player_name"),
                             PropertyInfo(Variant::STRING_NAME, "route_name"),
-                            PropertyInfo(Variant::INT, "direction")));
+                            PropertyInfo(Variant::INT, "kind")));
+    ClassDB::add_signal(
+        "Route", MethodInfo(SOffloadCargo,
+                            PropertyInfo(Variant::STRING_NAME, "player_name"),
+                            PropertyInfo(Variant::STRING_NAME, "route_name"),
+                            PropertyInfo(Variant::INT, "kind")));
+    ClassDB::add_signal(
+        "Route", MethodInfo(SOffloadCargoFinished,
+                            PropertyInfo(Variant::STRING_NAME, "player_name"),
+                            PropertyInfo(Variant::STRING_NAME, "route_name")));
+    ClassDB::add_signal(
+        "Route", MethodInfo(SOnloadCargoFinished,
+                            PropertyInfo(Variant::STRING_NAME, "player_name"),
+                            PropertyInfo(Variant::STRING_NAME, "route_name")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(ROUTE_INACTIVE);
