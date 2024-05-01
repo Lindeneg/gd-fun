@@ -6,13 +6,19 @@
 #include "../core/utils.h"
 #include "./industry.h"
 
+#ifdef CL_TRADING_DEBUG
+MAKE_LOG(CITYLOG, City)
+#endif
+
 // SIGNALS
 const char *godot::CL::City::SSuppliesChanged{"supplies_changed"};
+const char *godot::CL::City::SSupplyChanged{"supply_changed"};
 const char *godot::CL::City::SDemandsChanged{"demands_changed"};
 const char *godot::CL::City::SIndustriesChanged{"industries_changed"};
 
 godot::CL::City::City()
     : Entryable(ENTRYABLE_CITY),
+      debug_(false),
       size_(CITY_SIZE_VILLAGE),
       supplies_(TypedArray<CityResource>{}),
       demands_(TypedArray<CityResource>{}),
@@ -21,6 +27,80 @@ godot::CL::City::City()
       y_button_offset_(0.0f) {}
 
 godot::CL::City::~City() {}
+
+int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
+    for (int i = 0; i < supplies_.size(); i++) {
+        CityResource *supply{cast_to<CityResource>(supplies_[i])};
+        if (supply->get_resource_kind() == kind) {
+            auto s_amount{supply->get_amount()};
+            if (s_amount == 0) return 0;
+            auto actual_amount{amount};
+            if (amount > s_amount) {
+                actual_amount = s_amount;
+            }
+            int diff{s_amount - actual_amount};
+            supply->set_amount(diff);
+#ifdef CL_TRADING_DEBUG
+            CITYLOG(this, "has %d left of resource %d after consumption\n",
+                    diff, kind);
+#endif
+            emit_signal(SSupplyChanged, kind, diff);
+            return actual_amount;
+        }
+    }
+    for (int i = 0; i < industries_.size(); i++) {
+        Industry *industry{cast_to<Industry>(industries_[i])};
+        if (industry->get_out_kind() == kind) {
+            int i_amount{industry->get_out_amount()};
+            if (i_amount == 0) return 0;
+            int actual_amount{amount};
+            if (amount > i_amount) {
+                actual_amount = i_amount;
+            }
+            int diff{i_amount - actual_amount};
+            industry->set_out_amount(diff);
+#ifdef CL_TRADING_DEBUG
+            CITYLOG(this,
+                    "has %d left of industry resource %d after consumption\n",
+                    diff, kind);
+#endif
+            emit_signal(SSupplyChanged, kind, diff);
+            return actual_amount;
+        }
+    }
+    return 0;
+}
+
+godot::CL::CityReceiveResult godot::CL::City::receive_resource(
+    ResourceKind kind, int amount) {
+    CityReceiveResult result{"", false, 0, amount};
+    for (int i = 0; i < demands_.size(); i++) {
+        CityResource *demand{cast_to<CityResource>(demands_[i])};
+        if (demand->get_resource_kind() == kind) {
+#ifdef CL_TRADING_DEBUG
+            CITYLOG(this, "has received %d of resource %d\n", amount, kind);
+#endif
+            result.accepted_amount = amount;
+            return result;
+        }
+    }
+    for (int i = 0; i < industries_.size(); i++) {
+        Industry *industry{cast_to<Industry>(industries_[i])};
+        if (industry->get_in_kind() == kind) {
+            int actual_amount{industry->get_in_amount() + amount};
+            industry->set_in_amount(actual_amount);
+#ifdef CL_TRADING_DEBUG
+            CITYLOG(this, "has received %d of industry resource %d, total %d\n",
+                    amount, kind, actual_amount);
+#endif
+            result.accepted_amount = amount;
+            result.industry = industry->get_name();
+            result.industry_resource = true;
+            return result;
+        }
+    }
+    return result;
+}
 
 void godot::CL::City::_ready() {
     if (Utils::is_in_editor()) {
@@ -37,6 +117,8 @@ void godot::CL::City::_ready() {
 
 void godot::CL::City::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(City);
+
     ClassDB::bind_method(D_METHOD("get_size"), &City::get_size);
     ClassDB::bind_method(D_METHOD("set_size", "s"), &City::set_size);
     ClassDB::bind_method(D_METHOD("get_supplies"), &City::get_supplies);
@@ -107,4 +189,7 @@ void godot::CL::City::_bind_methods() {
     ClassDB::add_signal(
         "City", MethodInfo(SButtonClicked,
                            PropertyInfo(Variant::STRING_NAME, "city_name")));
+    ClassDB::add_signal(
+        "City", MethodInfo(SSupplyChanged, PropertyInfo(Variant::INT, "kind"),
+                           PropertyInfo(Variant::INT, "new_amount")));
 }

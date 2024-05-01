@@ -26,6 +26,7 @@ func _ready() -> void:
 		return;
 	btn_layer.visible = true;
 	if !Engine.is_editor_hint():
+		city.connect("supply_changed", _on_supply_changed);
 		city.connect("btn_state_changed", _on_btn_state_changed);
 		player.connect("connection_added", _on_player_connection_added);
 		player.connect("connection_removed", _on_player_connection_removed);
@@ -44,11 +45,12 @@ func _ready() -> void:
 	for cd in city.demands:
 		_create_supply_demand(cd.resource_kind, 0, ResourceType.DEMAND);
 	for industry in city.industries:
-		_create_supply_demand(industry.out, industry.amount, ResourceType.SUPPLY);
+		_create_supply_demand(industry.out, industry.get_out_amount(), ResourceType.SUPPLY);
 		_create_supply_demand(industry.in, 0, ResourceType.DEMAND);
 
 func _exit_tree() -> void:
 	if !Engine.is_editor_hint():
+		city.disconnect("supply_changed", _on_supply_changed);
 		city.disconnect("btn_state_changed", _on_btn_state_changed);
 		player.disconnect("connection_added", _on_player_connection_added);
 		player.disconnect("connection_removed", _on_player_connection_removed);
@@ -77,6 +79,14 @@ func _get_visual_tile_width() -> int:
 	if supplies >= demands:
 		return supplies + industries;
 	return demands + industries;
+
+func _on_supply_changed(kind: int, new_amount: int) -> void:
+	var res = resources.get_resource(kind);
+	assert(res != null);
+	for child in supply.get_children():
+		if child.name == res.name:
+			(child as CityResourceIcon).update_amount(new_amount);
+			return;
 
 func _on_btn_state_changed(enabled: bool) -> void:
 	btn.disabled = !enabled;

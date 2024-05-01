@@ -176,6 +176,8 @@ func _on_route_supply_click(entry):
 		update_current_cargo_view();
 
 func _on_route_cargo_click(index):
+	if (_chosen_cargo[_direction]["cargo"].size() <= 0):
+		return;
 	var res = gui.resources.get_resource(_chosen_cargo[_direction]["cargo"][index]);
 	_chosen_cargo[_direction]["cargo"].remove_at(index);
 	_chosen_cargo[_direction]["used_space"] = max(0, _chosen_cargo[_direction]["used_space"] - res.weight);
@@ -237,6 +239,10 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["type"] = _entryable_kind;
 	dict["surface"] = vehicle.surface;
 	dict["vehicle"] = vehicle.scene;
+	dict["cargo"] = _chosen_cargo;
+	if _entryable_kind == Entryable.ENTRYABLE_RESOURCE:
+		var res = gui.resource_manager.get_resource(_to.name);
+		dict["res"] = res.resource_kind;
 	stop_create();
 	emit_signal("create_route", dict);
 

@@ -7,6 +7,7 @@
 #include "../core/entryable.h"
 #include "./city_resource.h"
 #include "./industry.h"
+#include "utils.h"
 
 namespace godot::CL {
 
@@ -16,6 +17,13 @@ enum CitySize {
     CITY_SIZE_URBAN,
     CITY_SIZE_REGIO,
     CITY_SIZE_METRO
+};
+
+struct CityReceiveResult {
+    StringName industry;
+    bool industry_resource;
+    int accepted_amount;
+    int amount;
 };
 
 /* City has supply, demand and a size.
@@ -28,6 +36,7 @@ class City : public Entryable {
     GDCLASS(City, Entryable)
 
    private:
+    bool debug_;
     CitySize size_;
     TypedArray<CityResource> supplies_;
     TypedArray<CityResource> demands_;
@@ -43,10 +52,16 @@ class City : public Entryable {
     ~City();
 
     const static char *SSuppliesChanged;
+    const static char *SSupplyChanged;
     const static char *SDemandsChanged;
     const static char *SIndustriesChanged;
 
     void _ready() override;
+
+    int consume_resource(ResourceKind kind, int amount);
+    CityReceiveResult receive_resource(ResourceKind kind, int amount);
+
+    DEBUG_METHODS()
 
     inline CitySize get_size() const { return size_; }
     inline float get_y_container_offset() const { return y_container_offset_; }

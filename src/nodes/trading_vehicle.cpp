@@ -26,7 +26,7 @@ const char *godot::CL::TradingVehicle::AnimationNames
 const char *godot::CL::TradingVehicle::SDestReached{"destination_reached"};
 
 godot::CL::TradingVehicle::TradingVehicle()
-    : move_dir_(VEHICLE_MOVE_DIR_AB),
+    : move_dir_(VEHICLE_MOVE_DIR_BA),
       map_route_(TypedArray<Vector2>()),
       current_map_route_idx_(0),
       tile_surface_(TILE_SURFACE_GROUND),
@@ -102,7 +102,7 @@ void godot::CL::TradingVehicle::initialize_sprite_frames_() {
     animated_sprite_->set_sprite_frames(sprite_frames);
 }
 
-void godot::CL::TradingVehicle::switch_move_dir_() {
+void godot::CL::TradingVehicle::switch_move_dir() {
     if (move_dir_ == VEHICLE_MOVE_DIR_AB) {
         move_dir_ = VEHICLE_MOVE_DIR_BA;
     } else {
@@ -121,13 +121,10 @@ void godot::CL::TradingVehicle::handle_movement_(double delta) {
         if (next.is_valid_target) {
             set_navigation_target(next.target);
         } else {
-            auto tmp = navigation_target_;
             state_ = VEHICLE_IDLE;
-            switch_move_dir_();
             navigation_target_ = Vector2();
-            // stop animation
             update_animation_(true);
-            emit_signal(SDestReached, tmp);
+            emit_signal(SDestReached, move_dir_);
         }
         return;
     }
@@ -210,7 +207,11 @@ void godot::CL::TradingVehicle::_process(double delta) {
 
 void godot::CL::TradingVehicle::_bind_methods() {
     // BIND METHODS
+    ClassDB::bind_method(D_METHOD("switch_move_dir"),
+                         &TradingVehicle::switch_move_dir);
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);
+    ClassDB::bind_method(D_METHOD("set_state", "s"),
+                         &TradingVehicle::set_state);
     ClassDB::bind_method(D_METHOD("get_move_dir"),
                          &TradingVehicle::get_move_dir);
     ClassDB::bind_method(D_METHOD("get_navigation_target"),
@@ -287,9 +288,9 @@ void godot::CL::TradingVehicle::_bind_methods() {
                           "set_destination_threshold",
                           "get_destination_threshold");
 
-    ClassDB::add_signal("TradingVehicle",
-                        MethodInfo(SDestReached, PropertyInfo(Variant::VECTOR2,
-                                                              "destination")));
+    ClassDB::add_signal(
+        "TradingVehicle",
+        MethodInfo(SDestReached, PropertyInfo(Variant::INT, "destination")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);
