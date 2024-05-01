@@ -1,18 +1,22 @@
 #include "route_manager.h"
 
 #include <godot_cpp/core/error_macros.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
 #include "../core/utils.h"
 #include "./city_manager.h"
+#include "./resource.h"
+#include "./resource_manager.h"
 #include "./trading_vehicle.h"
-#include "godot_cpp/variant/variant.hpp"
 
 namespace godot::CL {
 void ROUTEMLOG NEW_M_LOG(RouteManager)
 }  // namespace godot::CL
 
 godot::CL::RouteManager::RouteManager()
-    : routes_(Dictionary()), city_manager_(nullptr) {}
+    : routes_(Dictionary()),
+      city_manager_(nullptr),
+      resource_manager_(nullptr) {}
 
 godot::CL::RouteManager::~RouteManager() {}
 
@@ -23,53 +27,70 @@ void godot::CL::RouteManager::handle_dest_reached_(StringName player_name,
     ERR_FAIL_NULL(route);
     EntryableKind route_kind{route->get_kind()};
     if (route_kind == ENTRYABLE_CITY) {
-        StringName city_name{route->get_target_entryable()};
-        City *city{city_manager_->get_city(city_name)};
-        ERR_FAIL_NULL(city);
-        auto offload_cargo{route->get_current_cargo()};
-        for (int i = 0; i < offload_cargo.size(); i++) {
-            auto cargo{cast_to<CityResource>(offload_cargo[i])};
-            if (cargo->get_amount() <= 0) {
-                continue;
-            }
-            // TODO notify finance stuff
-            // TODO have a delay before offloading
-            auto kind{cargo->get_resource_kind()};
-            int offloaded{city->receive_resource(kind, cargo->get_amount())};
-#ifdef CL_TRADING_ROUTE_DEBUG
-            ROUTEMLOG(
-                "%s\n",
-                GDSTR(vformat("%s offloaded %d of kind %d to city %s",
-                              route->get_name(), offloaded, kind, city_name)));
-#endif
-            cargo->set_amount(0);
+        handle_route_city_dest_(route);
+    } else if (route_kind == ENTRYABLE_RESOURCE) {
+        handle_route_resource_dest_(route, direction);
+    }
+    route->start();
+}
+
+void godot::CL::RouteManager::handle_route_city_dest_(Route *route) {
+    StringName city_name{route->get_target_entryable()};
+    City *city{city_manager_->get_city(city_name)};
+    ERR_FAIL_NULL(city);
+    auto offload_cargo{route->get_current_cargo()};
+    for (int i = 0; i < offload_cargo.size(); i++) {
+        auto cargo{cast_to<CityResource>(offload_cargo[i])};
+        if (cargo->get_amount() <= 0) {
+            continue;
         }
-        route->get_vehicle()->switch_move_dir();
-        auto onload_cargo{route->get_current_cargo()};
-        for (int i = 0; i < onload_cargo.size(); i++) {
-            auto cargo{cast_to<CityResource>(onload_cargo[i])};
-            if (cargo->get_capacity() <= 0) {
-                continue;
-            }
-            // TODO have a delay before onloading
-            auto kind{cargo->get_resource_kind()};
-            int onloaded{city->consume_resource(kind, cargo->get_capacity())};
+        // TODO notify finance stuff
+        // TODO have a delay before offloading
+        auto kind{cargo->get_resource_kind()};
+        int offloaded{city->receive_resource(kind, cargo->get_amount())};
 #ifdef CL_TRADING_ROUTE_DEBUG
+        ROUTEMLOG("%s\n", GDSTR(vformat("%s offloaded %d of kind %d to city %s",
+                                        route->get_name(), offloaded, kind,
+                                        city_name)));
+#endif
+        cargo->set_amount(0);
+    }
+    route->get_vehicle()->switch_move_dir();
+    auto onload_cargo{route->get_current_cargo()};
+    for (int i = 0; i < onload_cargo.size(); i++) {
+        auto cargo{cast_to<CityResource>(onload_cargo[i])};
+        if (cargo->get_capacity() <= 0) {
+            continue;
+        }
+        // TODO have a delay before onloading
+        auto kind{cargo->get_resource_kind()};
+        int onloaded{city->consume_resource(kind, cargo->get_capacity())};
+#ifdef CL_TRADING_ROUTE_DEBUG
+        if (onloaded > 0) {
             ROUTEMLOG(
                 "%s\n",
                 GDSTR(vformat("%s onloaded %d of kind %d from city %s",
                               route->get_name(), onloaded, kind, city_name)));
+        }
 #endif
-            cargo->set_amount(onloaded);
-        }
-    } else if (route_kind == ENTRYABLE_RESOURCE) {
-        if (direction == VEHICLE_MOVE_DIR_AB) {
-            // TODO handle resource onload
-        } else {
-            // TODO handle resource offload
-        }
+        cargo->set_amount(onloaded);
     }
-    route->start();
+}
+void godot::CL::RouteManager::handle_route_resource_dest_(
+    Route *route, VehicleMoveDir direction) {
+//    if (direction == VEHICLE_MOVE_DIR_AB) {
+//        ResourceTile *res{resource_manager_->get_resource(route->get_end())};
+//        ERR_FAIL_NULL(res);
+//        int total_amount{res->get_current_amount()};
+//        if (total_amount <= 0) {
+//            return;
+//        }
+//        auto onload_cargo{route->get_current_cargo()};
+//        // TODO handle resource onload
+//    } else {
+//        // TODO handle resource offload
+//    }
+    route->get_vehicle()->switch_move_dir();
 }
 
 void godot::CL::RouteManager::handle_timeout_(StringName player_name,
@@ -77,9 +98,14 @@ void godot::CL::RouteManager::handle_timeout_(StringName player_name,
 
 void godot::CL::RouteManager::_enter_tree() {
     if (Utils::is_in_editor()) return;
-    Node *node{get_node_or_null("../CityManager")};
-    ERR_FAIL_NULL_MSG(node, "CityManager not found in tree");
-    city_manager_ = static_cast<CityManager *>(node);
+
+    Node *city_node{get_node_or_null("../CityManager")};
+    ERR_FAIL_NULL_MSG(city_node, "CityManager not found in tree");
+    city_manager_ = static_cast<CityManager *>(city_node);
+
+    Node *resource_node{get_node_or_null("../ResourceManager")};
+    ERR_FAIL_NULL_MSG(resource_node, "ResourceManager not found in tree");
+    resource_manager_ = static_cast<ResourceManager *>(resource_node);
 }
 
 godot::TypedArray<godot::CL::Route> godot::CL::RouteManager::get_player_routes(
@@ -109,16 +135,14 @@ void godot::CL::RouteManager::add_route(Route *route) {
     add_child(route);
     Player *player{route->get_player()};
     StringName player_name{player->get_name()};
-    TypedArray<Route> player_routes{};
-    if (routes_.has(player_name)) {
-        player_routes = static_cast<TypedArray<Route>>(routes_[player_name]);
-    } else {
-        routes_[player_name] = player_routes;
-    }
-    player_routes.append(route);
+    auto routes{static_cast<TypedArray<Route>>(
+        routes_.get(player_name, TypedArray<Route>{}))};
+    routes.append(route);
+    routes_[player_name] = routes;
 #ifdef CL_TRADING_ROUTE_DEBUG
-    ROUTEMLOG("%s\n", GDSTR(vformat("created route %s for player %s",
-                                    route->get_name(), player_name)));
+    ROUTEMLOG("%s\n",
+              GDSTR(vformat("created route %s for player %s, total %d",
+                            route->get_name(), player_name, routes.size())));
 #endif
     player->add_connection(route->get_start());
     player->add_connection(route->get_end());

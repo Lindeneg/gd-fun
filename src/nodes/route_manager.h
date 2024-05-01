@@ -4,9 +4,11 @@
 #include <godot_cpp/classes/node.hpp>
 
 #include "./route.h"
+#include "./trading_vehicle.h"
 
 namespace godot::CL {
 class CityManager;
+class ResourceManager;
 
 class RouteManager : public Node {
     GDCLASS(RouteManager, Node)
@@ -14,7 +16,10 @@ class RouteManager : public Node {
    private:
     Dictionary routes_;
     CityManager *city_manager_;
+    ResourceManager *resource_manager_;
 
+    void handle_route_city_dest_(Route *route);
+    void handle_route_resource_dest_(Route *route, VehicleMoveDir direction);
     void handle_dest_reached_(StringName player_name, StringName route_name,
                               VehicleMoveDir direction);
     void handle_timeout_(StringName player_name, StringName route_name);

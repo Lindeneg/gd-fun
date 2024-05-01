@@ -12,6 +12,7 @@ void CITYLOG NEW_LOG(City)
 
 // SIGNALS
 const char *godot::CL::City::SSuppliesChanged{"supplies_changed"};
+const char *godot::CL::City::SSupplyChanged{"supply_changed"};
 const char *godot::CL::City::SDemandsChanged{"demands_changed"};
 const char *godot::CL::City::SIndustriesChanged{"industries_changed"};
 
@@ -26,43 +27,49 @@ godot::CL::City::City()
 
 godot::CL::City::~City() {}
 
-// TODO SIGNALS
 int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
     for (int i = 0; i < supplies_.size(); i++) {
         CityResource *supply{cast_to<CityResource>(supplies_[i])};
         if (supply->get_resource_kind() == kind) {
-            int actual_amount{
-                Math::max(0, Math::min(amount, supply->get_amount()))};
-            int diff{supply->get_amount() - actual_amount};
-            if (diff <= 0) return 0;
+            auto s_amount{supply->get_amount()};
+            if (s_amount == 0) return 0;
+            auto actual_amount{amount};
+            if (amount > s_amount) {
+                actual_amount = s_amount;
+            }
+            int diff{s_amount - actual_amount};
             supply->set_amount(diff);
 #ifdef CL_TRADING_CITY_DEBUG
             CITYLOG(this, "has %d left of resource %d after consumption\n",
                     diff, kind);
 #endif
+            emit_signal(SSupplyChanged, kind, diff);
             return actual_amount;
         }
     }
     for (int i = 0; i < industries_.size(); i++) {
         Industry *industry{cast_to<Industry>(industries_[i])};
         if (industry->get_out_kind() == kind) {
-            int actual_amount{
-                Math::max(0, Math::min(amount, industry->get_amount()))};
-            int diff{industry->get_amount() - actual_amount};
-            if (diff <= 0) return 0;
-            industry->set_amount(diff);
+            int i_amount{industry->get_out_amount()};
+            if (i_amount == 0) return 0;
+            int actual_amount{amount};
+            if (amount > i_amount) {
+                actual_amount = i_amount;
+            }
+            int diff{i_amount - actual_amount};
+            industry->set_out_amount(diff);
 #ifdef CL_TRADING_CITY_DEBUG
             CITYLOG(this,
                     "has %d left of industry resource %d after consumption\n",
                     diff, kind);
 #endif
+            emit_signal(SSupplyChanged, kind, diff);
             return actual_amount;
         }
     }
     return 0;
 }
 
-// TODO SIGNALS
 int godot::CL::City::receive_resource(ResourceKind kind, int amount) {
     for (int i = 0; i < demands_.size(); i++) {
         CityResource *demand{cast_to<CityResource>(demands_[i])};
@@ -76,8 +83,8 @@ int godot::CL::City::receive_resource(ResourceKind kind, int amount) {
     for (int i = 0; i < industries_.size(); i++) {
         Industry *industry{cast_to<Industry>(industries_[i])};
         if (industry->get_in_kind() == kind) {
-            int actual_amount{industry->get_amount() + amount};
-            industry->set_amount(actual_amount);
+            int actual_amount{industry->get_in_amount() + amount};
+            industry->set_in_amount(actual_amount);
 #ifdef CL_TRADING_CITY_DEBUG
             CITYLOG(this, "has received %d of industry resource %d, total %d\n",
                     amount, kind, actual_amount);
@@ -173,4 +180,7 @@ void godot::CL::City::_bind_methods() {
     ClassDB::add_signal(
         "City", MethodInfo(SButtonClicked,
                            PropertyInfo(Variant::STRING_NAME, "city_name")));
+    ClassDB::add_signal(
+        "City", MethodInfo(SSupplyChanged, PropertyInfo(Variant::INT, "kind"),
+                           PropertyInfo(Variant::INT, "new_amount")));
 }

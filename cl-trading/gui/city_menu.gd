@@ -47,7 +47,7 @@ func open_menu(city: City) -> void:
 	if _city.industries.size() > 0:
 		industry_header.visible = true;
 		for industry in _city.industries:
-			gui.create_supply_item(industry.out, industry.amount, menu_supply);
+			gui.create_supply_item(industry.out, industry.get_out_amount(), menu_supply);
 			gui.create_demand_item(industry.in, menu_demand);
 			gui.create_industry_item(industry, menu_industry);
 	else:
