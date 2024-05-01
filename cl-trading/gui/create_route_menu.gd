@@ -240,6 +240,9 @@ func _on_route_confirm_btn_button_down() -> void:
 	dict["surface"] = vehicle.surface;
 	dict["vehicle"] = vehicle.scene;
 	dict["cargo"] = _chosen_cargo;
+	if _entryable_kind == Entryable.ENTRYABLE_RESOURCE:
+		var res = gui.resource_manager.get_resource(_to.name);
+		dict["res"] = res.resource_kind;
 	stop_create();
 	emit_signal("create_route", dict);
 

@@ -58,13 +58,22 @@ func _on_gui_create_route(ctx: Dictionary) -> void:
 	route.set_end(ctx["to"]);
 	route.set_current_route(ctx["path"]);
 	route.set_vehicle(vehicle);
+	route.set_debug(true);
 
 	var cargo = {
 		TradingVehicle.VEHICLE_MOVE_DIR_AB: [],
 		TradingVehicle.VEHICLE_MOVE_DIR_BA: [],
 	};
-	_update_cargo_dict(cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB], ctx["cargo"][TradingVehicle.VEHICLE_MOVE_DIR_AB]["cargo"]);
-	_update_cargo_dict(cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA], ctx["cargo"][TradingVehicle.VEHICLE_MOVE_DIR_BA]["cargo"]);
-	route.set_cargo(cargo);
 
+	if ctx["type"] == Entryable.ENTRYABLE_CITY:
+		_update_cargo_dict(cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB], ctx["cargo"][TradingVehicle.VEHICLE_MOVE_DIR_AB]["cargo"]);
+		_update_cargo_dict(cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA], ctx["cargo"][TradingVehicle.VEHICLE_MOVE_DIR_BA]["cargo"]);
+	else:
+		var r = CityResource.new();
+		r.resource_kind = ctx["res"];
+		r.capacity = vehicle.cargo_space;
+		r.amount = 0;
+		cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA].append(r);
+
+	route.set_cargo(cargo);
 	add_route(route);
