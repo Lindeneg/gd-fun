@@ -23,6 +23,7 @@ class Route : public Node {
     GDCLASS(Route, Node)
 
    private:
+    bool debug_;
     bool initial_start_;
     EntryableKind kind_;
     Player *player_;
@@ -51,6 +52,8 @@ class Route : public Node {
    public:
     Route();
     ~Route();
+
+    DEBUG_METHODS()
 
     const static char *SOnloadCargo;
     const static char *SOnloadCargoFinished;

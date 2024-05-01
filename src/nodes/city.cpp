@@ -7,8 +7,7 @@
 #include "./industry.h"
 
 namespace godot::CL {
-static bool debug{false};
-void CITYLOG NEW_LOG(City)
+static void CITYLOG NEW_LOG(City)
 }  // namespace godot::CL
 
 // SIGNALS
@@ -19,6 +18,7 @@ const char *godot::CL::City::SIndustriesChanged{"industries_changed"};
 
 godot::CL::City::City()
     : Entryable(ENTRYABLE_CITY),
+      debug_(false),
       size_(CITY_SIZE_VILLAGE),
       supplies_(TypedArray<CityResource>{}),
       demands_(TypedArray<CityResource>{}),
@@ -40,7 +40,7 @@ int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
             }
             int diff{s_amount - actual_amount};
             supply->set_amount(diff);
-#ifdef CL_TRADING_CITY_DEBUG
+#ifdef CL_TRADING_DEBUG
             CITYLOG(this, "has %d left of resource %d after consumption\n",
                     diff, kind);
 #endif
@@ -59,7 +59,7 @@ int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
             }
             int diff{i_amount - actual_amount};
             industry->set_out_amount(diff);
-#ifdef CL_TRADING_CITY_DEBUG
+#ifdef CL_TRADING_DEBUG
             CITYLOG(this,
                     "has %d left of industry resource %d after consumption\n",
                     diff, kind);
@@ -77,7 +77,7 @@ godot::CL::CityReceiveResult godot::CL::City::receive_resource(
     for (int i = 0; i < demands_.size(); i++) {
         CityResource *demand{cast_to<CityResource>(demands_[i])};
         if (demand->get_resource_kind() == kind) {
-#ifdef CL_TRADING_CITY_DEBUG
+#ifdef CL_TRADING_DEBUG
             CITYLOG(this, "has received %d of resource %d\n", amount, kind);
 #endif
             result.accepted_amount = amount;
@@ -89,7 +89,7 @@ godot::CL::CityReceiveResult godot::CL::City::receive_resource(
         if (industry->get_in_kind() == kind) {
             int actual_amount{industry->get_in_amount() + amount};
             industry->set_in_amount(actual_amount);
-#ifdef CL_TRADING_CITY_DEBUG
+#ifdef CL_TRADING_DEBUG
             CITYLOG(this, "has received %d of industry resource %d, total %d\n",
                     amount, kind, actual_amount);
 #endif
@@ -115,6 +115,8 @@ void godot::CL::City::_ready() {
 
 void godot::CL::City::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(City);
+
     ClassDB::bind_method(D_METHOD("get_size"), &City::get_size);
     ClassDB::bind_method(D_METHOD("set_size", "s"), &City::set_size);
     ClassDB::bind_method(D_METHOD("get_supplies"), &City::get_supplies);

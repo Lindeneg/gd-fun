@@ -7,6 +7,7 @@
 #include "../core/entryable.h"
 #include "./city_resource.h"
 #include "./industry.h"
+#include "utils.h"
 
 namespace godot::CL {
 
@@ -33,6 +34,7 @@ class City : public Entryable {
     GDCLASS(City, Entryable)
 
    private:
+    bool debug_;
     CitySize size_;
     TypedArray<CityResource> supplies_;
     TypedArray<CityResource> demands_;
@@ -56,6 +58,8 @@ class City : public Entryable {
 
     int consume_resource(ResourceKind kind, int amount);
     CityReceiveResult receive_resource(ResourceKind kind, int amount);
+
+    DEBUG_METHODS()
 
     inline CitySize get_size() const { return size_; }
     inline float get_y_container_offset() const { return y_container_offset_; }

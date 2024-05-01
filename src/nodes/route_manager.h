@@ -13,6 +13,7 @@ class RouteManager : public Node {
     GDCLASS(RouteManager, Node)
 
    private:
+    bool debug_;
     Dictionary routes_;
     CityManager *city_manager_;
     ResourceManager *resource_manager_;
@@ -35,6 +36,8 @@ class RouteManager : public Node {
    public:
     RouteManager();
     ~RouteManager();
+
+    DEBUG_METHODS()
 
     void _enter_tree() override;
 

@@ -14,7 +14,8 @@ void ROUTEMLOG NEW_M_LOG(RouteManager)
 }  // namespace godot::CL
 
 godot::CL::RouteManager::RouteManager()
-    : routes_(Dictionary()),
+    : debug_(false),
+      routes_(Dictionary()),
       city_manager_(nullptr),
       resource_manager_(nullptr),
       offload_cargo_cb_(Callable(this, "handle_offload_cargo_")),
@@ -71,9 +72,10 @@ void godot::CL::RouteManager::handle_offload_finished_(StringName player_name,
                                                        StringName route_name) {
     Route *route{get_player_route(player_name, route_name)};
     ERR_FAIL_NULL(route);
-#ifdef CL_TRADING_ROUTE_DEBUG
-    ROUTEMLOG("%s\n", GDSTR(vformat("%s finished offloading cargo",
-                                    route->get_name())));
+#ifdef CL_TRADING_DEBUG
+    ROUTEMLOG(
+        debug_, "%s\n",
+        GDSTR(vformat("%s finished offloading cargo", route->get_name())));
 #endif
     route->get_vehicle()->set_state(VEHICLE_ONLOADING);
     route->switch_dir();
@@ -84,8 +86,8 @@ void godot::CL::RouteManager::handle_onload_finished_(StringName player_name,
                                                       StringName route_name) {
     Route *route{get_player_route(player_name, route_name)};
     ERR_FAIL_NULL(route);
-#ifdef CL_TRADING_ROUTE_DEBUG
-    ROUTEMLOG("%s\n",
+#ifdef CL_TRADING_DEBUG
+    ROUTEMLOG(debug_, "%s\n",
               GDSTR(vformat("%s finished onloading cargo", route->get_name())));
 #endif
     route->start();
@@ -134,8 +136,8 @@ void godot::CL::RouteManager::add_route(Route *route) {
         routes_.get(player_name, TypedArray<Route>{}))};
     routes.append(route);
     routes_[player_name] = routes;
-#ifdef CL_TRADING_ROUTE_DEBUG
-    ROUTEMLOG("%s\n",
+#ifdef CL_TRADING_DEBUG
+    ROUTEMLOG(debug_, "%s\n",
               GDSTR(vformat("created route %s for player %s, total %d",
                             route->get_name(), player_name, routes.size())));
 #endif
@@ -155,6 +157,8 @@ void godot::CL::RouteManager::remove_route(const Route *route) {}
 
 void godot::CL::RouteManager::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(RouteManager)
+
     ClassDB::bind_method(D_METHOD("add_route", "r"), &RouteManager::add_route);
     ClassDB::bind_method(D_METHOD("remove_route", "r"),
                          &RouteManager::remove_route);

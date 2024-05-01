@@ -9,7 +9,7 @@
 
 namespace godot::CL {
 void ROUTELOG NEW_LOG(Route)
-}
+}  // namespace godot::CL
 
 const char *godot::CL::Route::SOnloadCargo{"onload-cargo"};
 const char *godot::CL::Route::SOffloadCargo{"offload-cargo"};
@@ -17,7 +17,8 @@ const char *godot::CL::Route::SOnloadCargoFinished{"onload-finished"};
 const char *godot::CL::Route::SOffloadCargoFinished{"offload-finished"};
 
 godot::CL::Route::Route()
-    : initial_start_(true),
+    : debug_(false),
+      initial_start_(true),
       kind_(ENTRYABLE_CITY),
       player_(nullptr),
       current_route_(TypedArray<Vector2>()),
@@ -73,7 +74,7 @@ void godot::CL::Route::handle_destination_reached_(const int direction) {
     if (Utils::is_in_editor()) {
         return;
     }
-#ifdef CL_TRADING_ROUTE_DEBUG
+#ifdef CL_TRADING_DEBUG
     ROUTELOG(this, "destination reached with direction %d\n", direction);
 #endif
     current_cargo_idx_ = 0;
@@ -120,7 +121,7 @@ void godot::CL::Route::receive_current_resource(int amount) {
     int total{cargo->get_amount() + amount};
     ERR_FAIL_COND(total > cargo->get_capacity());
     cargo->set_amount(total);
-#ifdef CL_TRADING_ROUTE_DEBUG
+#ifdef CL_TRADING_DEBUG
     ROUTELOG(this, "onloaded resource %d for total %d\n",
              cargo->get_resource_kind(), total);
 #endif
@@ -133,7 +134,7 @@ void godot::CL::Route::consume_current_resource(int amount) {
     int total{cargo->get_amount() - amount};
     ERR_FAIL_COND(total < 0);
     cargo->set_amount(total);
-#ifdef CL_TRADING_ROUTE_DEBUG
+#ifdef CL_TRADING_DEBUG
     ROUTELOG(this, "offloaded resource %d for total %d\n",
              cargo->get_resource_kind(), total);
 #endif
@@ -235,6 +236,8 @@ void godot::CL::Route::_exit_tree() {
 
 void godot::CL::Route::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(Route);
+
     ClassDB::bind_method(D_METHOD("handle_timeout_"), &Route::handle_timeout_);
     ClassDB::bind_method(D_METHOD("handle_destination_reached_", "dest"),
                          &Route::handle_destination_reached_);
