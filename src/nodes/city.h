@@ -20,6 +20,8 @@ enum CitySize {
 };
 
 struct CityReceiveResult {
+    StringName industry;
+    bool industry_resource;
     int accepted_amount;
     int amount;
 };

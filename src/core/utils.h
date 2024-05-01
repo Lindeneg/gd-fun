@@ -8,7 +8,19 @@
 
 #define MAKE_RESOURCE_TYPE_HINT(m_type) \
     vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, m_type)
+
 #define GDSTR(s) Utils::convert_gd_string(s)
+
+#define MAKE_LOG(name, cls)       \
+    namespace godot::CL {         \
+    static void name NEW_LOG(cls) \
+    }  // namespace godot::CL
+
+#define MAKE_M_LOG(name, cls)       \
+    namespace godot::CL {           \
+    static void name NEW_M_LOG(cls) \
+    }  // namespace godot::CL
+
 #define NEW_LOG(cls)                          \
     (const cls *t, const char *format, ...) { \
         if (!t->get_debug()) return;          \
@@ -19,6 +31,7 @@
         vprintf(format, args);                \
         va_end(args);                         \
     }
+
 #define NEW_M_LOG(cls)                            \
     (const bool debug, const char *format, ...) { \
         if (!debug) return;                       \
@@ -28,9 +41,11 @@
         vprintf(format, args);                    \
         va_end(args);                             \
     }
+
 #define DEBUG_METHODS()                              \
     inline bool get_debug() const { return debug_; } \
     inline void set_debug(const bool d) { debug_ = d; }
+
 #define DEBUG_BIND(cls)                                                \
     ClassDB::bind_method(D_METHOD("get_debug"), &cls::get_debug);      \
     ClassDB::bind_method(D_METHOD("set_debug", "d"), &cls::set_debug); \

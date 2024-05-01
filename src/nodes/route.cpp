@@ -7,9 +7,9 @@
 #include "../core/utils.h"
 #include "./trading_vehicle.h"
 
-namespace godot::CL {
-void ROUTELOG NEW_LOG(Route)
-}  // namespace godot::CL
+#ifdef CL_TRADING_DEBUG
+MAKE_LOG(ROUTELOG, Route)
+#endif
 
 const char *godot::CL::Route::SOnloadCargo{"onload-cargo"};
 const char *godot::CL::Route::SOffloadCargo{"offload-cargo"};

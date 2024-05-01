@@ -9,9 +9,9 @@
 #include "./resource_manager.h"
 #include "./trading_vehicle.h"
 
-namespace godot::CL {
-void ROUTEMLOG NEW_M_LOG(RouteManager)
-}  // namespace godot::CL
+#ifdef CL_TRADING_DEBUG
+MAKE_M_LOG(ROUTEMLOG, RouteManager)
+#endif
 
 godot::CL::RouteManager::RouteManager()
     : debug_(false),
@@ -30,19 +30,17 @@ void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
                                                     ResourceKind kind) {
     Route *route{get_player_route(player_name, route_name)};
     ERR_FAIL_NULL(route);
-    if (route->get_kind() == ENTRYABLE_CITY) {
-        StringName city_name{route->get_target_entryable()};
-        City *city{city_manager_->get_city(city_name)};
-        ERR_FAIL_NULL(city);
-        auto offloaded{city->receive_resource(kind, 1)};
-        if (offloaded.amount > 0) {
-            route->consume_current_resource(offloaded.amount);
-            if (offloaded.accepted_amount > 0) {
-                // TODO: NOTIFY FINANCE
-            }
-        } else {
-            route->go_to_next_cargo();
+    StringName city_name{route->get_target_entryable()};
+    City *city{city_manager_->get_city(city_name)};
+    ERR_FAIL_NULL(city);
+    auto offloaded{city->receive_resource(kind, 1)};
+    if (offloaded.amount > 0) {
+        route->consume_current_resource(offloaded.amount);
+        if (offloaded.accepted_amount > 0) {
+            // TODO: NOTIFY FINANCE
         }
+    } else {
+        route->go_to_next_cargo();
     }
     route->queue_offload_cargo();
 }
@@ -63,7 +61,16 @@ void godot::CL::RouteManager::handle_onload_cargo_(StringName player_name,
             route->go_to_next_cargo();
         }
     } else {
-        // TODO resource tile onload
+        ResourceTile *res{resource_manager_->get_resource(route->get_end())};
+        ERR_FAIL_NULL(res);
+        int current_amount{res->get_current_amount()};
+        if (current_amount > 0) {
+            res->set_current_amount(current_amount - 1);
+            route->receive_current_resource(1);
+        } else {
+            handle_onload_finished_(player_name, route_name);
+            return;
+        }
     }
     route->queue_onload_cargo();
 }

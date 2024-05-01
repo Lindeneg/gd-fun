@@ -6,9 +6,9 @@
 #include "../core/utils.h"
 #include "./industry.h"
 
-namespace godot::CL {
-static void CITYLOG NEW_LOG(City)
-}  // namespace godot::CL
+#ifdef CL_TRADING_DEBUG
+MAKE_LOG(CITYLOG, City)
+#endif
 
 // SIGNALS
 const char *godot::CL::City::SSuppliesChanged{"supplies_changed"};
@@ -73,7 +73,7 @@ int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
 
 godot::CL::CityReceiveResult godot::CL::City::receive_resource(
     ResourceKind kind, int amount) {
-    CityReceiveResult result{0, amount};
+    CityReceiveResult result{"", false, 0, amount};
     for (int i = 0; i < demands_.size(); i++) {
         CityResource *demand{cast_to<CityResource>(demands_[i])};
         if (demand->get_resource_kind() == kind) {
@@ -94,6 +94,8 @@ godot::CL::CityReceiveResult godot::CL::City::receive_resource(
                     amount, kind, actual_amount);
 #endif
             result.accepted_amount = amount;
+            result.industry = industry->get_name();
+            result.industry_resource = true;
             return result;
         }
     }
