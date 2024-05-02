@@ -46,7 +46,7 @@ class RouteManager : public Node {
                             const StringName route_name) const;
     void add_route(Route *route);
     void remove_route_from_name(const StringName player_name,
-                      const StringName route_name);
+                                const StringName route_name);
     void remove_route(Route *route);
 };
 }  // namespace godot::CL

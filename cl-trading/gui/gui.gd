@@ -52,7 +52,6 @@ func _setup_uis() -> void:
 		resource_ui.resource = resource;
 		resource.add_child(resource_ui);
 
-
 func remove_nodes_children(nodes: Array) -> void:
 	for node in nodes:
 		remove_node_children(node);
@@ -146,7 +145,6 @@ func _on_city_manager_city_clicked(city_name: StringName) -> void:
 	if !city_manager:
 		return;
 	city_menu.open_menu(city_manager.get_city(city_name));
-
 
 func _on_create_route_menu_create_route(ctx: Dictionary) -> void:
 		emit_signal("create_route", ctx);

@@ -176,7 +176,7 @@ func _on_route_supply_click(entry):
 		update_current_cargo_view();
 
 func _on_route_cargo_click(index):
-	if (_chosen_cargo[_direction]["cargo"].size() <= 0):
+	if (index >= _chosen_cargo[_direction]["cargo"].size()):
 		return;
 	var res = gui.resources.get_resource(_chosen_cargo[_direction]["cargo"][index]);
 	_chosen_cargo[_direction]["cargo"].remove_at(index);

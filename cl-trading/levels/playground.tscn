@@ -124,28 +124,30 @@ script = ExtResource("8_k7mje")
 [node name="PlayerLars" type="Player" parent="PlayerManager"]
 start_city = &"Garland"
 
-[node name="CameraManager" parent="PlayerManager/PlayerLars" node_paths=PackedStringArray("tile_manager") instance=ExtResource("1_rr1md")]
-z_index = 4000
-position_smoothing_speed = 100.0
+[node name="Client" type="Node" parent="."]
+
+[node name="CameraManager" parent="Client" node_paths=PackedStringArray("tile_manager") instance=ExtResource("1_rr1md")]
 max_move_speed = 5.0
 move_cutoff = 250.0
-tile_manager = NodePath("../../../TileManager")
+tile_manager = NodePath("../../TileManager")
 
-[node name="GUI" parent="PlayerManager/PlayerLars/CameraManager" node_paths=PackedStringArray("camera_manager", "city_manager", "tile_manager", "route_manager", "resource_manager", "debug_manager", "resources", "player") instance=ExtResource("8_wqw8b")]
+[node name="GUI" parent="Client/CameraManager" node_paths=PackedStringArray("camera_manager", "city_manager", "tile_manager", "route_manager", "resource_manager", "debug_manager", "resources", "player") instance=ExtResource("8_wqw8b")]
+offset_right = 1920.0
+offset_bottom = 1080.0
 camera_manager = NodePath("..")
-city_manager = NodePath("../../../../CityManager")
-tile_manager = NodePath("../../../../TileManager")
-route_manager = NodePath("../../../../RouteManager")
-resource_manager = NodePath("../../../../ResourceManager")
-debug_manager = NodePath("../../../../DebugManager")
-resources = NodePath("../../../../BaseResources")
-player = NodePath("../..")
+city_manager = NodePath("../../../CityManager")
+tile_manager = NodePath("../../../TileManager")
+route_manager = NodePath("../../../RouteManager")
+resource_manager = NodePath("../../../ResourceManager")
+debug_manager = NodePath("../../../DebugManager")
+resources = NodePath("../../../BaseResources")
+player = NodePath("../../../PlayerManager/PlayerLars")
 
 [node name="DebugManager" parent="." instance=ExtResource("4_olsel")]
 z_index = 4096
 
 [connection signal="draw_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_draw_debug_grid"]
 [connection signal="remove_debug_grid" from="TileManager" to="DebugManager" method="_on_tile_manager_remove_debug_grid"]
-[connection signal="resource_clicked" from="ResourceManager" to="PlayerManager/PlayerLars/CameraManager/GUI" method="_on_resource_manager_resource_clicked"]
-[connection signal="city_clicked" from="CityManager" to="PlayerManager/PlayerLars/CameraManager/GUI" method="_on_city_manager_city_clicked"]
-[connection signal="create_route" from="PlayerManager/PlayerLars/CameraManager/GUI" to="RouteManager" method="_on_gui_create_route"]
+[connection signal="resource_clicked" from="ResourceManager" to="Client/CameraManager/GUI" method="_on_resource_manager_resource_clicked"]
+[connection signal="city_clicked" from="CityManager" to="Client/CameraManager/GUI" method="_on_city_manager_city_clicked"]
+[connection signal="create_route" from="Client/CameraManager/GUI" to="RouteManager" method="_on_gui_create_route"]
