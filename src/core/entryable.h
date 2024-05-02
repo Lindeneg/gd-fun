@@ -36,6 +36,7 @@ class Entryable : public Area2D {
     const static char *SButtonClicked;
     const static char *SButtonStateChanged;
 
+    // TODO
     inline Vector2i calculate_size_in_tiles() { return Vector2i(0, 0); }
 
     Dictionary get_entry_tile(const TileEntryType type) const;

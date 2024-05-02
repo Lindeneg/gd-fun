@@ -96,7 +96,6 @@ position = Vector2(480, 176)
 [node name="CityManager" type="CityManager" parent="."]
 
 [node name="Garland" parent="CityManager" instance=ExtResource("3_rkss4")]
-debug = true
 supplies = Array[CityResource]([SubResource("CityResource_q40ce"), SubResource("CityResource_4l0v7")])
 demands = Array[CityResource]([SubResource("CityResource_8ykkg"), SubResource("CityResource_bquv1")])
 industries = Array[Industry]([SubResource("Industry_1hx1g")])
@@ -117,7 +116,6 @@ position = Vector2(752, 624)
 position = Vector2(1216, 1056)
 
 [node name="RouteManager" type="RouteManager" parent="."]
-debug = true
 script = ExtResource("7_lwuc8")
 
 [node name="PlayerManager" type="Node" parent="."]

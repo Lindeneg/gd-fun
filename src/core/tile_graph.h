@@ -43,8 +43,6 @@ using AStarPrioQueueMember = std::map<TileVertex *, int>;
 
 /* TileGraph is a weighted undirected graph
  * structure that is used for pathfinding */
-// TODO (3)
-// should probably think about caching path results at some point
 class TileGraph {
    private:
     static const int MaxPathLength_;

@@ -53,6 +53,7 @@ class TradingVehicle : public Area2D {
     static const char *AnimationNames[];
     static const int32_t AnimationSize;
 
+    bool debug_;
     // are we going from
     // cityX->cityY or cityY->cityX
     VehicleMoveDir move_dir_;
@@ -111,6 +112,8 @@ class TradingVehicle : public Area2D {
     void start_navigating();
     void stop_navigating();
     void switch_move_dir();
+
+    DEBUG_METHODS()
 
     inline void clear_map_path() { map_route_.clear(); }
     inline bool is_moving() const { return state_ == VEHICLE_MOVING; }

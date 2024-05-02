@@ -24,9 +24,6 @@ godot::CL::Entryable::Entryable(EntryableKind kind)
       offshore_entries_(Array()) {}
 
 godot::CL::Entryable::~Entryable() {
-#ifdef CL_TRADING_DEBUG
-    printf("Entryable: queuing shape for deletion\n");
-#endif
     Utils::queue_delete(col_shape_);
     col_shape_ = nullptr;
 }

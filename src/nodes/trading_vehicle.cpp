@@ -1,7 +1,6 @@
 #include "trading_vehicle.h"
 
 #include <cstdint>
-#include <cstdio>
 #include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
@@ -17,6 +16,10 @@
 
 #include "../core/utils.h"
 
+#ifdef CL_TRADING_DEBUG
+MAKE_LOG(VEHICLELOG, TradingVehicle)
+#endif
+
 // STRING CONSTANTS
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const char *godot::CL::TradingVehicle::AnimationNames
@@ -26,7 +29,8 @@ const char *godot::CL::TradingVehicle::AnimationNames
 const char *godot::CL::TradingVehicle::SDestReached{"destination_reached"};
 
 godot::CL::TradingVehicle::TradingVehicle()
-    : move_dir_(VEHICLE_MOVE_DIR_BA),
+    : debug_(false),
+      move_dir_(VEHICLE_MOVE_DIR_BA),
       map_route_(TypedArray<Vector2>()),
       current_map_route_idx_(0),
       tile_surface_(TILE_SURFACE_GROUND),
@@ -44,7 +48,7 @@ godot::CL::TradingVehicle::TradingVehicle()
 
 godot::CL::TradingVehicle::~TradingVehicle() {
 #ifdef CL_TRADING_DEBUG
-    printf("TradingVehicle: queuing sprite and shape for deletion\n");
+    VEHICLELOG(this, "destructor called\n");
 #endif
     Utils::queue_delete(animated_sprite_);
     Utils::queue_delete(collision_shape_);
@@ -207,6 +211,8 @@ void godot::CL::TradingVehicle::_process(double delta) {
 
 void godot::CL::TradingVehicle::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(TradingVehicle)
+
     ClassDB::bind_method(D_METHOD("switch_move_dir"),
                          &TradingVehicle::switch_move_dir);
     ClassDB::bind_method(D_METHOD("get_state"), &TradingVehicle::get_state);

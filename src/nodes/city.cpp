@@ -26,7 +26,11 @@ godot::CL::City::City()
       y_container_offset_(0.0f),
       y_button_offset_(0.0f) {}
 
-godot::CL::City::~City() {}
+godot::CL::City::~City() {
+#ifdef CL_TRADING_DEBUG
+    CITYLOG(this, "destructor called\n");
+#endif
+}
 
 int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
     for (int i = 0; i < supplies_.size(); i++) {

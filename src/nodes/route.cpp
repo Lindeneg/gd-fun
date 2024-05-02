@@ -35,7 +35,12 @@ godot::CL::Route::Route()
       gold_cost_(0),
       vehicle_(nullptr) {}
 
-godot::CL::Route::~Route() { destroy(); }
+godot::CL::Route::~Route() {
+#ifdef CL_TRADING_DEBUG
+    ROUTELOG(this, "destructor called\n");
+#endif
+    destroy();
+}
 
 void godot::CL::Route::destroy() {
     Utils::disconnect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);

@@ -11,7 +11,6 @@
 #include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/variant.hpp>
-#include <iostream>
 
 #include "../core/tile_graph.h"
 #include "../core/utils.h"
@@ -42,7 +41,6 @@ void godot::CL::TileManager::set_rebuild_debug_graph(const bool m) {
     if (!debug_mode_) {
         return;
     }
-    std::cout << "TileManager: rebuilding debug graph\n";
     debug_array_.clear();
     create_graph_();
 #endif
@@ -61,7 +59,6 @@ void godot::CL::TileManager::emit_debug_signal_() {
 
 void godot::CL::TileManager::set_debug_array_() {
 #ifdef CL_TRADING_DEBUG
-    std::cout << "TileManager: setting debug array\n";
     const auto size{get_tile_graph_size()};
     if (size > debug_array_.size()) {
         debug_array_.resize(size);
@@ -251,9 +248,4 @@ void godot::CL::TileManager::_bind_methods() {
 
     BIND_ENUM_CONSTANT(TILE_DATA_LAYER_WEIGHT);
     BIND_ENUM_CONSTANT(TILE_DATA_LAYER_IS_WATER);
-
-    //    BIND_ENUM_CONSTANT(TILE_MAT_NONE);
-    //    BIND_ENUM_CONSTANT(TILE_MAT_GROUND);
-    //    BIND_ENUM_CONSTANT(TILE_MAT_WATER);
-    //    BIND_ENUM_CONSTANT(TILE_MAT_OBSTACLE);
 }
