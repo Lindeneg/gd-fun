@@ -111,6 +111,14 @@ void godot::CL::City::_ready() {
         e_assign_required_components_();
     } else {
         r_assign_required_components_();
+        for (int i = 0; i < industries_.size(); i++) {
+            Industry *industry{cast_to<Industry>(industries_[i])};
+            Timer *timer{industry->initialize_timer()};
+            ERR_FAIL_NULL(timer);
+            add_child(timer);
+            industry->connect(Industry::SResourceProcessFinished,
+                              Callable(this, "on_resource_process_finished_"));
+        }
     }
     set_y_sort_enabled(true);
     set_z_index(5);
@@ -122,6 +130,9 @@ void godot::CL::City::_ready() {
 void godot::CL::City::_bind_methods() {
     // BIND METHODS
     DEBUG_BIND(City);
+
+    ClassDB::bind_method(D_METHOD("on_resource_process_finished_"),
+                         &City::on_resource_process_finished_);
 
     ClassDB::bind_method(D_METHOD("get_size"), &City::get_size);
     ClassDB::bind_method(D_METHOD("set_size", "s"), &City::set_size);

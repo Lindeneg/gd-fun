@@ -1,17 +1,63 @@
 #include "industry.h"
 
+const char *godot::CL::Industry::SResourceProcessStarted{"process-started"};
+const char *godot::CL::Industry::SResourceProcessFinished{"process-finished"};
+
 godot::CL::Industry::Industry()
-    : in_kind_(RESOURCE_PASSENGER),
+    : timer_(nullptr),
+      debug_(false),
+      state_(INDUSTRY_STATE_IDLE),
+      in_kind_(RESOURCE_PASSENGER),
       out_kind_(RESOURCE_PASSENGER),
       time_to_convert_(0.0f),
       conversion_amount_(0),
       in_amount_(0),
       out_amount_(0) {}
 
-godot::CL::Industry::~Industry() {}
+godot::CL::Industry::~Industry() {
+    Utils::queue_delete(timer_);
+    timer_ = nullptr;
+}
+
+void godot::CL::Industry::on_process_resource_finished_() {
+    ERR_FAIL_COND(state_ != INDUSTRY_STATE_PROCESSING);
+    out_amount_ += 1;
+    state_ = INDUSTRY_STATE_IDLE;
+    emit_signal(SResourceProcessFinished, out_kind_, out_amount_);
+    if (in_amount_ >= conversion_amount_) {
+        queue_process_resource_();
+    }
+}
+
+void godot::CL::Industry::queue_process_resource_() {
+    if (state_ == INDUSTRY_STATE_PROCESSING ||
+        in_amount_ < conversion_amount_) {
+        return;
+    }
+    state_ = INDUSTRY_STATE_PROCESSING;
+    in_amount_ -= conversion_amount_;
+    emit_signal(SResourceProcessStarted, in_kind_, in_amount_);
+    timer_->start();
+}
+
+godot::Timer *godot::CL::Industry::initialize_timer() {
+    if (has_timer() || Utils::is_in_editor()) return nullptr;
+    timer_ = memnew(Timer);
+    timer_->set_wait_time(time_to_convert_);
+    timer_->set_one_shot(true);
+    timer_->connect("timeout", Callable(this, "on_process_resource_finished_"));
+    return timer_;
+}
 
 void godot::CL::Industry::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(Industry)
+
+    ClassDB::bind_method(D_METHOD("on_process_resource_finished_"),
+                         &Industry::on_process_resource_finished_);
+    ClassDB::bind_method(D_METHOD("queue_process_resource_"),
+                         &Industry::queue_process_resource_);
+
     ClassDB::bind_method(D_METHOD("get_in_kind"), &Industry::get_in_kind);
     ClassDB::bind_method(D_METHOD("get_out_kind"), &Industry::get_out_kind);
     ClassDB::bind_method(D_METHOD("get_conversion_amount"),
@@ -21,6 +67,8 @@ void godot::CL::Industry::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_in_kind", "k"), &Industry::set_in_kind);
     ClassDB::bind_method(D_METHOD("set_out_kind", "k"),
                          &Industry::set_out_kind);
+
+    ClassDB::bind_method(D_METHOD("get_state"), &Industry::get_state);
 
     ClassDB::bind_method(D_METHOD("get_in_amount"), &Industry::get_in_amount);
     ClassDB::bind_method(D_METHOD("set_in_amount", "a"),
@@ -47,4 +95,16 @@ void godot::CL::Industry::_bind_methods() {
     ClassDB::add_property("Industry",
                           PropertyInfo(Variant::FLOAT, "time_to_convert"),
                           "set_time_to_convert", "get_time_to_convert");
+
+    BIND_ENUM_CONSTANT(INDUSTRY_STATE_IDLE);
+    BIND_ENUM_CONSTANT(INDUSTRY_STATE_PROCESSING);
+
+    ClassDB::add_signal(
+        "Industry",
+        MethodInfo(SResourceProcessStarted, PropertyInfo(Variant::INT, "kind"),
+                   PropertyInfo(Variant::INT, "amount")));
+    ClassDB::add_signal(
+        "Industry",
+        MethodInfo(SResourceProcessFinished, PropertyInfo(Variant::INT, "kind"),
+                   PropertyInfo(Variant::INT, "amount")));
 }

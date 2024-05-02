@@ -44,6 +44,10 @@ class City : public Entryable {
     float y_container_offset_;
     float y_button_offset_;
 
+    inline void on_resource_process_finished_(int kind, int amount) {
+        emit_signal(SSupplyChanged, kind, amount);
+    }
+
    protected:
     static void _bind_methods();
 
