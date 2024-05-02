@@ -148,19 +148,45 @@ void godot::CL::RouteManager::add_route(Route *route) {
               GDSTR(vformat("created route %s for player %s, total %d",
                             route->get_name(), player_name, routes.size())));
 #endif
-    // TODO disconnect on route removal
     player->add_connection(route->get_start());
     player->add_connection(route->get_end());
-    route->connect(Route::SOnloadCargo, onload_cargo_cb_);
-    route->connect(Route::SOffloadCargo, offload_cargo_cb_);
-    route->connect(Route::SOffloadCargoFinished, offload_finished_cb_);
-    route->connect(Route::SOnloadCargoFinished, onload_finished_cb_);
+    Utils::connect(route, Route::SOnloadCargo, onload_cargo_cb_);
+    Utils::connect(route, Route::SOffloadCargo, offload_cargo_cb_);
+    Utils::connect(route, Route::SOffloadCargoFinished, offload_finished_cb_);
+    Utils::connect(route, Route::SOnloadCargoFinished, onload_finished_cb_);
     route->start();
 }
 
-void godot::CL::RouteManager::remove_route_from_name(const StringName name) {}
+void godot::CL::RouteManager::remove_route_from_name(
+    const StringName player_name, const StringName route_name) {
+    Route *route{get_player_route(player_name, route_name)};
+    remove_route(route);
+}
 
-void godot::CL::RouteManager::remove_route(const Route *route) {}
+void godot::CL::RouteManager::remove_route(Route *route) {
+    ERR_FAIL_NULL(route);
+    route->stop();
+    Player *player{route->get_player()};
+    ERR_FAIL_NULL(player);
+    StringName player_name{player->get_name()};
+    auto routes{static_cast<TypedArray<Route>>(
+        routes_.get(player_name, TypedArray<Route>{}))};
+    routes.erase(route);
+    routes_[player_name] = routes;
+#ifdef CL_TRADING_DEBUG
+    ROUTEMLOG(debug_, "%s\n",
+              GDSTR(vformat("erased route %s for player %s, total %d",
+                            route->get_name(), player_name, routes.size())));
+#endif
+    player->remove_connection(route->get_start());
+    player->remove_connection(route->get_end());
+    Utils::disconnect(route, Route::SOnloadCargo, onload_cargo_cb_);
+    Utils::disconnect(route, Route::SOffloadCargo, offload_cargo_cb_);
+    Utils::disconnect(route, Route::SOffloadCargoFinished,
+                      offload_finished_cb_);
+    Utils::disconnect(route, Route::SOnloadCargoFinished, onload_finished_cb_);
+    Utils::queue_delete(route);
+}
 
 void godot::CL::RouteManager::_bind_methods() {
     // BIND METHODS
@@ -169,7 +195,7 @@ void godot::CL::RouteManager::_bind_methods() {
     ClassDB::bind_method(D_METHOD("add_route", "r"), &RouteManager::add_route);
     ClassDB::bind_method(D_METHOD("remove_route", "r"),
                          &RouteManager::remove_route);
-    ClassDB::bind_method(D_METHOD("remove_route_from_name", "n"),
+    ClassDB::bind_method(D_METHOD("remove_route_from_name", "p", "r"),
                          &RouteManager::remove_route_from_name);
     ClassDB::bind_method(D_METHOD("get_player_route", "n", "r"),
                          &RouteManager::get_player_route);
