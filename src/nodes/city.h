@@ -50,25 +50,25 @@ class City : public Entryable {
 
     inline int get_restock_timeout() const {
         switch (size_) {
-            case CITY_SIZE_METRO:
-                return 25;
-            case CITY_SIZE_REGIO:
-                return 30;
-            case CITY_SIZE_URBAN:
-                return 35;
-            case CITY_SIZE_TOWN:
-                return 50;
+                //            case CITY_SIZE_METRO:
+                //                return 25;
+                //            case CITY_SIZE_REGIO:
+                //                return 30;
+                //            case CITY_SIZE_URBAN:
+                //                return 35;
+                //            case CITY_SIZE_TOWN:
+                //                return 50;
             default:
-                return 60;
+                return 10;
         }
     }
 
     inline int get_restock_amount() const {
         switch (size_) {
-            case CITY_SIZE_METRO:
-                return 3;
-            case CITY_SIZE_REGIO:
-                return 2;
+                //            case CITY_SIZE_METRO:
+                //                return 3;
+                //            case CITY_SIZE_REGIO:
+                //                return 2;
             default:
                 return 1;
         }

@@ -51,6 +51,9 @@ void godot::CL::ResourceTile::_bind_methods() {
     // BIND METHODS
     DEBUG_BIND(ResourceTile)
 
+    ClassDB::bind_method(D_METHOD("get_size"), &ResourceTile::get_size);
+    ClassDB::bind_method(D_METHOD("set_size", "s"), &ResourceTile::set_size);
+
     ClassDB::bind_method(D_METHOD("get_resource_kind"),
                          &ResourceTile::get_resource_kind);
     ClassDB::bind_method(D_METHOD("set_resource_kind", "k"),
@@ -80,6 +83,11 @@ void godot::CL::ResourceTile::_bind_methods() {
                           BaseResource::get_kind_prop_info("resource_kind"),
                           "set_resource_kind", "get_resource_kind");
 
+    ClassDB::add_property("ResourceTile",
+                          PropertyInfo(Variant::INT, "size", PROPERTY_HINT_ENUM,
+                                       "Small,Medium,Large"),
+                          "set_size", "get_size");
+
     ClassDB::add_signal(
         "ResourceTile",
         MethodInfo(SAmountChanged, PropertyInfo(Variant::INT, "amount")));
@@ -91,4 +99,8 @@ void godot::CL::ResourceTile::_bind_methods() {
         "ResourceTile",
         MethodInfo(SButtonClicked,
                    PropertyInfo(Variant::STRING_NAME, "resource_name")));
+
+    BIND_ENUM_CONSTANT(RESOURCE_TILE_SMALL);
+    BIND_ENUM_CONSTANT(RESOURCE_TILE_MEDIUM);
+    BIND_ENUM_CONSTANT(RESOURCE_TILE_LARGE);
 }

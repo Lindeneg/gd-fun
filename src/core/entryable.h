@@ -29,7 +29,7 @@ class Entryable : public Area2D {
 
     static void _bind_methods();
 
-    void r_assign_required_components_(const float restock_time = 5.0f);
+    void r_assign_required_components_(const float restock_time);
     void e_assign_required_components_();
 
     virtual void on_restock_timeout_(){};
