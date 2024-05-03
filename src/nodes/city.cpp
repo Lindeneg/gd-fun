@@ -4,6 +4,7 @@
 #include <godot_cpp/core/property_info.hpp>
 
 #include "../core/utils.h"
+#include "./base_resource.h"
 #include "./industry.h"
 
 #ifdef CL_TRADING_DEBUG
@@ -26,11 +27,7 @@ godot::CL::City::City()
       y_container_offset_(0.0f),
       y_button_offset_(0.0f) {}
 
-godot::CL::City::~City() {
-#ifdef CL_TRADING_DEBUG
-    CITYLOG(this, "destructor called\n");
-#endif
-}
+godot::CL::City::~City() {}
 
 int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
     for (int i = 0; i < supplies_.size(); i++) {
@@ -106,11 +103,35 @@ godot::CL::CityReceiveResult godot::CL::City::receive_resource(
     return result;
 }
 
+void godot::CL::City::on_restock_timeout_() {
+    int matches{0};
+    for (int i = 0; i < supplies_.size(); i++) {
+        if (matches >= 2) {
+            return;
+        }
+        CityResource *supply{cast_to<CityResource>(supplies_[i])};
+        ResourceKind kind{supply->get_resource_kind()};
+        if (kind == RESOURCE_PASSENGER || kind == RESOURCE_MAIL) {
+            int requested_amount{get_restock_amount()};
+            int new_amount{supply->get_amount() + requested_amount};
+            if (new_amount <= supply->get_capacity()) {
+                supply->set_amount(new_amount);
+#ifdef CL_TRADING_DEBUG
+                CITYLOG(this, "has restocked %d of resource %d\n",
+                        requested_amount, kind);
+#endif
+                emit_signal(SSupplyChanged, kind, new_amount);
+            }
+            matches++;
+        }
+    }
+}
+
 void godot::CL::City::_ready() {
     if (Utils::is_in_editor()) {
         e_assign_required_components_();
     } else {
-        r_assign_required_components_();
+        r_assign_required_components_(get_restock_timeout());
         for (int i = 0; i < industries_.size(); i++) {
             Industry *industry{cast_to<Industry>(industries_[i])};
             Timer *timer{industry->initialize_timer()};
@@ -125,6 +146,7 @@ void godot::CL::City::_ready() {
     set_monitorable(false);
     set_collision_layer(COLLISION_LAYER_CITY);
     set_collision_mask(COLLISION_LAYER_VEHICLE);
+    start_restock_timer();
 }
 
 void godot::CL::City::_bind_methods() {

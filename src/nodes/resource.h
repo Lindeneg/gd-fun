@@ -5,26 +5,61 @@
 #include <godot_cpp/core/binder_common.hpp>
 
 #include "../core/entryable.h"
+#include "../core/utils.h"
 #include "./base_resource.h"
 
 namespace godot::CL {
+
+enum ResourceTileSize {
+    RESOURCE_TILE_SMALL,
+    RESOURCE_TILE_MEDIUM,
+    RESOURCE_TILE_LARGE
+};
 
 class ResourceTile : public Entryable {
     GDCLASS(ResourceTile, Entryable)
 
    private:
+    bool debug_;
+    ResourceTileSize size_;
     ResourceKind resource_kind_;
     int capacity_amount_;
     int current_amount_;
 
+    inline int get_restock_timeout() const {
+        switch (size_) {
+            case RESOURCE_TILE_LARGE:
+                return 40;
+            case RESOURCE_TILE_MEDIUM:
+                return 45;
+            default:
+                return 60;
+        }
+    }
+
+    inline int get_restock_amount() const {
+        switch (size_) {
+            case RESOURCE_TILE_LARGE:
+                return 3;
+            case RESOURCE_TILE_MEDIUM:
+                return 2;
+            default:
+                return 1;
+        }
+    }
+
    protected:
     static void _bind_methods();
+
+    void on_restock_timeout_() override;
 
    public:
     ResourceTile();
     ~ResourceTile();
 
     const static char *SAmountChanged;
+
+    DEBUG_METHODS()
 
     void _ready() override;
 

@@ -48,8 +48,36 @@ class City : public Entryable {
         emit_signal(SSupplyChanged, kind, amount);
     }
 
+    inline int get_restock_timeout() const {
+        switch (size_) {
+            case CITY_SIZE_METRO:
+                return 25;
+            case CITY_SIZE_REGIO:
+                return 30;
+            case CITY_SIZE_URBAN:
+                return 35;
+            case CITY_SIZE_TOWN:
+                return 50;
+            default:
+                return 60;
+        }
+    }
+
+    inline int get_restock_amount() const {
+        switch (size_) {
+            case CITY_SIZE_METRO:
+                return 3;
+            case CITY_SIZE_REGIO:
+                return 2;
+            default:
+                return 1;
+        }
+    }
+
    protected:
     static void _bind_methods();
+
+    void on_restock_timeout_() override;
 
    public:
     City();

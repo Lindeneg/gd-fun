@@ -6,6 +6,10 @@
 #include "../core/utils.h"
 #include "./base_resource.h"
 
+#ifdef CL_TRADING_DEBUG
+MAKE_LOG(RESLOG, ResourceTile)
+#endif
+
 // SIGNALS
 const char *godot::CL::ResourceTile::SAmountChanged{"amount_changed"};
 
@@ -17,21 +21,36 @@ godot::CL::ResourceTile::ResourceTile()
 
 godot::CL::ResourceTile::~ResourceTile() {}
 
+void godot::CL::ResourceTile::on_restock_timeout_() {
+    int requested_amount{get_restock_amount()};
+    int new_amount{current_amount_ + requested_amount};
+    if (new_amount <= capacity_amount_) {
+        set_current_amount(new_amount);
+#ifdef CL_TRADING_DEBUG
+        RESLOG(this, "has restocked %d of resource %d\n", requested_amount,
+               resource_kind_);
+#endif
+    }
+}
+
 void godot::CL::ResourceTile::_ready() {
     if (Utils::is_in_editor()) {
         e_assign_required_components_();
     } else {
-        r_assign_required_components_();
+        r_assign_required_components_(get_restock_timeout());
     }
     set_y_sort_enabled(true);
     set_z_index(5);
     set_monitorable(false);
     set_collision_layer(COLLISION_LAYER_RESOURCE);
     set_collision_mask(COLLISION_LAYER_VEHICLE);
+    start_restock_timer();
 }
 
 void godot::CL::ResourceTile::_bind_methods() {
     // BIND METHODS
+    DEBUG_BIND(ResourceTile)
+
     ClassDB::bind_method(D_METHOD("get_resource_kind"),
                          &ResourceTile::get_resource_kind);
     ClassDB::bind_method(D_METHOD("set_resource_kind", "k"),

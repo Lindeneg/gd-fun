@@ -9,8 +9,6 @@
 #include <godot_cpp/variant/node_path.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
-#include "../core/utils.h"
-
 const char *godot::CL::Entryable::SButtonClicked{"btn_clicked"};
 const char *godot::CL::Entryable::SButtonStateChanged{"btn_state_changed"};
 
@@ -21,10 +19,12 @@ godot::CL::Entryable::Entryable(EntryableKind kind)
       tile_size_(Vector2i(0, 0)),
       col_shape_(nullptr),
       onshore_entries_(Array()),
-      offshore_entries_(Array()) {}
+      offshore_entries_(Array()),
+      restock_timer_(nullptr) {}
 
 godot::CL::Entryable::~Entryable() {
     Utils::queue_delete(col_shape_);
+    Utils::queue_delete(restock_timer_);
     col_shape_ = nullptr;
 }
 
@@ -38,11 +38,19 @@ void godot::CL::Entryable::add_entry_point(const Vector2i coords,
     }
 }
 
-void godot::CL::Entryable::r_assign_required_components_() {
+void godot::CL::Entryable::r_assign_required_components_(
+    const float restock_time) {
     if (col_shape_ == nullptr) {
         Node *col{find_child("*CollisionShape*")};
         ERR_FAIL_NULL_MSG(col, "required component CollisionShape missing");
         col_shape_ = static_cast<CollisionShape2D *>(col);
+    }
+    if (restock_timer_ == nullptr) {
+        restock_timer_ = Utils::create_component<Timer>(this);
+        restock_timer_->set_one_shot(false);
+        restock_timer_->set_wait_time(restock_time);
+        restock_timer_->connect("timeout",
+                                Callable(this, "on_restock_timeout_"));
     }
 }
 
@@ -80,6 +88,9 @@ godot::Dictionary godot::CL::Entryable::get_entry_tile(
 
 void godot::CL::Entryable::_bind_methods() {
     // BIND METHODS
+    ClassDB::bind_method(D_METHOD("on_restock_timeout_"),
+                         &Entryable::on_restock_timeout_);
+
     ClassDB::bind_method(D_METHOD("get_kind"), &Entryable::get_kind);
     ClassDB::bind_method(D_METHOD("get_onshore_entries"),
                          &Entryable::get_onshore_entries);

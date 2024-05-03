@@ -3,8 +3,11 @@
 
 #include <godot_cpp/classes/area2d.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
+#include <godot_cpp/classes/timer.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/core/binder_common.hpp>
+
+#include "../core/utils.h"
 
 namespace godot::CL {
 
@@ -19,14 +22,17 @@ class Entryable : public Area2D {
     CollisionShape2D *col_shape_;
     Array onshore_entries_;
     Array offshore_entries_;
+    Timer *restock_timer_;
 
    protected:
     bool button_enabled_;
 
     static void _bind_methods();
 
-    void r_assign_required_components_();
+    void r_assign_required_components_(const float restock_time = 5.0f);
     void e_assign_required_components_();
+
+    virtual void on_restock_timeout_(){};
 
    public:
     Entryable();
@@ -35,6 +41,13 @@ class Entryable : public Area2D {
 
     const static char *SButtonClicked;
     const static char *SButtonStateChanged;
+
+    inline void start_restock_timer() {
+        if (Utils::is_in_editor() || restock_timer_ == nullptr) {
+            return;
+        }
+        restock_timer_->start();
+    }
 
     // TODO
     inline Vector2i calculate_size_in_tiles() { return Vector2i(0, 0); }
