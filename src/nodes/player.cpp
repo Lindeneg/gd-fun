@@ -27,9 +27,6 @@ void godot::CL::Player::r_assign_required_components_() {
     ERR_FAIL_COND_MSG(
         node == nullptr,
         vformat("component PlayerFinance not found for player %s", get_name()));
-    ERR_FAIL_NULL_MSG(
-        node, vformat("PlayerFinance not found as node child for player %s",
-                      get_name()));
     finance_ = static_cast<PlayerFinance *>(node);
     finance_->initialize_finance(get_name());
 }
