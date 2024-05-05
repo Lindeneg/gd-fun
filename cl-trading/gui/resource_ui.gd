@@ -9,7 +9,7 @@ extends Control
 
 var resource: ResourceTile;
 var player: Player;
-var resources: Resources;
+var resources: BaseResourceManager;
 var base_resource: BaseResource;
 
 func _ready() -> void:

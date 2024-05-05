@@ -14,7 +14,7 @@ const _resource_ui_scene = preload("res://gui/resource_ui.tscn");
 @export var route_manager: RouteManager;
 @export var resource_manager: ResourceManager;
 @export var debug_manager: DebugManager;
-@export var resources: Resources;
+@export var base_resource_manager: BaseResourceManager;
 @export var player: Player;
 
 @onready var city_menu: CityMenu = $GUIContainer/CityMenu;
@@ -37,7 +37,7 @@ func _setup_uis() -> void:
 		var city_ui = _city_ui_scene.instantiate();
 		var city: City = cities[key];
 		city_ui.player = player;
-		city_ui.resources = resources;
+		city_ui.resources = base_resource_manager;
 		city_ui.city = city;
 		city.add_child(city_ui);
 
@@ -48,7 +48,7 @@ func _setup_uis() -> void:
 		resource_ui.custom_minimum_size = Vector2(25, 25);
 		resource_ui.anchors_preset = PRESET_BOTTOM_LEFT;
 		resource_ui.player = player;
-		resource_ui.resources = resources;
+		resource_ui.resources = base_resource_manager;
 		resource_ui.resource = resource;
 		resource.add_child(resource_ui);
 
@@ -63,8 +63,8 @@ func set_create_route_to(entry: Entryable) -> void:
 func create_supply_item(resource_kind: int, amount: int, node: Node) -> void:
 	var supply_item = VBoxContainer.new();
 	var supply_count = create_count(amount);
-	var supply_texture = create_texture(resources.get_resource_icon(resource_kind));
-	var resource = resources.get_resource(resource_kind);
+	var supply_texture = create_texture(base_resource_manager.get_resource_icon(resource_kind));
+	var resource = base_resource_manager.get_resource(resource_kind);
 
 	supply_item.name = resource.name;
 	supply_item.add_child(supply_count);
@@ -77,8 +77,8 @@ func create_route_supply_item(resource_kind: int, node: Node, cb: Callable, colo
 	var resource_size = 1;
 
 	if resource_kind > -1:
-		var resource = resources.get_resource(resource_kind);
-		supply_btn.texture_normal = resources.get_resource_icon(resource_kind);
+		var resource = base_resource_manager.get_resource(resource_kind);
+		supply_btn.texture_normal = base_resource_manager.get_resource_icon(resource_kind);
 		supply_item.name = resource.name;
 		supply_item.tooltip_text = "Weight: %d" % resource.weight;
 		resource_size = resource.weight;
@@ -99,8 +99,8 @@ func create_route_supply_item(resource_kind: int, node: Node, cb: Callable, colo
 
 func create_demand_item(resource_kind: int, node: Node) -> void:
 	var demand_item = VBoxContainer.new();
-	var demand_texture = create_texture(resources.get_resource_icon(resource_kind));
-	var resource = resources.get_resource(resource_kind);
+	var demand_texture = create_texture(base_resource_manager.get_resource_icon(resource_kind));
+	var resource = base_resource_manager.get_resource(resource_kind);
 
 	demand_item.name = resource.name;
 	demand_item.add_child(demand_texture);
@@ -108,10 +108,10 @@ func create_demand_item(resource_kind: int, node: Node) -> void:
 
 func create_industry_item(industry: Industry, node: Node) -> void:
 	var industry_item = VBoxContainer.new();
-	var industry_in_texture = create_texture(resources.get_resource_icon(industry.in));
+	var industry_in_texture = create_texture(base_resource_manager.get_resource_icon(industry.in));
 	var needed_count = create_count(industry.conversion);
 	var industry_arrow_texture = create_texture(_down_arrow_texture);
-	var industry_out_texture =create_texture(resources.get_resource_icon(industry.out));
+	var industry_out_texture =create_texture(base_resource_manager.get_resource_icon(industry.out));
 
 	industry_item.add_child(industry_in_texture);
 	industry_item.add_child(needed_count);
