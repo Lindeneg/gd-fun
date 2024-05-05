@@ -1,5 +1,5 @@
 @tool
-class_name Resources extends Node
+extends BaseResourceManager
 
 var _icon_paths = {
 	BaseResource.RESOURCE_PASSENGER: preload("res://assets/Icons/passenger.png"),
@@ -11,15 +11,5 @@ var _icon_paths = {
 	BaseResource.RESOURCE_TOOLS: preload("res://assets/Icons/wood.png")
 }
 
-var _resources: Dictionary = {};
-
-func get_resource(key: int) -> BaseResource:
-	return _resources.get(key) as BaseResource;
-
 func get_resource_icon(key: int):
 	return _icon_paths.get(key);
-
-func _ready() -> void:
-	var children = get_children();
-	for resource in children:
-		_resources[resource.resource_kind] = resource

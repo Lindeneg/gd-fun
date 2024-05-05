@@ -3,6 +3,7 @@
 
 #include <cstdarg>
 #include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/wrapped.hpp>
 #include <godot_cpp/core/binder_common.hpp>
 
@@ -52,6 +53,16 @@
     ClassDB::add_property(#cls, PropertyInfo(Variant::BOOL, "debug"),  \
                           "set_debug", "get_debug");
 
+#define ARR_ASSIGN(method, T, obj, key, value)          \
+    {                                                   \
+        auto target{static_cast<T>(obj.get(key, T{}))}; \
+        target.method(value);                           \
+        obj[key] = target;                              \
+    }
+
+#define PUSH_ASSIGN(T, obj, key, value) ARR_ASSIGN(append, T, obj, key, value)
+#define ERASE_ASSIGN(T, obj, key, value) ARR_ASSIGN(erase, T, obj, key, value)
+
 namespace godot {
 class String;
 class StringName;
@@ -94,6 +105,7 @@ class Utils : public Object {
     static bool is_in_editor();
     static bool is_in_game();
     static const char *convert_gd_string(const Node *n);
+    static const char *convert_gd_string(const Resource *n);
     static const char *convert_gd_string(String s);
     static const char *convert_gd_string(StringName s);
     static void connect(Node *node, const StringName name,

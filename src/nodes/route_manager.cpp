@@ -5,7 +5,10 @@
 
 #include "../core/entryable.h"
 #include "../core/utils.h"
+#include "./base_resource_manager.h"
 #include "./city_manager.h"
+#include "./player_finance.h"
+#include "./player_manager.h"
 #include "./resource_manager.h"
 #include "./trading_vehicle.h"
 
@@ -18,12 +21,26 @@ godot::CL::RouteManager::RouteManager()
       routes_(Dictionary()),
       city_manager_(nullptr),
       resource_manager_(nullptr),
+      base_resource_manager_(nullptr),
+      player_manager_(nullptr),
       offload_cargo_cb_(Callable(this, "handle_offload_cargo_")),
       onload_cargo_cb_(Callable(this, "handle_onload_cargo_")),
       onload_finished_cb_(Callable(this, "handle_onload_finished_")),
       offload_finished_cb_(Callable(this, "handle_offload_finished_")) {}
 
 godot::CL::RouteManager::~RouteManager() {}
+
+void godot::CL::RouteManager::handle_player_finance_(StringName player_name,
+                                                     ResourceKind kind,
+                                                     int amount) {
+    Player *player{player_manager_->get_player(player_name)};
+    ERR_FAIL_NULL(player);
+    BaseResource *resource{base_resource_manager_->get_resource(kind)};
+    ERR_FAIL_NULL(resource);
+    player->get_finance()->add_income(FINANCE_SUB_KIND_RESOURCE,
+                                      resource->get_name(),
+                                      resource->get_value(), amount, kind);
+}
 
 void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
                                                     StringName route_name,
@@ -37,7 +54,8 @@ void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
     if (offloaded.amount > 0) {
         route->consume_current_resource(offloaded.amount);
         if (offloaded.accepted_amount > 0) {
-            // TODO: NOTIFY FINANCE
+            handle_player_finance_(player_name, kind,
+                                   offloaded.accepted_amount);
         }
     } else {
         route->go_to_next_cargo();
@@ -110,6 +128,16 @@ void godot::CL::RouteManager::_enter_tree() {
     Node *resource_node{get_node_or_null("../ResourceManager")};
     ERR_FAIL_NULL_MSG(resource_node, "ResourceManager not found in tree");
     resource_manager_ = static_cast<ResourceManager *>(resource_node);
+
+    Node *player_node{get_node_or_null("../PlayerManager")};
+    ERR_FAIL_NULL_MSG(player_node, "PlayerManager not found in tree");
+    player_manager_ = static_cast<PlayerManager *>(player_node);
+
+    Node *base_resource_node{get_node_or_null("../BaseResourceManager")};
+    ERR_FAIL_NULL_MSG(base_resource_node,
+                      "BaseResourceManager not found in tree");
+    base_resource_manager_ =
+        static_cast<BaseResourceManager *>(base_resource_node);
 }
 
 godot::TypedArray<godot::CL::Route> godot::CL::RouteManager::get_player_routes(
@@ -139,14 +167,11 @@ void godot::CL::RouteManager::add_route(Route *route) {
     add_child(route);
     Player *player{route->get_player()};
     StringName player_name{player->get_name()};
-    auto routes{static_cast<TypedArray<Route>>(
-        routes_.get(player_name, TypedArray<Route>{}))};
-    routes.append(route);
-    routes_[player_name] = routes;
+    PUSH_ASSIGN(TypedArray<Route>, routes_, player_name, route)
 #ifdef CL_TRADING_DEBUG
     ROUTEMLOG(debug_, "%s\n",
-              GDSTR(vformat("created route %s for player %s, total %d",
-                            route->get_name(), player_name, routes.size())));
+              GDSTR(vformat("created route %s for player %s", route->get_name(),
+                            player_name)));
 #endif
     player->add_connection(route->get_start());
     player->add_connection(route->get_end());
@@ -169,14 +194,11 @@ void godot::CL::RouteManager::remove_route(Route *route) {
     Player *player{route->get_player()};
     ERR_FAIL_NULL(player);
     StringName player_name{player->get_name()};
-    auto routes{static_cast<TypedArray<Route>>(
-        routes_.get(player_name, TypedArray<Route>{}))};
-    routes.erase(route);
-    routes_[player_name] = routes;
+    ERASE_ASSIGN(TypedArray<Route>, routes_, player_name, route)
 #ifdef CL_TRADING_DEBUG
     ROUTEMLOG(debug_, "%s\n",
-              GDSTR(vformat("erased route %s for player %s, total %d",
-                            route->get_name(), player_name, routes.size())));
+              GDSTR(vformat("erased route %s for player %s", route->get_name(),
+                            player_name)));
 #endif
     player->remove_connection(route->get_start());
     player->remove_connection(route->get_end());

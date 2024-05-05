@@ -7,6 +7,7 @@
 #include <godot_cpp/variant/array.hpp>
 
 namespace godot::CL {
+// update finance code as well if enum changes
 enum ResourceKind {
     RESOURCE_PASSENGER,  // STANDARD RESOURCE
     RESOURCE_MAIL,       // STANDARD RESOURCE

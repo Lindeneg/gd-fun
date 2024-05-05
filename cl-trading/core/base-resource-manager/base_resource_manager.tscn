@@ -1,9 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://654d7awdntxl"]
+[gd_scene format=3 uid="uid://bevv6w7751d1q"]
 
-[ext_resource type="Script" path="res://core/resources/resources.gd" id="1_he0fr"]
-
-[node name="Resources" type="Node"]
-script = ExtResource("1_he0fr")
+[node name="BaseResourceManager" type="BaseResourceManager"]
+debug = true
 
 [node name="Mail" type="BaseResource" parent="."]
 value = 4

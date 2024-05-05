@@ -8,6 +8,8 @@
 namespace godot::CL {
 class CityManager;
 class ResourceManager;
+class BaseResourceManager;
+class PlayerManager;
 
 class RouteManager : public Node {
     GDCLASS(RouteManager, Node)
@@ -17,11 +19,15 @@ class RouteManager : public Node {
     Dictionary routes_;
     CityManager *city_manager_;
     ResourceManager *resource_manager_;
+    BaseResourceManager *base_resource_manager_;
+    PlayerManager *player_manager_;
     Callable offload_cargo_cb_;
     Callable onload_cargo_cb_;
     Callable offload_finished_cb_;
     Callable onload_finished_cb_;
 
+    void handle_player_finance_(StringName player_name, ResourceKind kind,
+                                int amount);
     void handle_offload_cargo_(StringName player_name, StringName route_name,
                                ResourceKind kind);
     void handle_onload_cargo_(StringName player_name, StringName route_name,

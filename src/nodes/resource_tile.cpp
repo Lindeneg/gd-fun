@@ -1,4 +1,4 @@
-#include "resource.h"
+#include "resource_tile.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/property_info.hpp>

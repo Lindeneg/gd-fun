@@ -18,7 +18,7 @@ var city_resource_icon = preload("res://gui/city_resource_icon.tscn");
 
 var city: City;
 var player: Player;
-var resources: Resources;
+var resources: BaseResourceManager;
 
 func _ready() -> void:
 	if !city or !player or !resources:

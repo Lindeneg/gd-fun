@@ -6,7 +6,7 @@
 #include <godot_cpp/variant/callable.hpp>
 
 #include "../core/tile_placeable.h"
-#include "./resource.h"
+#include "./resource_tile.h"
 
 namespace godot {
 class Node2D;

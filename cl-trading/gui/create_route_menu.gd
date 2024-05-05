@@ -168,7 +168,7 @@ func stop_create() -> void:
 	gui.camera_manager.unlock_cam();
 
 func _on_route_supply_click(entry):
-	var res = gui.resources.get_resource(entry);
+	var res = gui.base_resource_manager.get_resource(entry);
 	if get_free_cargo_space() - res.weight >= 0:
 		_chosen_cargo[_direction]["cargo"].append(entry);
 		_chosen_cargo[_direction]["used_space"] += res.weight;
@@ -178,7 +178,7 @@ func _on_route_supply_click(entry):
 func _on_route_cargo_click(index):
 	if (index >= _chosen_cargo[_direction]["cargo"].size()):
 		return;
-	var res = gui.resources.get_resource(_chosen_cargo[_direction]["cargo"][index]);
+	var res = gui.base_resource_manager.get_resource(_chosen_cargo[_direction]["cargo"][index]);
 	_chosen_cargo[_direction]["cargo"].remove_at(index);
 	_chosen_cargo[_direction]["used_space"] = max(0, _chosen_cargo[_direction]["used_space"] - res.weight);
 	update_cargo_title();
@@ -211,8 +211,8 @@ func _set_path_from_id(vehicle_id: int) -> void:
 func _on_city_menu_open_create_route_ui(from: City) -> void:
 	gui.is_creating_route = true;
 	_from = from;
-	_destinations = gui.city_manager.get_cities_within_distance(from, gui.player.range);
-	_destinations.append_array(gui.resource_manager.get_resources_within_distance(from, gui.player.range));
+	_destinations = gui.city_manager.get_cities_within_distance(from, gui.player.get_range());
+	_destinations.append_array(gui.resource_manager.get_resources_within_distance(from, gui.player.get_range()));
 	var names = [];
 	for dest in _destinations:
 		names.push_back(dest.name);

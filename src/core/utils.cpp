@@ -18,6 +18,11 @@ const char *godot::CL::Utils::convert_gd_string(const Node *n) {
     return convert_gd_string(n->get_name());
 }
 
+const char *godot::CL::Utils::convert_gd_string(const Resource *n) {
+    ERR_FAIL_NULL_V_MSG(n, "", "cannot get_name on resource that is nullptr");
+    return convert_gd_string(n->get_name());
+}
+
 const char *godot::CL::Utils::convert_gd_string(StringName s) {
     return convert_gd_string(String(s));
 }

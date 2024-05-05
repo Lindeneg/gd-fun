@@ -8,13 +8,16 @@
 #include "../core/entryable.h"
 #include "../core/tile_placeable.h"
 #include "../nodes/base_resource.h"
+#include "../nodes/base_resource_manager.h"
 #include "../nodes/city.h"
 #include "../nodes/city_manager.h"
 #include "../nodes/city_resource.h"
 #include "../nodes/industry.h"
 #include "../nodes/player.h"
-#include "../nodes/resource.h"
+#include "../nodes/player_finance.h"
+#include "../nodes/player_manager.h"
 #include "../nodes/resource_manager.h"
+#include "../nodes/resource_tile.h"
 #include "../nodes/route.h"
 #include "../nodes/route_manager.h"
 #include "../nodes/tile_manager.h"
@@ -35,9 +38,12 @@ void initialize_cl_trading_module(ModuleInitializationLevel p_level) {
     ClassDB::register_class<CL::BaseResource>();
     ClassDB::register_class<CL::ResourceTile>();
     ClassDB::register_class<CL::TradingVehicle>();
+    ClassDB::register_class<CL::PlayerFinance>();
     ClassDB::register_class<CL::Player>();
+    ClassDB::register_class<CL::PlayerManager>();
     ClassDB::register_class<CL::Route>();
     ClassDB::register_class<CL::RouteManager>();
+    ClassDB::register_class<CL::BaseResourceManager>();
     ClassDB::register_class<CL::TileManager>();
     ClassDB::register_class<CL::ResourceManager>();
     ClassDB::register_class<CL::CityManager>();
