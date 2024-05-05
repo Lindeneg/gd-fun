@@ -13,13 +13,13 @@ var _icon_paths = {
 
 var _resources: Dictionary = {};
 
+func _ready() -> void:
+	var children = get_children();
+	for resource in children:
+		_resources[resource.resource_kind] = resource
+
 func get_resource(key: int) -> BaseResource:
 	return _resources.get(key) as BaseResource;
 
 func get_resource_icon(key: int):
 	return _icon_paths.get(key);
-
-func _ready() -> void:
-	var children = get_children();
-	for resource in children:
-		_resources[resource.resource_kind] = resource

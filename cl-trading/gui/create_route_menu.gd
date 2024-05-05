@@ -211,8 +211,8 @@ func _set_path_from_id(vehicle_id: int) -> void:
 func _on_city_menu_open_create_route_ui(from: City) -> void:
 	gui.is_creating_route = true;
 	_from = from;
-	_destinations = gui.city_manager.get_cities_within_distance(from, gui.player.range);
-	_destinations.append_array(gui.resource_manager.get_resources_within_distance(from, gui.player.range));
+	_destinations = gui.city_manager.get_cities_within_distance(from, gui.player.get_range());
+	_destinations.append_array(gui.resource_manager.get_resources_within_distance(from, gui.player.get_range()));
 	var names = [];
 	for dest in _destinations:
 		names.push_back(dest.name);

@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://fhxcmytplax2"]
+[gd_scene load_steps=27 format=3 uid="uid://fhxcmytplax2"]
 
 [ext_resource type="PackedScene" uid="uid://dqftsxjx78obm" path="res://core/camera-manager/camera_manager.tscn" id="1_rr1md"]
 [ext_resource type="PackedScene" uid="uid://c4ldkys7rvwlr" path="res://core/tile-manager/tile_manager.tscn" id="3_0dhwo"]
@@ -9,7 +9,6 @@
 [ext_resource type="PackedScene" uid="uid://bhfi0udcbb1dk" path="res://sprites/cities/city_water2.tscn" id="5_2dkme"]
 [ext_resource type="PackedScene" uid="uid://btfn8crdxt066" path="res://sprites/cities/city_water.tscn" id="6_8ipfy"]
 [ext_resource type="Script" path="res://core/route-manager/route-manager.gd" id="7_lwuc8"]
-[ext_resource type="Script" path="res://core/player-manager/player_manager.gd" id="8_k7mje"]
 [ext_resource type="PackedScene" uid="uid://bh4owj8k1r3y0" path="res://gui/gui.tscn" id="8_wqw8b"]
 
 [sub_resource type="Environment" id="Environment_ivcfd"]
@@ -36,6 +35,7 @@ conversion = 2
 time_to_convert = 5.0
 
 [sub_resource type="CityResource" id="CityResource_e36wm"]
+capacity = 5
 amount = 5
 
 [sub_resource type="CityResource" id="CityResource_7kf6t"]
@@ -88,7 +88,6 @@ layer_3/tile_data = PackedInt32Array(1507361, 17, 1, 1507362, 65553, 1, 1572897,
 [node name="ResourceManager" type="ResourceManager" parent="."]
 
 [node name="GrainFarm1" parent="ResourceManager" instance=ExtResource("4_t4uab")]
-debug = true
 capacity_amount = 15
 start_amount = 8
 position = Vector2(480, 176)
@@ -96,7 +95,6 @@ position = Vector2(480, 176)
 [node name="CityManager" type="CityManager" parent="."]
 
 [node name="Garland" parent="CityManager" instance=ExtResource("3_rkss4")]
-debug = true
 supplies = Array[CityResource]([SubResource("CityResource_q40ce"), SubResource("CityResource_4l0v7")])
 demands = Array[CityResource]([SubResource("CityResource_8ykkg"), SubResource("CityResource_bquv1")])
 industries = Array[Industry]([SubResource("Industry_1hx1g")])
@@ -119,11 +117,16 @@ position = Vector2(1216, 1056)
 [node name="RouteManager" type="RouteManager" parent="."]
 script = ExtResource("7_lwuc8")
 
-[node name="PlayerManager" type="Node" parent="."]
-script = ExtResource("8_k7mje")
+[node name="PlayerManager" type="PlayerManager" parent="."]
+debug = true
 
 [node name="PlayerLars" type="Player" parent="PlayerManager"]
-start_city = &"Garland"
+debug = true
+start_city = &"Coltrane"
+
+[node name="LarsFinance" type="PlayerFinance" parent="PlayerManager/PlayerLars"]
+debug = true
+gold = 500
 
 [node name="Client" type="Node" parent="."]
 
