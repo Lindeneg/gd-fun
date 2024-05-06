@@ -74,7 +74,7 @@ int godot::CL::City::consume_resource(ResourceKind kind, int amount) {
 
 godot::CL::CityReceiveResult godot::CL::City::receive_resource(
     ResourceKind kind, int amount) {
-    CityReceiveResult result{"", false, 0, amount};
+    CityReceiveResult result{nullptr, 0, amount};
     for (int i = 0; i < demands_.size(); i++) {
         CityResource *demand{cast_to<CityResource>(demands_[i])};
         if (demand->get_resource_kind() == kind) {
@@ -95,8 +95,7 @@ godot::CL::CityReceiveResult godot::CL::City::receive_resource(
                     amount, kind, actual_amount);
 #endif
             result.accepted_amount = amount;
-            result.industry = industry->get_name();
-            result.industry_resource = true;
+            result.industry = industry;
             return result;
         }
     }

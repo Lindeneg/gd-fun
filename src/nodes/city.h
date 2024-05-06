@@ -5,9 +5,9 @@
 #include <godot_cpp/core/binder_common.hpp>
 
 #include "../core/entryable.h"
+#include "../core/utils.h"
 #include "./city_resource.h"
 #include "./industry.h"
-#include "utils.h"
 
 namespace godot::CL {
 
@@ -20,8 +20,7 @@ enum CitySize {
 };
 
 struct CityReceiveResult {
-    StringName industry;
-    bool industry_resource;
+    Industry *industry;
     int accepted_amount;
     int amount;
 };

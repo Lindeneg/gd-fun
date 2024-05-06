@@ -3,10 +3,10 @@
 
 #include <godot_cpp/classes/node.hpp>
 
+#include "./city_manager.h"
 #include "./route.h"
 
 namespace godot::CL {
-class CityManager;
 class ResourceManager;
 class BaseResourceManager;
 class PlayerManager;
@@ -26,8 +26,8 @@ class RouteManager : public Node {
     Callable offload_finished_cb_;
     Callable onload_finished_cb_;
 
-    void handle_player_finance_(StringName player_name, ResourceKind kind,
-                                int amount);
+    void handle_player_finance_(CityReceiveResult result,
+                                StringName player_name, ResourceKind kind);
     void handle_offload_cargo_(StringName player_name, StringName route_name,
                                ResourceKind kind);
     void handle_onload_cargo_(StringName player_name, StringName route_name,

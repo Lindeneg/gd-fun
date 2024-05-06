@@ -47,9 +47,6 @@ godot::CL::TradingVehicle::TradingVehicle()
       collision_shape_(nullptr) {}
 
 godot::CL::TradingVehicle::~TradingVehicle() {
-#ifdef CL_TRADING_DEBUG
-    VEHICLELOG(this, "destructor called\n");
-#endif
     Utils::queue_delete(animated_sprite_);
     Utils::queue_delete(collision_shape_);
     animated_sprite_ = nullptr;
@@ -70,7 +67,6 @@ void godot::CL::TradingVehicle::r_assign_required_components_() {
     }
 }
 
-// this is called on _ready notification in editor
 void godot::CL::TradingVehicle::e_assign_required_components_() {
     ERR_FAIL_COND_EDMSG(animated_sprite_ != nullptr,
                         "component AnimatedSprite already assigned");

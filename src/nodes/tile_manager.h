@@ -14,7 +14,6 @@ class PackedVector2Array;
 
 namespace godot::CL {
 
-
 // tile layers
 enum TileLayer {
     TILE_BACKGROUND_LAYER,

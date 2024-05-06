@@ -196,9 +196,7 @@ void godot::CL::Route::setup_vehicle_from_tree_() {
         return;
     }
     vehicle_ = static_cast<TradingVehicle *>(vehicle);
-    if (vehicle_ == nullptr) {
-        std::cout << "Vehicle is nullptr\n";
-    }
+    ERR_FAIL_NULL(vehicle);
     Utils::connect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
 }
 

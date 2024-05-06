@@ -58,7 +58,7 @@ func _on_gui_create_route(ctx: Dictionary) -> void:
 	route.set_end(ctx["to"]);
 	route.set_current_route(ctx["path"]);
 	route.set_vehicle(vehicle);
-	route.set_debug(true);
+	route.set_debug(debug);
 
 	var cargo = {
 		TradingVehicle.VEHICLE_MOVE_DIR_AB: [],

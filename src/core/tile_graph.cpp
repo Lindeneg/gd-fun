@@ -5,23 +5,19 @@
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <godot_cpp/variant/variant.hpp>
 #include <godot_cpp/variant/vector2i.hpp>
-#include <iostream>
 #include <queue>
 #include <vector>
+
+#ifdef CL_TRADING_DEBUG
+MAKE_M_LOG(TILELOG, TileGraph)
+#endif
 
 const int godot::CL::TileGraph::MaxPathLength_{1024};
 
 godot::CL::TileGraph::TileGraph() : foreign_occupants_({}), vertices_({}) {}
 
-godot::CL::TileGraph::~TileGraph() {
-#ifdef CL_TRADING_DEBUG
-    std::cout << "TileGraph: Freeing tile vertices\n";
-#endif
-    destroy();
-}
+godot::CL::TileGraph::~TileGraph() { destroy(); }
 
-// cleanup my mess.. the cleanup
-// itself is probably also a mess
 void godot::CL::TileGraph::destroy() {
     const auto size{vertices_.size()};
     for (int32_t i = 0; i < size; i++) {
@@ -34,15 +30,31 @@ void godot::CL::TileGraph::destroy() {
 
 godot::PackedVector2Array godot::CL::TileGraph::astar_construct_path(
     Vector2i start, Vector2i end, const TileSurface surface) {
-    auto *start_vertex = get_vertex(start);
-    auto *end_vertex = get_vertex(end);
+    TileVertex *start_vertex = get_vertex(start);
+    TileVertex *end_vertex = get_vertex(end);
     ERR_FAIL_NULL_V_EDMSG(start_vertex, PackedVector2Array(),
                           vformat("start vertex (%d,%d) was not found in graph",
                                   start.x, start.y));
     ERR_FAIL_NULL_V_EDMSG(
         end_vertex, PackedVector2Array(),
         vformat("end vertex (%d,%d) was not found in graph", end.x, end.y));
-    return astar_construct_path(start_vertex, end_vertex, surface);
+    PackedVector2Array path{
+        astar_construct_path(start_vertex, end_vertex, surface)};
+#ifdef CL_TRADING_DEBUG
+    String path_str{};
+    int64_t size{path.size()};
+    for (int i = 0; i < size; i++) {
+        Vector2 vec{path[i]};
+        path_str += vformat("(%d, %d)", vec.x, vec.y);
+        if (i < size - 1) {
+            path_str += "->";
+        }
+    }
+    TILELOG(debug_,
+            "path constructed, start=(%d, %d), end=(%d, %d), path:\n%s\n",
+            start.x, start.y, end.x, end.y, GDSTR(path_str));
+#endif
+    return path;
 }
 
 // https://en.wikipedia.org/wiki/A*_search_algorithm
@@ -141,6 +153,7 @@ int godot::CL::TileGraph::astar_calculate_heuristic_(TileVertex *current,
     auto x_diff{current->coords.x - goal->coords.x};
     auto y_diff{current->coords.y - goal->coords.y};
     auto mag{(x_diff * x_diff) + (y_diff * y_diff)};
+    // TODO why n * 10?
     return int(std::sqrt(mag) * 10);
 }
 
@@ -207,16 +220,18 @@ void godot::CL::TileGraph::reset_occupants_kind(const int kind) {
 }
 
 void godot::CL::TileGraph::print() const {
+#ifdef CL_TRADING_DEBUG
     for (const auto &vertex : vertices_) {
-        std::cout << "Vertex (" << vertex->coords.x << ", " << vertex->coords.y
-                  << "):" << '\n';
-        std::cout << "  -> Has Surface (" << vertex->surface << ")\n";
-        std::cout << "  -> Has Weight (" << vertex->weight << ")\n";
+        String edges_str{};
         for (const auto &edge : vertex->edges) {
-            std::cout << "      -> Has Edges (" << edge->coords.x << ", "
-                      << edge->coords.y << ") with weight " << edge->weight
-                      << '\n';
+            edges_str += vformat("\t\t-> Has Edges (%d, %d) with weight %d\n",
+                                 edge->coords.x, edge->coords.y, edge->weight);
         }
-        std::cout << '\n';
+        TILELOG(debug_,
+                "Vertex (%d, %d):\n\t-> Has Surface (%d)\n\t-> Has Weight "
+                "(%d)\n%s\n",
+                vertex->coords.x, vertex->coords.y, vertex->surface,
+                vertex->weight, GDSTR(edges_str));
     }
+#endif
 }

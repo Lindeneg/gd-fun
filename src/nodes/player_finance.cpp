@@ -96,12 +96,14 @@ void godot::CL::PlayerFinance::add_to_finance_(FinanceMainKind fm_kind,
 
 void godot::CL::PlayerFinance::add_income(FinanceKind fs_kind, StringName name,
                                           int value, int amount, int ctx) {
-    add_to_finance_(FINANCE_MAIN_KIND_INCOME, fs_kind, name, value, amount);
+    add_to_finance_(FINANCE_MAIN_KIND_INCOME, fs_kind, name, value, amount,
+                    ctx);
 }
 
 void godot::CL::PlayerFinance::add_expense(FinanceKind fs_kind, StringName name,
                                            int value, int amount, int ctx) {
-    add_to_finance_(FINANCE_MAIN_KIND_EXPENSE, fs_kind, name, value, amount);
+    add_to_finance_(FINANCE_MAIN_KIND_EXPENSE, fs_kind, name, value, amount,
+                    ctx);
 }
 
 void godot::CL::PlayerFinance::_bind_methods() {

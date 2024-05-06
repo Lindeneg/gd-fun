@@ -32,6 +32,7 @@ void godot::CL::TileManager::set_map_size(const Vector2i v) {
 
 void godot::CL::TileManager::set_debug_mode(const bool m) {
     debug_mode_ = m;
+    tile_graph_.set_debug(m);
     emit_debug_signal_();
 }
 

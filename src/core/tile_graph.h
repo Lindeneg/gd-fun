@@ -45,6 +45,8 @@ using AStarPrioQueueMember = std::map<TileVertex *, int>;
  * structure that is used for pathfinding */
 class TileGraph {
    private:
+    bool debug_;
+
     static const int MaxPathLength_;
 
     std::map<const Vector2i, ForeignOccupant> foreign_occupants_;
@@ -58,6 +60,8 @@ class TileGraph {
    public:
     TileGraph();
     ~TileGraph();
+
+    DEBUG_METHODS()
 
     inline const std::vector<TileVertex *> &get_vertices_() const {
         return vertices_;

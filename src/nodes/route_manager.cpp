@@ -6,7 +6,6 @@
 #include "../core/entryable.h"
 #include "../core/utils.h"
 #include "./base_resource_manager.h"
-#include "./city_manager.h"
 #include "./player_finance.h"
 #include "./player_manager.h"
 #include "./resource_manager.h"
@@ -30,16 +29,26 @@ godot::CL::RouteManager::RouteManager()
 
 godot::CL::RouteManager::~RouteManager() {}
 
-void godot::CL::RouteManager::handle_player_finance_(StringName player_name,
-                                                     ResourceKind kind,
-                                                     int amount) {
+void godot::CL::RouteManager::handle_player_finance_(CityReceiveResult result,
+                                                     StringName player_name,
+                                                     ResourceKind kind) {
     Player *player{player_manager_->get_player(player_name)};
     ERR_FAIL_NULL(player);
     BaseResource *resource{base_resource_manager_->get_resource(kind)};
     ERR_FAIL_NULL(resource);
+    int res_value{resource->get_value()};
     player->get_finance()->add_income(FINANCE_SUB_KIND_RESOURCE,
-                                      resource->get_name(),
-                                      resource->get_value(), amount, kind);
+                                      resource->get_name(), res_value,
+                                      result.accepted_amount, kind);
+    if (result.industry != nullptr) {
+        int industry_profit{int(res_value * result.accepted_amount / 3)};
+        result.industry->add_to_profits(industry_profit);
+        if (result.industry->get_owner() == player_name) {
+            player->get_finance()->add_income(FINANCE_SUB_KIND_INDUSTRY,
+                                              resource->get_name(),
+                                              industry_profit, 1);
+        }
+    }
 }
 
 void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
@@ -50,12 +59,11 @@ void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
     StringName city_name{route->get_target_entryable()};
     City *city{city_manager_->get_city(city_name)};
     ERR_FAIL_NULL(city);
-    auto offloaded{city->receive_resource(kind, 1)};
+    CityReceiveResult offloaded{city->receive_resource(kind, 1)};
     if (offloaded.amount > 0) {
         route->consume_current_resource(offloaded.amount);
         if (offloaded.accepted_amount > 0) {
-            handle_player_finance_(player_name, kind,
-                                   offloaded.accepted_amount);
+            handle_player_finance_(offloaded, player_name, kind);
         }
     } else {
         route->go_to_next_cargo();

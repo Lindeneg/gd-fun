@@ -4,7 +4,9 @@ const char *godot::CL::Industry::SResourceProcessStarted{"process-started"};
 const char *godot::CL::Industry::SResourceProcessFinished{"process-finished"};
 
 godot::CL::Industry::Industry()
-    : timer_(nullptr),
+    : total_profits_(0),
+      timer_(nullptr),
+      owner_(""),
       debug_(false),
       state_(INDUSTRY_STATE_IDLE),
       in_kind_(RESOURCE_PASSENGER),
@@ -53,6 +55,9 @@ void godot::CL::Industry::_bind_methods() {
     // BIND METHODS
     DEBUG_BIND(Industry)
 
+    ClassDB::bind_method(D_METHOD("get_owner"), &Industry::get_owner);
+    ClassDB::bind_method(D_METHOD("set_owner", "o"), &Industry::set_owner);
+
     ClassDB::bind_method(D_METHOD("on_process_resource_finished_"),
                          &Industry::on_process_resource_finished_);
     ClassDB::bind_method(D_METHOD("queue_process_resource_"),
@@ -95,6 +100,9 @@ void godot::CL::Industry::_bind_methods() {
     ClassDB::add_property("Industry",
                           PropertyInfo(Variant::FLOAT, "time_to_convert"),
                           "set_time_to_convert", "get_time_to_convert");
+    ClassDB::add_property("Industry",
+                          PropertyInfo(Variant::STRING_NAME, "owner"),
+                          "set_owner", "get_owner");
 
     BIND_ENUM_CONSTANT(INDUSTRY_STATE_IDLE);
     BIND_ENUM_CONSTANT(INDUSTRY_STATE_PROCESSING);
