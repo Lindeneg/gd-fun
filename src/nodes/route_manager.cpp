@@ -28,7 +28,8 @@ godot::CL::RouteManager::RouteManager()
 
 godot::CL::RouteManager::~RouteManager() {}
 
-void godot::CL::RouteManager::handle_player_finance_(CityReceiveResult result,
+void godot::CL::RouteManager::handle_player_finance_(Route *route,
+                                                     CityReceiveResult result,
                                                      Player *player,
                                                      ResourceKind kind) {
     BaseResource *resource{base_resource_manager_->get_resource(kind)};
@@ -37,6 +38,7 @@ void godot::CL::RouteManager::handle_player_finance_(CityReceiveResult result,
     player->get_finance()->add_income(FINANCE_SUB_KIND_RESOURCE,
                                       resource->get_name(), res_value,
                                       result.accepted_amount, kind);
+    route->add_to_total_profits(res_value * result.accepted_amount);
     if (result.industry != nullptr) {
         int industry_profit{int(res_value * result.accepted_amount / 3)};
         result.industry->add_to_profits(industry_profit);
@@ -60,7 +62,7 @@ void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
     if (offloaded.amount > 0) {
         route->consume_current_resource(offloaded.amount);
         if (offloaded.accepted_amount > 0) {
-            handle_player_finance_(offloaded, route->get_player(), kind);
+            handle_player_finance_(route, offloaded, route->get_player(), kind);
         }
     } else {
         route->go_to_next_cargo();

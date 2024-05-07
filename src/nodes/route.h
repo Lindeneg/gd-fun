@@ -32,8 +32,10 @@ class Route : public Node {
     TileSurface type_;
     Callable timeout_cb_;
     Callable dest_reached_cb_;
+    Callable upkeep_required_cb_;
     StringName start_;
     StringName end_;
+    int total_profits_;
     int distance_;
     int current_cargo_idx_;
     RouteState state_;
@@ -42,6 +44,7 @@ class Route : public Node {
     TradingVehicle *vehicle_;
 
     void handle_timeout_();
+    void handle_upkeep_required_();
     void handle_destination_reached_(const int direction);
     void setup_timer_from_tree_or_create_();
     void setup_vehicle_from_tree_();
@@ -76,6 +79,9 @@ class Route : public Node {
     void queue_onload_cargo();
 
     TypedArray<CityResource> get_current_cargo() const;
+
+    inline int get_total_profits() const { return total_profits_; }
+    inline void add_to_total_profits(const int a) { total_profits_ += a; }
 
     inline Dictionary get_cargo() const { return cargo_; }
     inline void set_cargo(const Dictionary c) { cargo_ = c; }

@@ -20,13 +20,13 @@
 MAKE_LOG(VEHICLELOG, TradingVehicle)
 #endif
 
-// STRING CONSTANTS
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const char *godot::CL::TradingVehicle::AnimationNames
     [godot::CL::TradingVehicle::AnimationSize]{"left", "up", "right", "down"};
+const int godot::CL::TradingVehicle::UpkeepTimeout{10};
 
-// SIGNALS
 const char *godot::CL::TradingVehicle::SDestReached{"destination_reached"};
+const char *godot::CL::TradingVehicle::SUpkeepRequired{"upkeep_required"};
 
 godot::CL::TradingVehicle::TradingVehicle()
     : debug_(false),
@@ -35,6 +35,7 @@ godot::CL::TradingVehicle::TradingVehicle()
       current_map_route_idx_(0),
       tile_surface_(TILE_SURFACE_GROUND),
       tier_(VEHICLE_TIER_COMMON),
+      upkeep_timer_(nullptr),
       speed_(0.0),
       cost_(0),
       upkeep_(0),
@@ -49,11 +50,12 @@ godot::CL::TradingVehicle::TradingVehicle()
 godot::CL::TradingVehicle::~TradingVehicle() {
     Utils::queue_delete(animated_sprite_);
     Utils::queue_delete(collision_shape_);
+    Utils::queue_delete(upkeep_timer_);
     animated_sprite_ = nullptr;
     collision_shape_ = nullptr;
+    upkeep_timer_ = nullptr;
 }
 
-// this is called on _ready notification at runtime
 void godot::CL::TradingVehicle::r_assign_required_components_() {
     if (animated_sprite_ == nullptr) {
         Node *anim{find_child("*AnimatedSprite*")};
@@ -64,6 +66,14 @@ void godot::CL::TradingVehicle::r_assign_required_components_() {
         Node *col{find_child("*CollisionShape*")};
         ERR_FAIL_NULL_MSG(col, "required component CollisionShape missing");
         collision_shape_ = static_cast<CollisionShape2D *>(col);
+    }
+    if (upkeep_timer_ == nullptr) {
+        upkeep_timer_ = memnew(Timer);
+        upkeep_timer_->set_one_shot(false);
+        add_child(upkeep_timer_);
+        upkeep_timer_->set_wait_time(UpkeepTimeout);
+        Utils::connect(upkeep_timer_, "timeout",
+                       Callable(this, "handle_upkeep_timeout_"));
     }
 }
 
@@ -88,6 +98,10 @@ void godot::CL::TradingVehicle::e_assign_required_components_() {
     } else {
         collision_shape_ = static_cast<CollisionShape2D *>(col);
     }
+}
+
+void godot::CL::TradingVehicle::handle_upkeep_timeout_() {
+    emit_signal(SUpkeepRequired);
 }
 
 void godot::CL::TradingVehicle::initialize_sprite_frames_() {
@@ -242,6 +256,8 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_speed", "s"),
                          &TradingVehicle::set_speed);
 
+    ClassDB::bind_method(D_METHOD("handle_upkeep_timeout_"),
+                         &TradingVehicle::handle_upkeep_timeout_);
     ClassDB::bind_method(D_METHOD("get_tier"), &TradingVehicle::get_tier);
     ClassDB::bind_method(D_METHOD("set_tier", "t"), &TradingVehicle::set_tier);
     ClassDB::bind_method(D_METHOD("get_cost"), &TradingVehicle::get_cost);
@@ -293,6 +309,8 @@ void godot::CL::TradingVehicle::_bind_methods() {
     ClassDB::add_signal(
         "TradingVehicle",
         MethodInfo(SDestReached, PropertyInfo(Variant::INT, "destination")));
+
+    ClassDB::add_signal("TradingVehicle", MethodInfo(SUpkeepRequired));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(VEHICLE_IDLE);

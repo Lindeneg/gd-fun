@@ -6,6 +6,7 @@
 
 #include "../core/utils.h"
 #include "./trading_vehicle.h"
+#include "player_finance.h"
 
 #ifdef CL_TRADING_DEBUG
 MAKE_LOG(ROUTELOG, Route)
@@ -26,10 +27,12 @@ godot::CL::Route::Route()
       type_(TILE_SURFACE_NONE),
       timeout_cb_(Callable(this, "handle_timeout_")),
       dest_reached_cb_(Callable(this, "handle_destination_reached_")),
+      upkeep_required_cb_(Callable(this, "handle_upkeep_required_")),
       start_(""),
       end_(""),
       state_(ROUTE_INACTIVE),
       cooldown_timer_(nullptr),
+      total_profits_(0),
       distance_(0),
       current_cargo_idx_(0),
       gold_cost_(0),
@@ -44,6 +47,8 @@ godot::CL::Route::~Route() {
 
 void godot::CL::Route::destroy() {
     Utils::disconnect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
+    Utils::disconnect(vehicle_, TradingVehicle::SUpkeepRequired,
+                      upkeep_required_cb_);
     Utils::disconnect(cooldown_timer_, "timeout", timeout_cb_);
     Utils::queue_delete(vehicle_);
     Utils::queue_delete(cooldown_timer_);
@@ -73,6 +78,16 @@ void godot::CL::Route::handle_timeout_() {
         emit_signal(SOnloadCargo, player_->get_name(), get_name(),
                     cargo->get_resource_kind());
     }
+}
+
+void godot::CL::Route::handle_upkeep_required_() {
+    if (Utils::is_in_editor()) {
+        return;
+    }
+    int upkeep{vehicle_->get_upkeep()};
+    player_->get_finance()->add_expense(FINANCE_SUB_KIND_UPKEEP, get_name(),
+                                        upkeep, 1);
+    add_to_total_profits(-upkeep);
 }
 
 void godot::CL::Route::handle_destination_reached_(const int direction) {
@@ -159,6 +174,7 @@ void godot::CL::Route::start() {
     if (initial_start_) {
         vehicle_->set_map_path(current_route_);
         vehicle_->set_position(current_route_[0]);
+        vehicle_->start_upkeep_timer();
         initial_start_ = false;
     }
     vehicle_->start_navigating();
@@ -185,6 +201,8 @@ void godot::CL::Route::set_vehicle(TradingVehicle *vehicle) {
     add_child(vehicle_);
     vehicle_->set_owner(this);
     Utils::connect(vehicle_, TradingVehicle::SDestReached, dest_reached_cb_);
+    Utils::connect(vehicle_, TradingVehicle::SUpkeepRequired,
+                   upkeep_required_cb_);
 }
 
 void godot::CL::Route::setup_vehicle_from_tree_() {
@@ -242,6 +260,8 @@ void godot::CL::Route::_bind_methods() {
     DEBUG_BIND(Route);
 
     ClassDB::bind_method(D_METHOD("handle_timeout_"), &Route::handle_timeout_);
+    ClassDB::bind_method(D_METHOD("handle_upkeep_required_"),
+                         &Route::handle_upkeep_required_);
     ClassDB::bind_method(D_METHOD("handle_destination_reached_", "dest"),
                          &Route::handle_destination_reached_);
 
@@ -250,6 +270,8 @@ void godot::CL::Route::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_current_route", "path"),
                          &Route::set_current_route);
 
+    ClassDB::bind_method(D_METHOD("get_total_profits"),
+                         &Route::get_total_profits);
     ClassDB::bind_method(D_METHOD("start"), &Route::start);
     ClassDB::bind_method(D_METHOD("stop"), &Route::stop);
     ClassDB::bind_method(D_METHOD("get_vehicle"), &Route::get_vehicle);

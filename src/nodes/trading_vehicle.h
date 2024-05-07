@@ -2,6 +2,7 @@
 #define CL_TRADING_TRADING_VEHICLE_H_
 
 #include <godot_cpp/classes/area2d.hpp>
+#include <godot_cpp/classes/timer.hpp>
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/core/memory.hpp>
 #include <godot_cpp/templates/vector.hpp>
@@ -52,6 +53,7 @@ class TradingVehicle : public Area2D {
    private:
     static const char *AnimationNames[];
     static const int32_t AnimationSize;
+    static const int UpkeepTimeout;
 
     bool debug_;
     // are we going from
@@ -63,6 +65,7 @@ class TradingVehicle : public Area2D {
 
     // tier of vehicle
     VehicleTier tier_;
+    Timer *upkeep_timer_;
     // speed multiplier
     double speed_;
     int cost_;
@@ -82,6 +85,7 @@ class TradingVehicle : public Area2D {
     // moves towards target if VehicleState is moving
     Vector2 navigation_target_;
 
+    void handle_upkeep_timeout_();
     // get next navigation target
     NextNavResult get_next_navigation_target_();
     // handle movement towards current navigation target
@@ -105,6 +109,7 @@ class TradingVehicle : public Area2D {
     ~TradingVehicle();
 
     const static char *SDestReached;
+    const static char *SUpkeepRequired;
 
     void _ready() override;
     void _process(double delta) override;
@@ -115,6 +120,10 @@ class TradingVehicle : public Area2D {
 
     DEBUG_METHODS()
 
+    inline void start_upkeep_timer() {
+        ERR_FAIL_NULL(upkeep_timer_);
+        upkeep_timer_->start();
+    }
     inline void clear_map_path() { map_route_.clear(); }
     inline bool is_moving() const { return state_ == VEHICLE_MOVING; }
 
