@@ -19,7 +19,12 @@ const _resource_ui_scene = preload("res://gui/resource_ui.tscn");
 
 @onready var city_menu: CityMenu = $GUIContainer/CityMenu;
 @onready var create_route_ui: CreateRoute = $GUIContainer/CreateRouteMenu;
-@onready var container: CanvasLayer = $GUIContainer;
+@onready var container: CanvasLayer = $GUIContainer
+@onready var player_ctx: Panel = $GUIContainer/PlayerCtx;
+@onready var top_right: Control = $GUIContainer/TopRight;
+@onready var gold_label: Label = $GUIContainer/PlayerCtx/PlayerCtxContainer/GoldLabel;
+
+var player_finance: PlayerFinance;
 var is_creating_route: bool = false;
 
 func _ready() -> void:
@@ -28,6 +33,11 @@ func _ready() -> void:
 	_setup_uis();
 	if !Engine.is_editor_hint():
 		resource_manager.lock_all_buttons();
+		top_right.visible = true;
+		player_ctx.visible = true;
+		player_finance = player.get_finance();
+		player_finance.connect("gold-changed", _on_player_gold_changed);
+		_on_player_gold_changed(player_finance.get_gold_());
 
 func _setup_uis() -> void:
 	if !city_manager or !resource_manager:
@@ -111,7 +121,7 @@ func create_industry_item(industry: Industry, node: Node) -> void:
 	var industry_in_texture = create_texture(base_resource_manager.get_resource_icon(industry.in));
 	var needed_count = create_count(industry.conversion);
 	var industry_arrow_texture = create_texture(_down_arrow_texture);
-	var industry_out_texture =create_texture(base_resource_manager.get_resource_icon(industry.out));
+	var industry_out_texture = create_texture(base_resource_manager.get_resource_icon(industry.out));
 
 	industry_item.add_child(industry_in_texture);
 	industry_item.add_child(needed_count);
@@ -145,6 +155,10 @@ func _on_city_manager_city_clicked(city_name: StringName) -> void:
 	if !city_manager:
 		return;
 	city_menu.open_menu(city_manager.get_city(city_name));
+
+func _on_player_gold_changed(new_amount: int) -> void:
+	gold_label.text = "%dg" % new_amount;
+	create_route_ui.player_gold_changed(new_amount);
 
 func _on_create_route_menu_create_route(ctx: Dictionary) -> void:
 		emit_signal("create_route", ctx);

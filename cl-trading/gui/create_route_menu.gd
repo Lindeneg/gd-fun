@@ -17,6 +17,8 @@ signal create_route(ctx: Dictionary);
 @onready var cargo_title: Label = $CreateRouteRect/CreateRouteContainer/CargoTitle;
 @onready var from_label: Label = $CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/SupplySelection/Label;
 @onready var to_label: Label = $CreateRouteRect/CreateRouteContainer/CargoContainer/SelectionContainer/DemandSelection/Label;
+@onready var confirm_btn: Button = $CreateRouteRect/CreateRouteContainer/RouteActions/RouteConfirmBtn;
+
 @export var gui: GUI;
 
 var _from: City = null;
@@ -37,6 +39,8 @@ var _chosen_cargo: Dictionary = {
 		"cargo": []
 	},
 };
+var _player_gold = 0;
+var _vehicle_cost = 0;
 
 var vehicles = [];
 
@@ -79,6 +83,8 @@ func open_menu() -> void:
 		cargo_title.visible = false;
 		chosen_cargo_container.visible = false;
 
+	player_gold_changed(gui.player_finance.get_gold_());
+
 	gui.city_manager.lock_all_buttons();
 	gui.resource_manager.lock_all_buttons();
 	gui.camera_manager.lock_cam();
@@ -106,6 +112,10 @@ func preselect_vehicle() -> void:
 		route_surface_opts.select(offshore_idx);
 		_set_path_from_idx(offshore_idx);
 
+func player_gold_changed(new_amount: int) -> void:
+	_player_gold = new_amount;
+	update_buy_button_state();
+
 func get_free_cargo_space() -> int:
 	var cargo_ctx = _chosen_cargo[_direction];
 	return cargo_ctx["total_space"] - cargo_ctx["used_space"];
@@ -127,6 +137,16 @@ func update_current_cargo_view() -> void:
 			cargo_resource = cargo_ctx["cargo"][i];
 		used += gui.create_route_supply_item(cargo_resource, chosen_cargo_container, _on_route_cargo_click.bind(i), Color.ALICE_BLUE);
 		i += 1
+
+func update_buy_button_state() -> void:
+	if _player_gold < _vehicle_cost:
+		confirm_btn.disabled = true;
+		confirm_btn.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN;
+		confirm_btn.tooltip_text = "Not enough gold";
+	else:
+		confirm_btn.disabled = false;
+		confirm_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;
+		confirm_btn.tooltip_text = "";
 
 func update_city_city_cargo_view() -> void:
 	gui.remove_node_children(supply_container);
@@ -160,6 +180,8 @@ func stop_create() -> void:
 	_to = {};
 	_destinations = [];
 	_chosen_path = [];
+	_player_gold = 0;
+	_vehicle_cost = 0;
 	gui.remove_node_children(supply_container);
 	gui.remove_node_children(demand_container);
 	gui.remove_node_children(chosen_cargo_container);
@@ -198,6 +220,8 @@ func _set_path_from_id(vehicle_id: int) -> void:
 	upkeep_value.text = "%d" % vehicle.upkeep;
 	space_value.text = "%d" % vehicle.cargo_space;
 
+	_vehicle_cost = vehicle.cost;
+
 	var total_space = vehicle.cargo_space;
 	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB]["total_space"] = total_space;
 	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_AB]["used_space"] = 0;
@@ -205,6 +229,7 @@ func _set_path_from_id(vehicle_id: int) -> void:
 	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA]["total_space"] = total_space;
 	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA]["used_space"] = 0;
 	_chosen_cargo[TradingVehicle.VEHICLE_MOVE_DIR_BA]["cargo"] = [];
+	update_buy_button_state();
 	update_cargo_title();
 	update_current_cargo_view();
 

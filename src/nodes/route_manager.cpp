@@ -21,7 +21,6 @@ godot::CL::RouteManager::RouteManager()
       city_manager_(nullptr),
       resource_manager_(nullptr),
       base_resource_manager_(nullptr),
-      player_manager_(nullptr),
       offload_cargo_cb_(Callable(this, "handle_offload_cargo_")),
       onload_cargo_cb_(Callable(this, "handle_onload_cargo_")),
       onload_finished_cb_(Callable(this, "handle_onload_finished_")),
@@ -30,10 +29,8 @@ godot::CL::RouteManager::RouteManager()
 godot::CL::RouteManager::~RouteManager() {}
 
 void godot::CL::RouteManager::handle_player_finance_(CityReceiveResult result,
-                                                     StringName player_name,
+                                                     Player *player,
                                                      ResourceKind kind) {
-    Player *player{player_manager_->get_player(player_name)};
-    ERR_FAIL_NULL(player);
     BaseResource *resource{base_resource_manager_->get_resource(kind)};
     ERR_FAIL_NULL(resource);
     int res_value{resource->get_value()};
@@ -43,7 +40,7 @@ void godot::CL::RouteManager::handle_player_finance_(CityReceiveResult result,
     if (result.industry != nullptr) {
         int industry_profit{int(res_value * result.accepted_amount / 3)};
         result.industry->add_to_profits(industry_profit);
-        if (result.industry->get_owner() == player_name) {
+        if (result.industry->get_owner() == player->get_name()) {
             player->get_finance()->add_income(FINANCE_SUB_KIND_INDUSTRY,
                                               resource->get_name(),
                                               industry_profit, 1);
@@ -63,7 +60,7 @@ void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
     if (offloaded.amount > 0) {
         route->consume_current_resource(offloaded.amount);
         if (offloaded.accepted_amount > 0) {
-            handle_player_finance_(offloaded, player_name, kind);
+            handle_player_finance_(offloaded, route->get_player(), kind);
         }
     } else {
         route->go_to_next_cargo();
@@ -137,10 +134,6 @@ void godot::CL::RouteManager::_enter_tree() {
     ERR_FAIL_NULL_MSG(resource_node, "ResourceManager not found in tree");
     resource_manager_ = static_cast<ResourceManager *>(resource_node);
 
-    Node *player_node{get_node_or_null("../PlayerManager")};
-    ERR_FAIL_NULL_MSG(player_node, "PlayerManager not found in tree");
-    player_manager_ = static_cast<PlayerManager *>(player_node);
-
     Node *base_resource_node{get_node_or_null("../BaseResourceManager")};
     ERR_FAIL_NULL_MSG(base_resource_node,
                       "BaseResourceManager not found in tree");
@@ -174,6 +167,9 @@ godot::CL::Route *godot::CL::RouteManager::get_player_route(
 void godot::CL::RouteManager::add_route(Route *route) {
     add_child(route);
     Player *player{route->get_player()};
+    player->get_finance()->add_expense(FINANCE_SUB_KIND_ROUTE,
+                                       route->get_name(),
+                                       route->get_vehicle()->get_cost(), 1);
     StringName player_name{player->get_name()};
     PUSH_ASSIGN(TypedArray<Route>, routes_, player_name, route)
 #ifdef CL_TRADING_DEBUG
