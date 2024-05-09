@@ -1,0 +1,119 @@
+[gd_scene load_steps=3 format=3 uid="uid://dthog8s4qoi75"]
+
+[ext_resource type="Script" path="res://gui/player_menu.gd" id="1_yqo6q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m2ner"]
+bg_color = Color(0.109804, 0.117647, 0.105882, 1)
+
+[node name="PlayerMenu" type="Control"]
+custom_minimum_size = Vector2(800, 600)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_yqo6q")
+
+[node name="PlayerMenuContainer" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_m2ner")
+tab_focus_mode = 0
+
+[node name="Routes" type="Control" parent="PlayerMenuContainer"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="NoRoutesCreatedLabel" type="Label" parent="PlayerMenuContainer/Routes"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "No Routes Created"
+horizontal_alignment = 1
+
+[node name="RoutesContainer" type="ScrollContainer" parent="PlayerMenuContainer/Routes"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RoutesGrid" type="GridContainer" parent="PlayerMenuContainer/Routes/RoutesContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+theme_override_constants/h_separation = 25
+theme_override_constants/v_separation = 25
+columns = 5
+
+[node name="Originlabel" type="Label" parent="PlayerMenuContainer/Routes/RoutesContainer/RoutesGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.423529, 0.588235, 0.596078, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "ORIGIN"
+
+[node name="DestinationLabel" type="Label" parent="PlayerMenuContainer/Routes/RoutesContainer/RoutesGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.423529, 0.588235, 0.596078, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "DESTINATION"
+
+[node name="ProfitsLabel" type="Label" parent="PlayerMenuContainer/Routes/RoutesContainer/RoutesGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.423529, 0.588235, 0.596078, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "PROFITS"
+
+[node name="CargoLabel" type="Label" parent="PlayerMenuContainer/Routes/RoutesContainer/RoutesGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.423529, 0.588235, 0.596078, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "CARGO"
+
+[node name="ActionsLabel" type="Label" parent="PlayerMenuContainer/Routes/RoutesContainer/RoutesGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.423529, 0.588235, 0.596078, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "ACTIONS"
+
+[node name="Finance" type="Control" parent="PlayerMenuContainer"]
+visible = false
+layout_mode = 2
+mouse_filter = 1
+
+[node name="Resources" type="Control" parent="PlayerMenuContainer"]
+visible = false
+layout_mode = 2
+mouse_filter = 1
+
+[node name="CloseBtn" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -50.0
+offset_bottom = 31.0
+grow_horizontal = 0
+text = "Close Menu"
+
+[connection signal="button_down" from="CloseBtn" to="." method="_on_close_btn_button_down"]

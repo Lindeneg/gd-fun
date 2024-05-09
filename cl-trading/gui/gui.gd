@@ -129,15 +129,19 @@ func create_industry_item(industry: Industry, node: Node) -> void:
 	industry_item.add_child(industry_out_texture);
 	node.add_child(industry_item);
 
-func create_texture(texture: Object) -> TextureRect:
+func create_texture(texture: Object, item_size: Vector2 = Vector2(32, 32)) -> TextureRect:
 	var item = TextureRect.new();
 	item.texture = texture;
-	item.custom_minimum_size = Vector2(32, 32);
+	item.custom_minimum_size = item_size;
+	return item;
+
+func create_label(txt: String) -> Label:
+	var item = Label.new();
+	item.text = txt;
 	return item;
 
 func create_count(count: int) -> Label:
-	var item = Label.new();
-	item.text = "%d" % count;
+	var item = create_label("%d" % count);
 	item.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER;
 	return item;
 

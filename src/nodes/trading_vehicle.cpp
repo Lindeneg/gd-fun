@@ -23,7 +23,7 @@ MAKE_LOG(VEHICLELOG, TradingVehicle)
 const int32_t godot::CL::TradingVehicle::AnimationSize{4};
 const char *godot::CL::TradingVehicle::AnimationNames
     [godot::CL::TradingVehicle::AnimationSize]{"left", "up", "right", "down"};
-const int godot::CL::TradingVehicle::UpkeepTimeout{10};
+const int godot::CL::TradingVehicle::UpkeepTimeout{30};
 
 const char *godot::CL::TradingVehicle::SDestReached{"destination_reached"};
 const char *godot::CL::TradingVehicle::SUpkeepRequired{"upkeep_required"};

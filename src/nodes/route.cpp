@@ -5,8 +5,8 @@
 #include <godot_cpp/core/error_macros.hpp>
 
 #include "../core/utils.h"
+#include "./player_finance.h"
 #include "./trading_vehicle.h"
-#include "player_finance.h"
 
 #ifdef CL_TRADING_DEBUG
 MAKE_LOG(ROUTELOG, Route)

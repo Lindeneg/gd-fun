@@ -136,7 +136,7 @@ start_city = &"Garland"
 
 [node name="LarsFinance" type="PlayerFinance" parent="PlayerManager/PlayerLars"]
 debug = true
-gold = 100
+gold = 500
 
 [node name="Client" type="Node" parent="."]
 

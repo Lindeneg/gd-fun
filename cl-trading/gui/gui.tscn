@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bh4owj8k1r3y0"]
+[gd_scene load_steps=8 format=3 uid="uid://bh4owj8k1r3y0"]
 
 [ext_resource type="Script" path="res://gui/gui.gd" id="1_d1v18"]
 [ext_resource type="Script" path="res://gui/cam_label_timer.gd" id="1_uu4hx"]
 [ext_resource type="PackedScene" uid="uid://da0oc27bh80ic" path="res://gui/city_menu.tscn" id="3_yniq2"]
 [ext_resource type="PackedScene" uid="uid://c83ingpvbre02" path="res://gui/create_route_menu.tscn" id="4_5jou7"]
+[ext_resource type="PackedScene" uid="uid://dthog8s4qoi75" path="res://gui/player_menu.tscn" id="5_ybx7c"]
 
 [sub_resource type="Theme" id="Theme_wa76b"]
 
@@ -24,6 +25,7 @@ script = ExtResource("1_d1v18")
 layer = 2
 
 [node name="PlayerCtx" type="Panel" parent="GUIContainer"]
+visible = false
 custom_minimum_size = Vector2(64, 0)
 anchors_preset = 1
 anchor_left = 1.0
@@ -77,6 +79,10 @@ visible = false
 gui = NodePath("../..")
 
 [node name="CreateRouteMenu" parent="GUIContainer" node_paths=PackedStringArray("gui") instance=ExtResource("4_5jou7")]
+visible = false
+gui = NodePath("../..")
+
+[node name="PlayerMenu" parent="GUIContainer" node_paths=PackedStringArray("gui") instance=ExtResource("5_ybx7c")]
 visible = false
 gui = NodePath("../..")
 
