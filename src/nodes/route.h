@@ -58,6 +58,7 @@ class Route : public Node {
 
     DEBUG_METHODS()
 
+    const static char *SProfitsChanged;
     const static char *SOnloadCargo;
     const static char *SOnloadCargoFinished;
     const static char *SOffloadCargo;
@@ -81,7 +82,10 @@ class Route : public Node {
     TypedArray<CityResource> get_current_cargo() const;
 
     inline int get_total_profits() const { return total_profits_; }
-    inline void add_to_total_profits(const int a) { total_profits_ += a; }
+    inline void add_to_total_profits(const int a) {
+        total_profits_ += a;
+        emit_signal(SProfitsChanged, total_profits_);
+    }
 
     inline Dictionary get_cargo() const { return cargo_; }
     inline void set_cargo(const Dictionary c) { cargo_ = c; }

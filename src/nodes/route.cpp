@@ -12,6 +12,7 @@
 MAKE_LOG(ROUTELOG, Route)
 #endif
 
+const char *godot::CL::Route::SProfitsChanged{"profits-changed"};
 const char *godot::CL::Route::SOnloadCargo{"onload-cargo"};
 const char *godot::CL::Route::SOffloadCargo{"offload-cargo"};
 const char *godot::CL::Route::SOnloadCargoFinished{"onload-finished"};
@@ -324,6 +325,9 @@ void godot::CL::Route::_bind_methods() {
         "Route", MethodInfo(SOnloadCargoFinished,
                             PropertyInfo(Variant::STRING_NAME, "player_name"),
                             PropertyInfo(Variant::STRING_NAME, "route_name")));
+    ClassDB::add_signal(
+        "Route",
+        MethodInfo(SProfitsChanged, PropertyInfo(Variant::INT, "new_amount")));
 
     // BIND ENUMS
     BIND_ENUM_CONSTANT(ROUTE_INACTIVE);

@@ -1,5 +1,13 @@
 class_name PlayerMenu extends Control
 
+enum Tab {
+	Routes = 0,
+	Finance = 1,
+	Resources = 2
+}
+
+const EMPTY_CARGO = -1;
+
 @onready var container: TabContainer = $PlayerMenuContainer;
 @onready var no_routes_label: Label = $PlayerMenuContainer/Routes/NoRoutesCreatedLabel;
 @onready var routes_container: ScrollContainer = $PlayerMenuContainer/Routes/RoutesContainer;
@@ -7,13 +15,15 @@ class_name PlayerMenu extends Control
 
 @export var gui: GUI;
 
-var _clean_up_fns = [];
-
-enum Tab {
-	Routes = 0,
-	Finance = 1,
-	Resources = 2
-}
+var ctx: Dictionary = {
+	Tab.Routes: {},
+	Tab.Finance: {
+		"cleanup": []
+	},
+	Tab.Resources: {
+		"cleanup": []
+	}
+};
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("open_player_menu") and !gui.is_creating_route and !gui.city_menu.visible:
@@ -31,6 +41,27 @@ func _open_menu(tab: int = Tab.Routes) -> void:
 	if tab == Tab.Routes:
 		_render_route_tab();
 
+func _ctx_add_route_item(route_name: String) -> void:
+	ctx[Tab.Routes][route_name] = {
+		"cleanup": [],
+		"container": null,
+		"cargo": {},
+	};
+
+func _ctx_cleanup_tab(tab: Tab) -> void:
+	for fn in ctx[tab]["cleanup"]:
+		fn.call();
+	ctx[tab]["cleanup"] = [];
+
+func _ctx_cleanup() -> void:
+	_ctx_cleanup_tab(Tab.Finance);
+	_ctx_cleanup_tab(Tab.Resources);
+	for route in ctx[Tab.Routes].values():
+		for fn in route["cleanup"]:
+			fn.call();
+		route["cleanup"] = [];
+	ctx[Tab.Routes] = {};
+
 func _render_route_tab() -> void:
 		var routes = gui.route_manager.get_player_routes(gui.player.name);
 		if routes.size() > 0:
@@ -43,11 +74,26 @@ func _render_route_tab() -> void:
 			routes_container.visible = false;
 
 func _create_route_entry(route: Route) -> void:
-	var cargo = _create_cargo_flow_container(route.get_current_cargo(), route.get_vehicle().cargo_space);
+	_ctx_add_route_item(route.name);
+
+	var cargo = _create_cargo_flow_container(route.name, route.get_current_cargo(), route.get_vehicle().cargo_space);
 	var actions = _create_actions_flow_container();
 	var origin = gui.create_label(route.get_start());
 	var destination = gui.create_label(route.get_end());
 	var profits = gui.create_label("%dg" % route.get_total_profits());
+
+	var profits_changed_cb = func on_profits_changed(new_amount: int) -> void:
+		profits.text = "%dg" % new_amount;
+
+	var cargo_added_cb = func on_cargo_added(_player_name: StringName, route_name: StringName, kind: int) -> void:
+		_set_cargo_item(route_name, kind, 1);
+
+	var cargo_removed_cb = func on_cargo_removed(_player_name: StringName, route_name: StringName, kind: int) -> void:
+		_set_cargo_item(route_name, kind, -1);
+
+	route.connect("profits-changed", profits_changed_cb);
+	route.connect("onload-cargo", cargo_added_cb);
+	route.connect("offload-cargo", cargo_removed_cb);
 
 	routes_grid_container.add_child(origin);
 	routes_grid_container.add_child(destination);
@@ -55,40 +101,72 @@ func _create_route_entry(route: Route) -> void:
 	routes_grid_container.add_child(cargo);
 	routes_grid_container.add_child(actions);
 
-	_clean_up_fns.append(Callable(self, "_cleanup_route_entry").bind(
-		origin,
-		destination,
-		profits,
-		cargo,
-		actions
-	));
+	ctx[Tab.Routes][route.name]["cleanup"].append(func clean_up() -> void:
+		route.disconnect("profits-changed", profits_changed_cb);
+		route.disconnect("onload-cargo", cargo_added_cb);
+		route.disconnect("offload-cargo", cargo_removed_cb);
+		routes_grid_container.remove_child(origin);
+		routes_grid_container.remove_child(destination);
+		routes_grid_container.remove_child(profits);
+		routes_grid_container.remove_child(cargo);
+		routes_grid_container.remove_child(actions));
 
-func _cleanup_route_entry(origin: Label, destination: Label, profits: Label, cargo: FlowContainer, actions: FlowContainer) -> void:
-	routes_grid_container.remove_child(origin);
-	routes_grid_container.remove_child(destination);
-	routes_grid_container.remove_child(profits);
-	routes_grid_container.remove_child(cargo);
-	routes_grid_container.remove_child(actions);
-
-func _create_cargo_flow_container(cargo: Array[CityResource], space: int) -> FlowContainer:
+func _create_cargo_flow_container(route_name: String, cargo: Array[CityResource], space: int) -> FlowContainer:
 	var flow_container = FlowContainer.new();
+	ctx[Tab.Routes][route_name]["container"] = flow_container;
 	flow_container.vertical = true;
 
 	var used = 0;
 	var i = 0;
 	while used < space:
-		var kind = -1;
-		var amount = 0;
+		var kind = EMPTY_CARGO;
+		var amount = 1;
 		if cargo.size() > i:
 			var cargo_item: CityResource = cargo[i];
 			kind = cargo_item.resource_kind;
 			amount = cargo_item.amount;
-		var result = _create_cargo_flow_item(kind, amount);
-		flow_container.add_child(result[0]);
-		used += result[1];
+		if ctx[Tab.Routes][route_name]["cargo"].has(kind):
+			var target = ctx[Tab.Routes][route_name]["cargo"][kind];
+			if kind == EMPTY_CARGO:
+				used += 1;
+				target["amount"] += 1;
+			else:
+				var resource = gui.base_resource_manager.get_resource(kind);
+				target["amount"] += amount;
+				used += (amount * resource.weight);
+			target["node"].get_child(0).text = "%d" % target["amount"];
+		elif amount > 0:
+			var result = _create_cargo_flow_item(kind, amount);
+			flow_container.add_child(result[0]);
+			used += result[1];
+			ctx[Tab.Routes][route_name]["cargo"][kind] = {
+				"amount": amount,
+				"node": result[0]
+			};
 		i += 1
 
 	return flow_container;
+
+func _set_cargo_item(route_name: String, kind: int, amount: int, adjust_empty_space: bool = true) -> void:
+	if ctx[Tab.Routes][route_name]["cargo"].has(kind):
+		var target = ctx[Tab.Routes][route_name]["cargo"][kind];
+		var new_amount = target["amount"] + amount;
+		if new_amount <= 0:
+			ctx[Tab.Routes][route_name]["container"].remove_child(target["node"]);
+			ctx[Tab.Routes][route_name]["cargo"].erase(kind);
+		else:
+			target["amount"] = new_amount;
+			target["node"].get_child(0).text = "%d" % new_amount;
+	else:
+		var result = _create_cargo_flow_item(kind, amount);
+		ctx[Tab.Routes][route_name]["container"].add_child(result[0]);
+		ctx[Tab.Routes][route_name]["cargo"][kind] = {
+			"amount": amount,
+			"node": result[0]
+		};
+	if adjust_empty_space:
+		var res = gui.base_resource_manager.get_resource(kind);
+		_set_cargo_item(route_name, EMPTY_CARGO, -(amount * res.weight), false);
 
 func _create_actions_flow_container() -> FlowContainer:
 	var flow_container = FlowContainer.new();
@@ -116,7 +194,7 @@ func _create_cargo_flow_item(kind: int, amount: int) -> Array:
 	var used_space = 1;
 	count_label.add_theme_font_size_override("theme_override_font_sizes/font_size", 12);
 	box.add_child(count_label);
-	if amount == 0:
+	if kind == EMPTY_CARGO:
 		var rect = ReferenceRect.new();
 		rect.editor_only = false;
 		rect.custom_minimum_size = Vector2(16, 16);
@@ -133,9 +211,7 @@ func _create_cargo_flow_item(kind: int, amount: int) -> Array:
 func _close_menu() -> void:
 	container.current_tab = Tab.Routes;
 	visible = false;
-	for fn in _clean_up_fns:
-		fn.call();
-	_clean_up_fns = [];
+	_ctx_cleanup();
 	gui.city_manager.unlock_all_buttons();
 	gui.camera_manager.unlock_cam();
 
