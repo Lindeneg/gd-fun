@@ -15,6 +15,9 @@
 MAKE_M_LOG(ROUTEMLOG, RouteManager)
 #endif
 
+const char *godot::CL::RouteManager::SOnloadRouteCargo{"onload-route-cargo"};
+const char *godot::CL::RouteManager::SOffloadRouteCargo{"offload-route-cargo"};
+
 godot::CL::RouteManager::RouteManager()
     : debug_(false),
       routes_(Dictionary()),
@@ -61,6 +64,7 @@ void godot::CL::RouteManager::handle_offload_cargo_(StringName player_name,
     CityReceiveResult offloaded{city->receive_resource(kind, 1)};
     if (offloaded.amount > 0) {
         route->consume_current_resource(offloaded.amount);
+        emit_signal(SOffloadRouteCargo, player_name, route_name, kind);
         if (offloaded.accepted_amount > 0) {
             handle_player_finance_(route, offloaded, route->get_player(), kind);
         }
@@ -92,6 +96,7 @@ void godot::CL::RouteManager::handle_onload_cargo_(StringName player_name,
         if (current_amount > 0) {
             res->set_current_amount(current_amount - 1);
             route->receive_current_resource(1);
+            emit_signal(SOnloadRouteCargo, player_name, route_name, kind);
         } else {
             handle_onload_finished_(player_name, route_name);
             return;
@@ -238,4 +243,17 @@ void godot::CL::RouteManager::_bind_methods() {
                          &RouteManager::handle_offload_finished_);
     ClassDB::bind_method(D_METHOD("handle_onload_finished_", "p", "r"),
                          &RouteManager::handle_onload_finished_);
+
+    ClassDB::add_signal(
+        "RouteManager",
+        MethodInfo(SOnloadRouteCargo,
+                   PropertyInfo(Variant::STRING_NAME, "player_name"),
+                   PropertyInfo(Variant::STRING_NAME, "route_name"),
+                   PropertyInfo(Variant::INT, "kind")));
+    ClassDB::add_signal(
+        "RouteManager",
+        MethodInfo(SOffloadRouteCargo,
+                   PropertyInfo(Variant::STRING_NAME, "player_name"),
+                   PropertyInfo(Variant::STRING_NAME, "route_name"),
+                   PropertyInfo(Variant::INT, "kind")));
 }

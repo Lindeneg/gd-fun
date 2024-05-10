@@ -42,6 +42,9 @@ class RouteManager : public Node {
     RouteManager();
     ~RouteManager();
 
+    const static char *SOnloadRouteCargo;
+    const static char *SOffloadRouteCargo;
+
     DEBUG_METHODS()
 
     void _enter_tree() override;

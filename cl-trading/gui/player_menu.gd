@@ -25,6 +25,25 @@ var ctx: Dictionary = {
 	}
 };
 
+func _enter_tree() -> void:
+	gui.route_manager.connect("onload-route-cargo", _on_onload_route_cargo);
+	gui.route_manager.connect("offload-route-cargo", _on_offload_route_cargo);
+
+func _exit_tree() -> void:
+	gui.route_manager.disconnect("onload-route-cargo", _on_onload_route_cargo);
+	gui.route_manager.disconnect("offload-route-cargo", _on_offload_route_cargo);
+
+func _on_route_cargo_change(amount: int, player_name: StringName, route_name: StringName, kind: int) -> void:
+	if player_name != gui.player.name:
+		return;
+	_set_cargo_item(route_name, kind, amount);
+
+func _on_onload_route_cargo(player_name: StringName, route_name: StringName, kind: int) -> void:
+	_on_route_cargo_change(1, player_name, route_name, kind);
+
+func _on_offload_route_cargo(player_name: StringName, route_name: StringName, kind: int) -> void:
+	_on_route_cargo_change(-1, player_name, route_name, kind);
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("open_player_menu") and !gui.is_creating_route and !gui.city_menu.visible:
 		if visible:
@@ -85,15 +104,7 @@ func _create_route_entry(route: Route) -> void:
 	var profits_changed_cb = func on_profits_changed(new_amount: int) -> void:
 		profits.text = "%dg" % new_amount;
 
-	var cargo_added_cb = func on_cargo_added(_player_name: StringName, route_name: StringName, kind: int) -> void:
-		_set_cargo_item(route_name, kind, 1);
-
-	var cargo_removed_cb = func on_cargo_removed(_player_name: StringName, route_name: StringName, kind: int) -> void:
-		_set_cargo_item(route_name, kind, -1);
-
 	route.connect("profits-changed", profits_changed_cb);
-	route.connect("onload-cargo", cargo_added_cb);
-	route.connect("offload-cargo", cargo_removed_cb);
 
 	routes_grid_container.add_child(origin);
 	routes_grid_container.add_child(destination);
@@ -103,8 +114,6 @@ func _create_route_entry(route: Route) -> void:
 
 	ctx[Tab.Routes][route.name]["cleanup"].append(func clean_up() -> void:
 		route.disconnect("profits-changed", profits_changed_cb);
-		route.disconnect("onload-cargo", cargo_added_cb);
-		route.disconnect("offload-cargo", cargo_removed_cb);
 		routes_grid_container.remove_child(origin);
 		routes_grid_container.remove_child(destination);
 		routes_grid_container.remove_child(profits);

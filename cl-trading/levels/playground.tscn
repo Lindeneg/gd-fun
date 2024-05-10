@@ -92,8 +92,8 @@ script = ExtResource("3_7n5x5")
 
 [node name="GrainFarm1" parent="ResourceManager" instance=ExtResource("4_t4uab")]
 debug = true
-capacity_amount = 15
-start_amount = 8
+capacity_amount = 2
+start_amount = 2
 size = -1217909447
 position = Vector2(480, 176)
 
