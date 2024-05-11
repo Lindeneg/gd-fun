@@ -34,7 +34,7 @@ func _exit_tree() -> void:
 	gui.route_manager.disconnect("offload-route-cargo", _on_offload_route_cargo);
 
 func _on_route_cargo_change(amount: int, player_name: StringName, route_name: StringName, kind: int) -> void:
-	if player_name != gui.player.name:
+	if !visible or player_name != gui.player.name:
 		return;
 	_set_cargo_item(route_name, kind, amount);
 

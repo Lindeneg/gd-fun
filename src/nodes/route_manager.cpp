@@ -86,6 +86,7 @@ void godot::CL::RouteManager::handle_onload_cargo_(StringName player_name,
         int consumed{city->consume_resource(kind, 1)};
         if (consumed > 0) {
             route->receive_current_resource(consumed);
+            emit_signal(SOnloadRouteCargo, player_name, route_name, kind);
         } else {
             route->go_to_next_cargo();
         }
